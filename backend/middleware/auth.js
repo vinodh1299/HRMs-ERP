@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'keka_clone_jwt_secret_token_2026_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'hrms_platform_jwt_secret_token_2026_key';
 
 export function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];

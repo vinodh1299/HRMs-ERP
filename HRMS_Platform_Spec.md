@@ -1,20 +1,20 @@
 # HRMS + Payroll Platform — Full Technical Specification
-### (Modeled on Keka's module structure)
+### (Modeled on standard modular HRMS structure)
 
 ---
 
 ## 1. Scope & Positioning
 
-Keka isn't one app — it's four bundled products sold as tiers:
+An HRMS platform isn't one app — it's four bundled products sold as tiers:
 
 1. **HRMS & Payroll (CoreHR)** — employee records, attendance, leave, payroll, compliance
 2. **Hiring (ATS)** — recruitment, career page, onboarding
 3. **Performance & Culture** — goals/OKRs, reviews, 360° feedback, engagement
 4. **Projects & Timesheets (PSA)** — project time tracking, billing, profitability
 
-Building "all of Keka" = building all four as independently deployable modules sharing one Core HR data layer (single source of truth for employee records, which every other module reads from).
+Building a complete HRMS platform = building all four as independently deployable modules sharing one Core HR data layer (single source of truth for employee records, which every other module reads from).
 
-**Realistic approach:** build Core HR + Attendance + Leave + Payroll first (this alone is a sellable product for Indian SMBs — matches what you already do for Yuken). Add ATS, Performance, Engagement, PSA in later phases.
+**Realistic approach:** build Core HR + Attendance + Leave + Payroll first (this alone is a sellable product for Indian SMBs). Add ATS, Performance, Engagement, PSA in later phases.
 
 ---
 
@@ -22,17 +22,17 @@ Building "all of Keka" = building all four as independently deployable modules s
 
 | Layer | Recommendation | Why |
 |---|---|---|
-| Backend | **Java 17 + Spring Boot 3** (REST) — or Node.js/Express if you want faster iteration | You already run JSP/Servlet stacks for Yuken; Spring Boot is the natural upgrade path and handles RBAC, scheduled jobs (payroll runs), and validation well |
+| Backend | **Java 17 + Spring Boot 3** (REST) — or Node.js/Express if you want faster iteration | Spring Boot is the natural upgrade path for enterprise-grade modularity and handles RBAC, scheduled jobs (payroll runs), and validation well |
 | Frontend | **React + TypeScript**, Tailwind or MUI | You already build React frontends |
 | Mobile | **Flutter** (attendance punch-in, leave apply, payslip view) | You already ship Flutter apps |
-| DB | **MySQL 8** (or PostgreSQL if you want better JSON/window-function support for reports) | Matches your DreamHost/Yuken MySQL experience |
+| DB | **MySQL 8** (or PostgreSQL if you want better JSON/window-function support for reports) | Matches standard cloud relational DB needs |
 | Auth | JWT + refresh tokens, RBAC (role × module × action) | Multi-tenant needs strict permission layering |
-| File storage | S3-compatible (documents, payslips, resumes) | Keka stores a *lot* of documents per employee |
+| File storage | S3-compatible (documents, payslips, resumes) | HRMS platforms store a *lot* of documents per employee |
 | Background jobs | Spring `@Scheduled` / Quartz, or a queue (BullMQ if Node) | Payroll runs, leave-accrual, reminder emails all need cron-like jobs |
 | PDF generation | iText (Java) / Puppeteer (Node) | Payslips, offer letters, Form 16 |
 | Notifications | Email (SES/SMTP) + push (FCM) + in-app | Approvals, reminders |
 
-**Multi-tenancy decision (important, decide early):** since Keka serves many companies, you need either (a) one schema per tenant, or (b) shared schema with `tenant_id`/`org_id` on every table. For a single-company internal tool (like Yuken), skip multi-tenancy entirely and simplify massively.
+**Multi-tenancy decision (important, decide early):** since SaaS platforms serve many companies, you need either (a) one schema per tenant, or (b) shared schema with `tenant_id`/`org_id` on every table. For a single-company internal tool, skip multi-tenancy entirely and simplify massively.
 
 ---
 
@@ -436,15 +436,15 @@ POST /admin/workflows                     defineApprovalWorkflow()   // e.g. lea
 | 7 | Performance Management + Engagement | Most schema-flexible (JSON-heavy), do last |
 | 8 | Reports & Analytics + PSA (project timesheets/billing) | Needs mature data from all other modules to be meaningful |
 
-For a single developer, Phases 1–4 alone (Core HR + Attendance + Leave + Payroll + ESS) is a legitimate, sellable HRMS product for the Indian SMB market — that's roughly what greytHR and early-stage Keka shipped.
+For a single developer, Phases 1–4 alone (Core HR + Attendance + Leave + Payroll + ESS) is a legitimate, sellable HRMS product for the Indian SMB market — that's roughly what early-stage platforms shipped.
 
 ---
 
-## 6. A Note on the "exactly the same as Keka" goal
+## 6. A Note on standard modular HRMS positioning
 
 Two things worth flagging as you plan this:
 
-1. **UI/branding**: don't clone Keka's exact visual design, logo, or copy — build your own interface on top of the same *functional* blueprint above. That keeps you clean of trademark/copyright issues while still delivering equivalent capability.
+1. **UI/branding**: don't clone specific visual designs, logos, or copy — build your own interface on top of the same *functional* blueprint above. That keeps you clean of trademark/copyright issues while still delivering equivalent capability.
 2. **Compliance modules (PF/ESI/TDS) require careful legal accuracy** — these aren't just code, they need to track government-notified rates and formats, and errors have real financial consequences for whoever uses the software. Budget time to validate against official sources (EPFO, ESIC, Income Tax Dept circulars) each fiscal year rather than treating them as fixed logic.
 
 If you want, I can go deeper on any single module next — e.g. a full ER diagram + migration scripts for Core HR + Attendance + Leave, or the payroll calculation engine logic in detail — since that's the highest-complexity piece.

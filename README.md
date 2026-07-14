@@ -1,13 +1,13 @@
-# Roh HRMS — Keka Clone Platform
+# Roh HRMS — HRMS Platform
 
-A fully functional, responsive, and secure HRMS and Payroll platform clone of Keka. Serves the needs of HR, managers, and employees with clean responsive design interfaces adapting to desktop, tablet, and mobile views.
+A fully functional, responsive, and secure HRMS and Payroll platform. Serves the needs of HR, managers, and employees with clean responsive design interfaces adapting to desktop, tablet, and mobile views.
 
 ---
 
 ## 1. Project Directory Structure
 
 ```text
-keka-clone/
+hrms-erp/
 │
 ├── backend/                  # Node.js + Express REST API Server
 │   ├── db/                   # Database migrations (migrate.js) & seeds (seed.js)
@@ -23,6 +23,7 @@ keka-clone/
     │   ├── providers/        # Riverpod State Management controllers
     │   ├── screens/          # Dashboard, Me, Inbox, My Team, Finances, Org, Engage, Helpdesk screens
     │   └── main.dart         # Entry point defining routes, auth checks, and shell layout
+    │   └── services/         # API Service and database interface
     └── pubspec.yaml          # Project dependency definition
 ```
 
@@ -58,7 +59,7 @@ keka-clone/
     DB_NAME=roh
     DB_USER=root
     DB_PASSWORD=ACAdev@123#
-    JWT_SECRET=keka_clone_jwt_secret_token_2026_key
+    JWT_SECRET=hrms_platform_jwt_secret_token_2026_key
     PORT=3000
     ```
 4.  Run the server:

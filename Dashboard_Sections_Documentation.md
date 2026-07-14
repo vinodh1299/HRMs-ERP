@@ -1,11 +1,11 @@
-# Keka HRMS — Dashboard Screen: Sections & Sub-Sections
+# HRMS Platform — Dashboard Screen: Sections & Sub-Sections
 **Organization:** Asian Christian Academy
 **Screen:** Home → Dashboard
 
 ---
 
 ## 1. Top Navigation Bar
-- Product logo (Keka)
+- Product logo
 - Organization name display
 - Global search bar (search employees or actions, e.g. "Apply Leave")
 - Notifications icon
@@ -90,7 +90,7 @@
 
 ## 7. Sidebar Modules — Sections & Sub-Sections (Verified from ACA screenshots)
 
-*Everything in this section is confirmed directly from your Asian Christian Academy Keka instance (acaindia.keka.com), based on 8 screenshots. Where a sub-tab is visible but its contents weren't captured in a screenshot, it's marked "(not opened in screenshots)".*
+*Everything in this section is confirmed directly from your Asian Christian Academy HRMS instance, based on 8 screenshots. Where a sub-tab is visible but its contents weren't captured in a screenshot, it's marked "(not opened in screenshots)".*
 
 ### 7.1 Me
 Top-level tabs inside **Me**: **Attendance | Leave | Performance | Expenses & Travel | Helpdesk | Apps**
@@ -182,4 +182,4 @@ Tabs: **Summary | Tickets | Reports**
 
 ---
 
-*Note: This is now grounded in your actual Keka instance rather than generic research. A few sub-tabs weren't opened in the screenshots you sent (Me → Leave/Performance/Expenses & Travel/Apps, My Finances → My Pay/Manage Tax, Org → Documents/Hiring, Engage → Polls/Articles, Helpdesk → Tickets/Reports). If you send screenshots of those, I'll fill in the remaining gaps to make this fully complete.*
+*Note: This is now grounded in your actual HRMS instance rather than generic research. A few sub-tabs weren't opened in the screenshots you sent (Me → Leave/Performance/Expenses & Travel/Apps, My Finances → My Pay/Manage Tax, Org → Documents/Hiring, Engage → Polls/Articles, Helpdesk → Tickets/Reports). If you send screenshots of those, I'll fill in the remaining gaps to make this fully complete.*

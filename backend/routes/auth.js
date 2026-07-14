@@ -5,7 +5,7 @@ import pool from '../db/db.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'keka_clone_jwt_secret_token_2026_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'hrms_platform_jwt_secret_token_2026_key';
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {

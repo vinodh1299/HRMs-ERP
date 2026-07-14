@@ -1,7 +1,7 @@
 {
-  "name": "keka-clone-backend",
+  "name": "hrms-erp-backend",
   "version": "1.0.0",
-  "description": "HRMS Platform (Keka Clone) Backend REST API",
+  "description": "HRMS Platform Backend REST API",
   "main": "server.js",
   "type": "module",
   "scripts": {
