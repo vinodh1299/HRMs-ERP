@@ -69,6 +69,142 @@ class NavigationShell extends ConsumerWidget {
     }
   }
 
+  int _getMobileSelectedIndex(String location) {
+    if (location == '/' || location.startsWith('/stubs/dashboard')) return 0;
+    if (location.startsWith('/me')) return 1;
+    if (location.startsWith('/inbox')) return 2;
+    if (location.startsWith('/helpdesk')) return 3;
+    return 4; // 'More'
+  }
+
+  void _onMobileItemTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.go('/');
+        break;
+      case 1:
+        context.go('/me');
+        break;
+      case 2:
+        context.go('/inbox');
+        break;
+      case 3:
+        context.go('/helpdesk');
+        break;
+      case 4:
+        _showMobileMoreSheet(context);
+        break;
+    }
+  }
+
+  void _showMobileMoreSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Pull bar indicator
+              Container(
+                width: 38,
+                height: 4.5,
+                decoration: BoxDecoration(
+                  color: AppTheme.borderGrey,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'More Modules',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textDark,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Flexible(
+                child: GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 0.95,
+                  children: [
+                    _buildMoreGridItem(context, 'My Team', Icons.people_outline, Colors.orange, '/myteam'),
+                    _buildMoreGridItem(context, 'Finances', Icons.account_balance_wallet_outlined, Colors.green, '/myfinances'),
+                    _buildMoreGridItem(context, 'Org', Icons.corporate_fare_outlined, AppTheme.primary, '/org'),
+                    _buildMoreGridItem(context, 'Engage', Icons.campaign_outlined, AppTheme.secondary, '/engage'),
+                    _buildMoreGridItem(context, 'Performance', Icons.speed, Colors.teal, '/stubs/performance'),
+                    _buildMoreGridItem(context, 'Recruitment', Icons.work_outline, Colors.blue, '/stubs/recruitment'),
+                    _buildMoreGridItem(context, 'Expenses', Icons.receipt_long_outlined, Colors.purple, '/stubs/expenses'),
+                    _buildMoreGridItem(context, 'Assets', Icons.devices, Colors.indigo, '/stubs/assets'),
+                    _buildMoreGridItem(context, 'Reports', Icons.bar_chart_outlined, Colors.red, '/stubs/reports'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMoreGridItem(BuildContext context, String title, IconData icon, Color color, String path) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context); // Close sheet
+          context.go(path); // Navigate
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withOpacity(0.12), width: 1),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textDark,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = _getSelectedIndex(context);
@@ -168,6 +304,9 @@ class NavigationShell extends ConsumerWidget {
     );
 
     if (isMobile) {
+      final location = GoRouterState.of(context).matchedLocation;
+      final mobileSelectedIndex = _getMobileSelectedIndex(location);
+
       return Scaffold(
         appBar: appBar,
         body: child,
@@ -176,14 +315,36 @@ class NavigationShell extends ConsumerWidget {
           backgroundColor: Colors.white,
           selectedItemColor: AppTheme.primary,
           unselectedItemColor: AppTheme.textMuted,
-          currentIndex: selectedIndex < _navItems.length ? selectedIndex : 0,
-          onTap: (index) => _onItemTapped(context, index),
-          items: _navItems.map((item) {
-            return BottomNavigationBarItem(
-              icon: Icon(item.icon),
-              label: item.title,
-            );
-          }).toList(),
+          currentIndex: mobileSelectedIndex,
+          onTap: (index) => _onMobileItemTapped(context, index),
+          selectedLabelStyle: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: const TextStyle(fontSize: 10.5),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Me',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.inbox_outlined),
+              activeIcon: Icon(Icons.inbox),
+              label: 'Inbox',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.help_outline),
+              activeIcon: Icon(Icons.help),
+              label: 'Helpdesk',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.more_horiz),
+              label: 'More',
+            ),
+          ],
         ),
       );
     }
