@@ -1,0 +1,15 @@
+# Root GitIgnore
+.DS_Store
+*.log
+
+# Backend Node modules and local environment variables
+backend/node_modules/
+backend/.env
+
+# Frontend Flutter/Dart build files and dependencies
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.pub/
+frontend/.pub-cache/
+frontend/build/
