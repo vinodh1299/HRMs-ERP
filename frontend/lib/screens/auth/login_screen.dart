@@ -21,37 +21,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() async {
-    final input = _emailController.text.trim();
-    if (input.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an email or username')),
-      );
-      return;
-    }
-
+  void _submit(String method) async {
     setState(() {
       _isLoading = true;
     });
 
-    // Simulated short delay
-    await Future.delayed(const Duration(milliseconds: 600));
+    // Simulated short delay for presentation realism
+    await Future.delayed(const Duration(milliseconds: 400));
 
     if (!mounted) return;
 
-    // Use default fallback credentials for simulation
-    String email = 'employee@acaindia.org';
-    String password = 'employee123';
-
-    if (input.contains('admin')) {
-      email = 'admin@acaindia.org';
-      password = 'admin123';
-    } else if (input.contains('manager')) {
-      email = 'manager@acaindia.org';
-      password = 'manager123';
-    }
-
-    final success = await ref.read(authProvider.notifier).login(email, password);
+    // Direct dummy sign in as standard employee profile
+    final success = await ref.read(authProvider.notifier).login(
+          'employee@acaindia.org',
+          'employee123',
+        );
 
     setState(() {
       _isLoading = false;
@@ -59,172 +43,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Successfully authenticated'),
+        SnackBar(
+          content: Text('Successfully authenticated via $method (Demo Mode)'),
           backgroundColor: Colors.green,
         ),
       );
     }
-  }
-
-  void _showMicrosoftPopup() {
-    final msEmailController = TextEditingController();
-    final msPassController = TextEditingController();
-    bool showPasswordStep = false;
-    bool isMsLoading = false;
-
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              elevation: 24,
-              child: Container(
-                width: 440,
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 44),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Microsoft Quad Logo
-                    _buildMicrosoftLogo(size: 34),
-                    const SizedBox(height: 24),
-                    Text(
-                      showPasswordStep ? 'Enter password' : 'Sign in',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF262626),
-                        fontFamily: 'Segoe UI',
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    if (!showPasswordStep) ...[
-                      TextField(
-                        controller: msEmailController,
-                        decoration: const InputDecoration(
-                          hintText: 'Email, phone, or Skype',
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF0067B8), width: 2),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF0067B8), width: 2),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 8),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      const Text(
-                        "No account? Create one!",
-                        style: TextStyle(color: Color(0xFF0067B8), fontSize: 13),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Can't access your account?",
-                        style: TextStyle(color: Color(0xFF0067B8), fontSize: 13),
-                      ),
-                    ] else ...[
-                      Text(
-                        msEmailController.text,
-                        style: const TextStyle(fontSize: 14, color: Color(0xFF262626)),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: msPassController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          hintText: 'Password',
-                          border: UnderlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(vertical: 8),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      const Text(
-                        "Forgot password?",
-                        style: TextStyle(color: Color(0xFF0067B8), fontSize: 13),
-                      ),
-                    ],
-                    const SizedBox(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (showPasswordStep)
-                          OutlinedButton(
-                            onPressed: () {
-                              setDialogState(() {
-                                showPasswordStep = false;
-                              });
-                            },
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: const Color(0xFFCCCCCC),
-                              side: BorderSide.none,
-                              shape: const RoundedRectangleBorder(),
-                            ),
-                            child: const Text('Back', style: TextStyle(color: Colors.black)),
-                          ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: isMsLoading
-                              ? null
-                              : () async {
-                                  if (!showPasswordStep) {
-                                    if (msEmailController.text.trim().isEmpty) return;
-                                    setDialogState(() {
-                                      showPasswordStep = true;
-                                    });
-                                  } else {
-                                    if (msPassController.text.trim().isEmpty) return;
-                                    setDialogState(() {
-                                      isMsLoading = true;
-                                    });
-                                    await Future.delayed(const Duration(milliseconds: 800));
-                                    if (!mounted) return;
-                                    Navigator.pop(context); // Close dialog
-                                    // Log in user as generic Admin/Employee
-                                    final success = await ref.read(authProvider.notifier).login(
-                                          msEmailController.text.trim().contains('admin')
-                                              ? 'admin@acaindia.org'
-                                              : 'employee@acaindia.org',
-                                          'employee123',
-                                        );
-                                    if (success) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Successfully authenticated via Microsoft Entra ID'),
-                                          backgroundColor: Colors.green,
-                                        ),
-                                      );
-                                    }
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0067B8),
-                            foregroundColor: Colors.white,
-                            shape: const RoundedRectangleBorder(),
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                          ),
-                          child: isMsLoading
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                )
-                              : Text(showPasswordStep ? 'Sign in' : 'Next'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 
   Widget _buildMicrosoftLogo({double size = 16}) {
@@ -247,14 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildGoogleLogo() {
-    return Image.asset(
-      'assets/logo.png', // Fallback to app logo, styled as google colors or circular badge
-      height: 20,
-      width: 20,
-      errorBuilder: (context, error, stackTrace) {
-        return const Icon(Icons.g_mobiledata_rounded, color: Colors.blue, size: 24);
-      },
-    );
+    return const Icon(Icons.g_mobiledata_rounded, color: Colors.blue, size: 24);
   }
 
   @override
@@ -303,7 +120,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 14),
                 // Continue Button
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _submit,
+                  onPressed: _isLoading ? null : () => _submit('Username/Email'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF5E4EBD),
                     padding: const EdgeInsets.symmetric(vertical: 18),
@@ -347,45 +164,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 _buildSocialButton(
                   icon: const Icon(Icons.phone_iphone_outlined, color: Colors.blue, size: 20),
                   label: 'Continue with Mobile',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Simulated OTP sign-in triggered')),
-                    );
-                  },
+                  onTap: () => _submit('Mobile Verification'),
                 ),
                 const SizedBox(height: 12),
                 // Continue with Microsoft
                 _buildSocialButton(
                   icon: _buildMicrosoftLogo(size: 16),
                   label: 'Continue with Microsoft',
-                  onTap: _showMicrosoftPopup,
+                  onTap: () => _submit('Microsoft Entra ID'),
                 ),
                 const SizedBox(height: 12),
                 // Continue with Google
                 _buildSocialButton(
                   icon: _buildGoogleLogo(),
                   label: 'Continue with Google',
-                  onTap: () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    await Future.delayed(const Duration(milliseconds: 600));
-                    final success = await ref.read(authProvider.notifier).login(
-                          'employee@acaindia.org',
-                          'employee123',
-                        );
-                    setState(() {
-                      _isLoading = false;
-                    });
-                    if (success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Successfully authenticated via Google account simulation'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
-                  },
+                  onTap: () => _submit('Google Accounts'),
                 ),
               ],
             ),
