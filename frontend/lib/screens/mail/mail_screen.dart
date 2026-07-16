@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/responsive.dart';
 import '../../core/theme.dart';
+import '../../core/date_parser_helper.dart';
 
 class EmailMessage {
   final String id;
@@ -51,7 +53,7 @@ class _MailScreenState extends State<MailScreen> {
       senderEmail: 'john.doe@acaindia.org',
       subject: 'Updated Video Stream Guidelines for Sunday',
       snippet: 'Please review the updated guidelines for streaming setup.',
-      body: 'Hi Team,\n\nI have updated the Sunday stream configurations in the console. Please ensure the audio bitrate is locked to 192kbps and the camera feeds are balanced.\n\nLet me know if you run into any issues during testing.\n\nBest regards,\nJohn',
+      body: 'Hi Team,\n\nI have updated the Sunday stream configurations in the console. Please ensure the audio bitrate is locked to 192kbps and the camera feeds are balanced.\n\nOur next stream testing will happen on 13 sep 2026. Please prepare.\n\nBest regards,\nJohn',
       date: DateTime.now().subtract(const Duration(hours: 2)),
       isUnread: true,
     ),
@@ -61,7 +63,7 @@ class _MailScreenState extends State<MailScreen> {
       senderEmail: 'hr@acaindia.org',
       subject: 'Holiday Calendar 2026 Updates',
       snippet: 'The holiday schedule has been adjusted for the upcoming quarter.',
-      body: 'Dear Employees,\n\nPlease find attached the revised holiday calendar for Q3 2026. The regional holiday for mid-August has been approved.\n\nYou can also check the upcoming holidays directly on your Portal Dashboard home page.\n\nWarm regards,\nHR Department',
+      body: 'Dear Employees,\n\nPlease find attached the revised holiday calendar for Q3 2026. The regional holiday for mid-August has been approved.\n\nThe annual day rehearsals start on 12 august. The setup planning begins tomorrow morning 10AM.\n\nYou can also check the upcoming holidays directly on your Portal Dashboard home page.\n\nWarm regards,\nHR Department',
       date: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];
@@ -396,9 +398,15 @@ class _MailScreenState extends State<MailScreen> {
           const SizedBox(height: 18),
           Expanded(
             child: SingleChildScrollView(
-              child: Text(
-                email.body,
-                style: const TextStyle(fontSize: 14, color: AppTheme.textDark, height: 1.5),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  return DateParserHelper.buildClickableText(
+                    context,
+                    ref,
+                    email.body,
+                    style: const TextStyle(fontSize: 14, color: AppTheme.textDark, height: 1.5),
+                  );
+                },
               ),
             ),
           ),

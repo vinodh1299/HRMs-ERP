@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/responsive.dart';
 import '../../core/theme.dart';
+import '../../core/date_parser_helper.dart';
 
 class ChatMessage {
   final String sender;
@@ -67,11 +69,11 @@ class _ChatScreenState extends State<ChatScreen> {
       ChatMessage(sender: 'Accounts', text: 'Please upload bills before the 25th of this month.', timestamp: DateTime.now().subtract(const Duration(days: 1)), isMe: false),
     ],
     'Vinodh': [
-      ChatMessage(sender: 'Vinodh', text: 'Hey there! How is the new navigation bar layout looking?', timestamp: DateTime.now().subtract(const Duration(minutes: 30)), isMe: false),
+      ChatMessage(sender: 'Vinodh', text: 'Hey there! How is the new navigation bar layout looking? Our review is on 13 sep 2026.', timestamp: DateTime.now().subtract(const Duration(minutes: 30)), isMe: false),
       ChatMessage(sender: 'Me', text: 'Looking super clean! The More bottom sheet works great.', timestamp: DateTime.now().subtract(const Duration(minutes: 25)), isMe: true),
     ],
     'John Doe': [
-      ChatMessage(sender: 'John Doe', text: 'Are we testing the attendance punches today?', timestamp: DateTime.now().subtract(const Duration(hours: 1)), isMe: false),
+      ChatMessage(sender: 'John Doe', text: 'Are we testing the attendance punches today? Let\'s test today afternoon 3pm.', timestamp: DateTime.now().subtract(const Duration(hours: 1)), isMe: false),
     ],
     'Jane Smith': [],
     'Alice Cooper': [],
@@ -323,12 +325,18 @@ class _ChatScreenState extends State<ChatScreen> {
                 bottomRight: msg.isMe ? Radius.zero : const Radius.circular(12),
               ),
             ),
-            child: Text(
-              msg.text,
-              style: TextStyle(
-                color: msg.isMe ? Colors.white : AppTheme.textDark,
-                fontSize: 13.5,
-              ),
+            child: Consumer(
+              builder: (context, ref, child) {
+                return DateParserHelper.buildClickableText(
+                  context,
+                  ref,
+                  msg.text,
+                  style: TextStyle(
+                    color: msg.isMe ? Colors.white : AppTheme.textDark,
+                    fontSize: 13.5,
+                  ),
+                );
+              },
             ),
           ),
         ],

@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/responsive.dart';
 import '../../core/theme.dart';
+import '../../core/date_parser_helper.dart';
 import '../../models/leave.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/attendance_provider.dart';
 import '../../providers/leave_provider.dart';
+import '../../providers/events_provider.dart';
 import '../../services/api_service.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -27,6 +29,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   String _selectedWorkMode = 'Office';
   late Timer _timer;
   String _currentTime = '';
+  final List<Map<String, String>> _recentTickets = [
+    {
+      'dept': 'Maintenance',
+      'service': 'Light bulb change',
+      'desc': 'Please replace the faulty tube light in classroom 3B by 13 sep 2026.',
+      'status': 'Pending'
+    },
+    {
+      'dept': 'Media',
+      'service': 'Live stream setup',
+      'desc': 'Audio mixer testing scheduled for tomorrow morning 10AM.',
+      'status': 'In Progress'
+    }
+  ];
 
   @override
   void initState() {
@@ -83,6 +99,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       {'name': 'HR', 'icon': Icons.badge_outlined, 'color': Colors.pink},
       {'name': 'Inventory', 'icon': Icons.inventory_2_outlined, 'color': Colors.teal},
       {'name': 'HOB', 'icon': Icons.cookie_outlined, 'color': Colors.orange},
+      {'name': 'IT', 'icon': Icons.computer_outlined, 'color': Colors.indigo},
     ];
 
     return Column(
@@ -161,6 +178,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       'HR': ['Leave policy query', 'Address proof request', 'Update bank details', 'Provident fund issue'],
       'Inventory': ['Request laptop accessories', 'Stationary requisition', 'Office chair replacement'],
       'HOB': ['Event catering order', 'Bread order placement', 'Pantry issue report', 'Kitchen cleaning request'],
+      'IT': ['Software installation request', 'Hardware troubleshooting', 'Network & VPN access', 'Email / account setup'],
     };
 
     final Map<String, List<Map<String, dynamic>>> presence = {
@@ -194,6 +212,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         {'name': 'Chef Pierre', 'status': 'IN'},
         {'name': 'Assistant Jean', 'status': 'IN'},
         {'name': 'Gaston Cleaner', 'status': 'OUT'},
+      ],
+      'IT': [
+        {'name': 'Linus Torvalds', 'status': 'IN'},
+        {'name': 'Steve Wozniak', 'status': 'IN'},
+        {'name': 'Guido van Rossum', 'status': 'OUT'},
       ],
     };
 
@@ -347,7 +370,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      if (descController.text.trim().isEmpty) return;
+                      final desc = descController.text.trim();
+                      if (desc.isEmpty) return;
+                      
+                      setState(() {
+                        _recentTickets.insert(0, {
+                          'dept': deptName,
+                          'service': selectedService,
+                          'desc': desc,
+                          'status': 'Pending'
+                        });
+                      });
+
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -366,6 +400,64 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  const Divider(height: 1, color: AppTheme.borderGrey),
+                  const SizedBox(height: 16),
+                  Text(
+                    'RECENT TICKETS FOR $deptName',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textMuted,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ..._recentTickets.where((t) => t['dept'] == deptName).map((t) {
+                    return Card(
+                      color: AppTheme.bgLight,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  t['service']!,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: t['status'] == 'Pending' ? Colors.amber.withOpacity(0.12) : Colors.blue.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    t['status']!,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: t['status'] == 'Pending' ? Colors.amber[800] : Colors.blue[800],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            DateParserHelper.buildClickableText(
+                              context,
+                              ref,
+                              t['desc']!,
+                              style: const TextStyle(fontSize: 12.5, color: AppTheme.textBody),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ],
               ),
             );
@@ -420,6 +512,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         _buildTimeTodayWidget(),
         const SizedBox(height: 16),
         _buildLeaveBalancesWidget(),
+        const SizedBox(height: 16),
+        const InteractiveCalendarWidget(),
         const SizedBox(height: 16),
         _buildHolidaysWidget(),
       ],
@@ -1176,4 +1270,371 @@ class _DotGridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Interactive Calendar & Blinking Event Widgets ────────────────────────────
+
+class BlinkingContainer extends StatefulWidget {
+  final Widget child;
+  const BlinkingContainer({required this.child, super.key});
+
+  @override
+  State<BlinkingContainer> createState() => _BlinkingContainerState();
+}
+
+class _BlinkingContainerState extends State<BlinkingContainer> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: const Color(0xFFD97706).withOpacity(_controller.value),
+              width: 2.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFD97706).withOpacity(_controller.value * 0.25),
+                blurRadius: 4,
+                spreadRadius: 1,
+              )
+            ],
+          ),
+          child: widget.child,
+        );
+      },
+    );
+  }
+}
+
+class InteractiveCalendarWidget extends ConsumerStatefulWidget {
+  const InteractiveCalendarWidget({super.key});
+
+  @override
+  ConsumerState<InteractiveCalendarWidget> createState() => _InteractiveCalendarWidgetState();
+}
+
+class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarWidget> {
+  late DateTime _currentMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentMonth = DateTime.now();
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 1);
+    });
+  }
+
+  void _prevMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1, 1);
+    });
+  }
+
+  int _daysInMonth(DateTime date) {
+    final nextMonth = DateTime(date.year, date.month + 1, 1);
+    final lastDay = nextMonth.subtract(const Duration(days: 1));
+    return lastDay.day;
+  }
+
+  String _shortEventTitle(String title) {
+    if (title.length <= 8) return title;
+    final words = title.split(' ');
+    if (words.length > 1) {
+      final lastWord = words.last.trim();
+      if (lastWord.length <= 8) return lastWord;
+      final firstWord = words.first.trim();
+      if (firstWord.length <= 8) return firstWord;
+    }
+    return title.length > 8 ? '${title.substring(0, 7)}…' : title;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final events = ref.watch(eventsProvider);
+    final now = DateTime.now();
+    final year = _currentMonth.year;
+    final month = _currentMonth.month;
+
+    final firstDayOfMonth = DateTime(year, month, 1);
+    final totalDays = _daysInMonth(_currentMonth);
+    final startOffset = firstDayOfMonth.weekday % 7;
+
+    final monthName = DateFormat('MMMM yyyy').format(_currentMonth);
+    const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+    return Card(
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left_rounded, size: 20),
+                  onPressed: _prevMonth,
+                ),
+                Text(
+                  monthName,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textDark),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right_rounded, size: 20),
+                  onPressed: _nextMonth,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: weekdays.map((day) {
+                return SizedBox(
+                  width: 32,
+                  child: Text(
+                    day,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textMuted,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 8),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: startOffset + totalDays,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                mainAxisSpacing: 6,
+                crossAxisSpacing: 6,
+                childAspectRatio: 1.0,
+              ),
+              itemBuilder: (context, index) {
+                if (index < startOffset) {
+                  return const SizedBox.shrink();
+                }
+
+                final dayNum = index - startOffset + 1;
+                final targetDate = DateTime(year, month, dayNum);
+                final isToday = targetDate.year == now.year &&
+                    targetDate.month == now.month &&
+                    targetDate.day == now.day;
+
+                final dayEvents = events.where((e) {
+                  return e.date.year == targetDate.year &&
+                      e.date.month == targetDate.month &&
+                      e.date.day == targetDate.day;
+                }).toList();
+
+                final hasEvents = dayEvents.isNotEmpty;
+
+                Widget dayCell = Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isToday ? AppTheme.primary : (hasEvents ? const Color(0xFFFEF3C7) : Colors.transparent),
+                    borderRadius: BorderRadius.circular(8),
+                    border: isToday
+                        ? null
+                        : Border.all(
+                            color: hasEvents ? const Color(0xFFF59E0B) : Colors.transparent,
+                            width: 1,
+                          ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$dayNum',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: isToday
+                              ? Colors.white
+                              : (hasEvents ? const Color(0xFFB45309) : AppTheme.textDark),
+                        ),
+                      ),
+                      if (hasEvents)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Text(
+                            _shortEventTitle(dayEvents.first.title),
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFB45309),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+
+                if (hasEvents) {
+                  dayCell = BlinkingContainer(child: dayCell);
+                }
+
+                return InkWell(
+                  onTap: () {
+                    if (hasEvents) {
+                      _showDayEventsDialog(context, targetDate, dayEvents);
+                    } else {
+                      _showAddEventDirectDialog(context, targetDate);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: dayCell,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDayEventsDialog(BuildContext context, DateTime date, List<CalendarEvent> dayEvents) {
+    final dateStr = DateFormat('EEEE, d MMMM yyyy').format(date);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Scheduled Events',
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dateStr,
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+              ),
+              const SizedBox(height: 12),
+              ...dayEvents.map((e) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFFD97706)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          e.title,
+                          style: const TextStyle(fontWeight: FontWeight.w500, color: AppTheme.textDark),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _showAddEventDirectDialog(context, date);
+              },
+              child: const Text('Add Event'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddEventDirectDialog(BuildContext context, DateTime date) {
+    final textController = TextEditingController();
+    final dateStr = DateFormat('d MMMM yyyy').format(date);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Schedule Event',
+            style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Date: $dateStr',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: textController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Event Details',
+                  hintText: 'e.g. Annual day rehearsals',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final title = textController.text.trim();
+                if (title.isNotEmpty) {
+                  ref.read(eventsProvider.notifier).addEvent(date, title);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Scheduled "$title" on $dateStr!'),
+                      backgroundColor: AppTheme.successGreen,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save Event'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
