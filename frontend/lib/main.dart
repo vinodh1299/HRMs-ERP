@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'core/theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/dashboard_screen.dart';
 import 'screens/me/me_dashboard.dart';
@@ -90,9 +91,13 @@ class MyApp extends ConsumerWidget {
       ],
     );
 
+    final themeMode = ref.watch(themeProvider);
+
     return MaterialApp.router(
       title: 'ACA Portal',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

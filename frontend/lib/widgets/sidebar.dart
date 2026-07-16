@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/responsive.dart';
 import '../core/theme.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 
 class NavItem {
   final String title;
@@ -261,7 +262,11 @@ class NavigationShell extends ConsumerWidget {
           ],
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'logout') ref.read(authProvider.notifier).logout();
+              if (value == 'toggle_theme') {
+                ref.read(themeProvider.notifier).toggleTheme();
+              } else if (value == 'logout') {
+                ref.read(authProvider.notifier).logout();
+              }
             },
             offset: const Offset(0, 44),
             child: Container(
@@ -282,16 +287,34 @@ class NavigationShell extends ConsumerWidget {
                 const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white70, size: 16),
               ]),
             ),
-            itemBuilder: (context) => [
-              const PopupMenuItem<String>(
-                value: 'logout',
-                child: Row(children: [
-                  Icon(Icons.logout_rounded, color: Colors.red, size: 18),
-                  SizedBox(width: 8),
-                  Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
-                ]),
-              ),
-            ],
+            itemBuilder: (context) {
+              final isDark = ref.watch(themeProvider) == ThemeMode.dark;
+              return [
+                PopupMenuItem<String>(
+                  value: 'toggle_theme',
+                  child: Row(
+                    children: [
+                      Icon(
+                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                        color: isDark ? Colors.amber : Colors.grey[700],
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(isDark ? 'Light Theme' : 'Dark Theme', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(height: 1),
+                const PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(children: [
+                    Icon(Icons.logout_rounded, color: Colors.red, size: 18),
+                    SizedBox(width: 8),
+                    Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 13)),
+                  ]),
+                ),
+              ];
+            },
           ),
         ],
       ),
