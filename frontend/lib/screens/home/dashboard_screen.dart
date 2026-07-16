@@ -74,6 +74,307 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     } catch (_) {}
   }
 
+  Widget _buildDepartmentPortalsRow() {
+    final list = [
+      {'name': 'Media', 'icon': Icons.video_camera_back_outlined, 'color': Colors.blue},
+      {'name': 'Maintenance', 'icon': Icons.build_outlined, 'color': Colors.amber},
+      {'name': 'Finance', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.green},
+      {'name': 'CPD', 'icon': Icons.school_outlined, 'color': Colors.purple},
+      {'name': 'HR', 'icon': Icons.badge_outlined, 'color': Colors.pink},
+      {'name': 'Inventory', 'icon': Icons.inventory_2_outlined, 'color': Colors.teal},
+      {'name': 'HOB', 'icon': Icons.cookie_outlined, 'color': Colors.orange},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          child: Text(
+            'DEPARTMENT PORTALS',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textMuted,
+              letterSpacing: 1.1,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 90,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              final dept = list[index];
+              final name = dept['name'] as String;
+              final icon = dept['icon'] as IconData;
+              final color = dept['color'] as Color;
+
+              return Container(
+                margin: const EdgeInsets.only(right: 12),
+                width: 95,
+                child: Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: AppTheme.borderGrey, width: 1),
+                  ),
+                  color: color.withOpacity(0.05),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => _openDepartmentSheet(context, name, icon, color),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(icon, color: color, size: 24),
+                        const SizedBox(height: 6),
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textDark,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _openDepartmentSheet(BuildContext context, String deptName, IconData icon, Color color) {
+    final Map<String, List<String>> services = {
+      'Media': ['Video editing request', 'Livestream setup', 'AV equipment request', 'Photography booking'],
+      'Maintenance': ['Light bulb change', 'Plumbing repair', 'Carpentry fix', 'AC maintenance', 'Electrical issues'],
+      'Finance': ['Expense reimbursement', 'Invoice processing request', 'Salary discrepancy query', 'Tax declaration support'],
+      'CPD': ['Register for workshop', 'Course material request', 'Certificate collection', 'Training log approval'],
+      'HR': ['Leave policy query', 'Address proof request', 'Update bank details', 'Provident fund issue'],
+      'Inventory': ['Request laptop accessories', 'Stationary requisition', 'Office chair replacement'],
+      'HOB': ['Event catering order', 'Bread order placement', 'Pantry issue report', 'Kitchen cleaning request'],
+    };
+
+    final Map<String, List<Map<String, dynamic>>> presence = {
+      'Media': [
+        {'name': 'John Doe', 'status': 'IN'},
+        {'name': 'Sarah Connor', 'status': 'IN'},
+        {'name': 'David Miller', 'status': 'OUT'},
+      ],
+      'Maintenance': [
+        {'name': 'Peter Parker', 'status': 'IN'},
+        {'name': 'Robert Bruce', 'status': 'OUT'},
+        {'name': 'Tony Stark', 'status': 'IN'},
+      ],
+      'Finance': [
+        {'name': 'Grace Hopper', 'status': 'IN'},
+        {'name': 'Charles Babbage', 'status': 'OUT'},
+      ],
+      'CPD': [
+        {'name': 'James Gosling', 'status': 'IN'},
+        {'name': 'Ada Lovelace', 'status': 'IN'},
+      ],
+      'HR': [
+        {'name': 'Emma Watson', 'status': 'IN'},
+        {'name': 'Paul Rudd', 'status': 'OUT'},
+      ],
+      'Inventory': [
+        {'name': 'Wilson Fisk', 'status': 'IN'},
+        {'name': 'Steven Rogers', 'status': 'OUT'},
+      ],
+      'HOB': [
+        {'name': 'Chef Pierre', 'status': 'IN'},
+        {'name': 'Assistant Jean', 'status': 'IN'},
+        {'name': 'Gaston Cleaner', 'status': 'OUT'},
+      ],
+    };
+
+    final deptServices = services[deptName] ?? ['General Support Request'];
+    final deptPresence = presence[deptName] ?? [{'name': 'Staff Member', 'status': 'IN'}];
+
+    String selectedService = deptServices.first;
+    final descController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppTheme.borderGrey,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(icon, color: color, size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        '$deptName Portal',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Section 1: Team Presence
+                  Text(
+                    'TEAM PRESENCE',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textMuted,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: deptPresence.map((p) {
+                      final name = p['name'] as String;
+                      final isIN = p['status'] == 'IN';
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isIN ? Colors.green.withOpacity(0.06) : Colors.red.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isIN ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: isIN ? Colors.green : Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: isIN ? Colors.green[800] : Colors.red[800],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 24),
+                  // Section 2: Helpdesk Ticket
+                  Text(
+                    'RAISE SERVICE TICKET',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textMuted,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: selectedService,
+                    decoration: const InputDecoration(
+                      labelText: 'Select Service Required',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    items: deptServices.map((String service) {
+                      return DropdownMenuItem<String>(
+                        value: service,
+                        child: Text(service, style: const TextStyle(fontSize: 13.5)),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setModalState(() {
+                          selectedService = val;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: descController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Description / Remarks',
+                      alignLabelWithHint: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (descController.text.trim().isEmpty) return;
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Ticket created successfully for $deptName ($selectedService)'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Submit Ticket Request',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
@@ -127,6 +428,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final rightColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _buildDepartmentPortalsRow(),
+        const SizedBox(height: 16),
         _buildAnnouncementsFeed(),
         const SizedBox(height: 16),
         _buildCelebrationsWidget(),

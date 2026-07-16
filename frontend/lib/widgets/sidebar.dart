@@ -25,12 +25,9 @@ class NavigationShell extends ConsumerWidget {
   static const List<NavItem> _navItems = [
     NavItem(title: 'Home', icon: Icons.home_outlined, path: '/'),
     NavItem(title: 'Me', icon: Icons.person_outline, path: '/me'),
-    NavItem(title: 'Inbox', icon: Icons.inbox_outlined, path: '/inbox'),
-    NavItem(title: 'My Team', icon: Icons.people_outline, path: '/myteam'),
-    NavItem(title: 'My Finances', icon: Icons.account_balance_wallet_outlined, path: '/myfinances'),
+    NavItem(title: 'Mail', icon: Icons.mail_outline_rounded, path: '/mail'),
+    NavItem(title: 'Chat', icon: Icons.chat_bubble_outline_rounded, path: '/chat'),
     NavItem(title: 'Org', icon: Icons.corporate_fare_outlined, path: '/org'),
-    NavItem(title: 'Engage', icon: Icons.campaign_outlined, path: '/engage'),
-    NavItem(title: 'Helpdesk', icon: Icons.help_outline, path: '/helpdesk'),
   ];
 
   static const List<NavItem> _stubItems = [
@@ -72,8 +69,8 @@ class NavigationShell extends ConsumerWidget {
   int _getMobileSelectedIndex(String location) {
     if (location == '/' || location.startsWith('/stubs/dashboard')) return 0;
     if (location.startsWith('/me')) return 1;
-    if (location.startsWith('/inbox')) return 2;
-    if (location.startsWith('/helpdesk')) return 3;
+    if (location.startsWith('/mail')) return 2;
+    if (location.startsWith('/chat')) return 3;
     return 4; // 'More'
   }
 
@@ -86,10 +83,10 @@ class NavigationShell extends ConsumerWidget {
         context.go('/me');
         break;
       case 2:
-        context.go('/inbox');
+        context.go('/mail');
         break;
       case 3:
-        context.go('/helpdesk');
+        context.go('/chat');
         break;
       case 4:
         _showMobileMoreSheet(context);
@@ -143,10 +140,7 @@ class NavigationShell extends ConsumerWidget {
                   crossAxisSpacing: 16,
                   childAspectRatio: 0.95,
                   children: [
-                    _buildMoreGridItem(context, 'My Team', Icons.people_outline, Colors.orange, '/myteam'),
-                    _buildMoreGridItem(context, 'Finances', Icons.account_balance_wallet_outlined, Colors.green, '/myfinances'),
                     _buildMoreGridItem(context, 'Org', Icons.corporate_fare_outlined, AppTheme.primary, '/org'),
-                    _buildMoreGridItem(context, 'Engage', Icons.campaign_outlined, AppTheme.secondary, '/engage'),
                     _buildMoreGridItem(context, 'Performance', Icons.speed, Colors.teal, '/stubs/performance'),
                     _buildMoreGridItem(context, 'Recruitment', Icons.work_outline, Colors.blue, '/stubs/recruitment'),
                     _buildMoreGridItem(context, 'Expenses', Icons.receipt_long_outlined, Colors.purple, '/stubs/expenses'),
@@ -331,14 +325,14 @@ class NavigationShell extends ConsumerWidget {
               label: 'Me',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.inbox_outlined),
-              activeIcon: Icon(Icons.inbox),
-              label: 'Inbox',
+              icon: Icon(Icons.mail_outline_rounded),
+              activeIcon: Icon(Icons.mail_rounded),
+              label: 'Mail',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.help_outline),
-              activeIcon: Icon(Icons.help),
-              label: 'Helpdesk',
+              icon: Icon(Icons.chat_bubble_outline_rounded),
+              activeIcon: Icon(Icons.chat_bubble_rounded),
+              label: 'Chat',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.more_horiz),

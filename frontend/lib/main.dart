@@ -7,12 +7,9 @@ import 'providers/auth_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/dashboard_screen.dart';
 import 'screens/me/me_dashboard.dart';
-import 'screens/inbox/inbox_screen.dart';
-import 'screens/my_team/team_screen.dart';
-import 'screens/my_finances/finances_screen.dart';
+import 'screens/mail/mail_screen.dart';
+import 'screens/chat/chat_screen.dart';
 import 'screens/org/org_screen.dart';
-import 'screens/engage/engage_screen.dart';
-import 'screens/helpdesk/helpdesk_screen.dart';
 import 'screens/stubs/empty_state_screen.dart';
 import 'widgets/sidebar.dart';
 
@@ -68,28 +65,16 @@ class MyApp extends ConsumerWidget {
               builder: (context, state) => const MeDashboardScreen(),
             ),
             GoRoute(
-              path: '/inbox',
-              builder: (context, state) => const InboxScreen(),
+              path: '/mail',
+              builder: (context, state) => const MailScreen(),
             ),
             GoRoute(
-              path: '/myteam',
-              builder: (context, state) => const MyTeamScreen(),
-            ),
-            GoRoute(
-              path: '/myfinances',
-              builder: (context, state) => const MyFinancesScreen(),
+              path: '/chat',
+              builder: (context, state) => const ChatScreen(),
             ),
             GoRoute(
               path: '/org',
               builder: (context, state) => const OrgScreen(),
-            ),
-            GoRoute(
-              path: '/engage',
-              builder: (context, state) => const EngageScreen(),
-            ),
-            GoRoute(
-              path: '/helpdesk',
-              builder: (context, state) => const HelpdeskScreen(),
             ),
             GoRoute(
               path: '/stubs/:module',
