@@ -810,8 +810,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         _buildTimeTodayWidget(),
         const SizedBox(height: 16),
         const InteractiveCalendarWidget(),
-        const SizedBox(height: 16),
-        _buildHolidaysWidget(),
       ],
     );
 
@@ -824,7 +822,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         const SizedBox(height: 16),
         _buildCelebrationsWidget(),
         const SizedBox(height: 16),
-        _buildPollsWidget(),
+        _buildHolidaysWidget(),
       ],
     );
 
@@ -968,6 +966,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final String statusLabel = isCheckedOut ? 'Day Complete' : isCheckedIn ? 'Working' : 'Not Checked In';
 
     return Container(
+      height: 90,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -976,35 +975,49 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // ── Title + work mode ─────────────────────────────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Left side: Time + Date
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(children: [
-                Container(
-                  width: 32, height: 32,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppTheme.primary, AppTheme.secondary],
-                      begin: Alignment.topLeft, end: Alignment.bottomRight,
+              Row(
+                children: [
+                  const Icon(Icons.access_time_rounded, color: AppTheme.primary, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    _currentTime,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.textDark,
+                      letterSpacing: -0.5,
                     ),
-                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.access_time_rounded, color: Colors.white, size: 17),
-                ),
-                const SizedBox(width: 10),
-                const Text('Time Today', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
-              ]),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$todayStr • $statusLabel',
+                style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          // Right side: Work mode + Action button
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Work mode dropdown (compact)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                height: 24,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   color: AppTheme.bgLight,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppTheme.borderGrey),
                 ),
                 child: DropdownButtonHideUnderline(
@@ -1012,102 +1025,52 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                     value: _selectedWorkMode,
                     isDense: true,
                     onChanged: isCheckedIn ? null : (val) => setState(() => _selectedWorkMode = val!),
-                    style: const TextStyle(color: AppTheme.textDark, fontSize: 12, fontWeight: FontWeight.w600),
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppTheme.textMuted),
+                    style: const TextStyle(color: AppTheme.textDark, fontSize: 10, fontWeight: FontWeight.w600),
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 12, color: AppTheme.textMuted),
                     items: ['Office', 'Work From Home', 'On Duty'].map((m) =>
                       DropdownMenuItem(value: m, child: Text(m))).toList(),
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          // ── Time + status + button in one clean row ───────
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Time block
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _currentTime,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textDark,
-                        letterSpacing: -0.5,
-                        height: 1,
-                      ),
+              const SizedBox(height: 6),
+              // Clock button (compact)
+              if (!isCheckedOut)
+                SizedBox(
+                  height: 28,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (!isCheckedIn) {
+                        final ok = await ref.read(attendanceProvider.notifier).checkIn(source: _selectedWorkMode);
+                        if (ok && mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checked In ✓')));
+                      } else {
+                        final ok = await ref.read(attendanceProvider.notifier).checkOut();
+                        if (ok && mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checked Out ✓')));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isCheckedIn ? Colors.orange : AppTheme.primary,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 0,
                     ),
-                    const SizedBox(height: 4),
-                    Text(todayStr, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
-                    if (isCheckedIn) ...[  
-                      const SizedBox(height: 6),
-                      Text(
-                        isCheckedOut
-                            ? '${todayLog!.checkIn}  →  ${todayLog.checkOut}'
-                            : 'Clocked in at ${todayLog!.checkIn}',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: isCheckedOut ? AppTheme.textMuted : statusColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 14),
-              // Status + button stacked
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Status pill
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(20),
+                    child: Text(
+                      isCheckedIn ? 'Clock Out' : 'Clock In',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Container(width: 6, height: 6,
-                        decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle)),
-                      const SizedBox(width: 6),
-                      Text(statusLabel,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor)),
-                    ]),
                   ),
-                  if (!isCheckedOut) ...[  
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        if (!isCheckedIn) {
-                          final ok = await ref.read(attendanceProvider.notifier).checkIn(source: _selectedWorkMode);
-                          if (ok && mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checked In ✓')));
-                        } else {
-                          final ok = await ref.read(attendanceProvider.notifier).checkOut();
-                          if (ok && mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checked Out ✓')));
-                        }
-                      },
-                      icon: Icon(isCheckedIn ? Icons.logout_rounded : Icons.login_rounded, size: 15),
-                      label: Text(
-                        isCheckedIn ? 'Clock Out' : 'Clock In',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isCheckedIn ? Colors.orange : AppTheme.accent,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        elevation: 0,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF059669).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    'Complete',
+                    style: TextStyle(color: Color(0xFF059669), fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
             ],
           ),
         ],
@@ -1247,6 +1210,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final leaveState = ref.watch(leaveProvider);
     final holidays = leaveState.holidays;
 
+    Holiday? nextHoliday;
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    
+    for (final h in holidays) {
+      try {
+        final parsedDate = DateTime.parse(h.date);
+        if (parsedDate.isAfter(todayStart) || parsedDate.isAtSameMomentAs(todayStart)) {
+          nextHoliday = h;
+          break;
+        }
+      } catch (_) {}
+    }
+    
+    if (nextHoliday == null && holidays.isNotEmpty) {
+      nextHoliday = holidays.first;
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1262,24 +1243,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         children: [
           const Text('Upcoming Holidays', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
           const SizedBox(height: 16),
-          if (holidays.isEmpty)
-            const Text('No holidays listed.')
+          if (nextHoliday == null)
+            const Text('No upcoming holidays listed.')
           else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: holidays.length > 3 ? 3 : holidays.length,
-              separatorBuilder: (context, idx) => const Divider(color: AppTheme.borderGrey),
-              itemBuilder: (context, idx) {
-                final h = holidays[idx];
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  leading: const Icon(Icons.celebration, color: AppTheme.primary),
-                  title: Text(h.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(h.date),
-                );
-              },
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              leading: const Icon(Icons.celebration, color: AppTheme.primary),
+              title: Text(nextHoliday.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(nextHoliday.date),
             ),
         ],
       ),
@@ -2480,7 +2452,7 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
               crossAxisCount: 7,
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
-              childAspectRatio: 1.25,
+              childAspectRatio: 1.65,
             ),
             itemBuilder: (context, index) {
               if (index < startOffset) {
