@@ -507,6 +507,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final leftColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          child: Text(
+            'TIME & ATTENDANCE',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textMuted,
+              letterSpacing: 1.1,
+            ),
+          ),
+        ),
         _buildTimeTodayWidget(),
         const SizedBox(height: 16),
         const InteractiveCalendarWidget(),
