@@ -507,8 +507,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final leftColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildWelcomeBanner(employeeName),
-        const SizedBox(height: 16),
         _buildTimeTodayWidget(),
         const SizedBox(height: 16),
         const InteractiveCalendarWidget(),
@@ -532,22 +530,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: isDesktop
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 5, child: rightColumn),
-                const SizedBox(width: 16),
-                Expanded(flex: 3, child: leftColumn),
-              ],
-            )
-          : Column(
-              children: [
-                leftColumn,
-                const SizedBox(height: 16),
-                rightColumn,
-              ],
-            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildWelcomeBanner(employeeName),
+          const SizedBox(height: 20),
+          isDesktop
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 5, child: rightColumn),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 3, child: leftColumn),
+                  ],
+                )
+              : Column(
+                  children: [
+                    leftColumn,
+                    const SizedBox(height: 16),
+                    rightColumn,
+                  ],
+                ),
+        ],
+      ),
     );
   }
 
