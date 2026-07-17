@@ -427,7 +427,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                     )
                   else
                     SizedBox(
-                      height: 112,
+                      height: 130,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: deptPresence.length,
