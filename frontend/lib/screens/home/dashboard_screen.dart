@@ -958,8 +958,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      image: const DecorationImage(
+                        image: AssetImage('assets/waving_hand_illustration.jpg'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    child: const Icon(Icons.waving_hand_rounded, color: Colors.white, size: 26),
                   ),
                   const SizedBox(width: 18),
                   Expanded(
@@ -1141,7 +1144,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1157,48 +1160,45 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _activeQuickActions.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 2.2,
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 36,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _activeQuickActions.length,
+              separatorBuilder: (context, idx) => const SizedBox(width: 8),
+              itemBuilder: (context, idx) {
+                final key = _activeQuickActions[idx];
+                final config = _allQuickActions[key]!;
+                return _buildQuickActionBtn(
+                  context,
+                  icon: config['icon'] as IconData,
+                  label: key,
+                  color: config['color'] as Color,
+                  onTap: () {
+                    if (key == 'Apply Leave') {
+                      context.go('/me');
+                    } else if (key == 'Claim Expense') {
+                      _openDepartmentSheet(context, 'Finance', Icons.account_balance_wallet_rounded, Colors.green);
+                    } else if (key == 'IT Support') {
+                      _openDepartmentSheet(context, 'IT', Icons.computer_rounded, Colors.indigo);
+                    } else if (key == 'Staff Directory') {
+                      _openDepartmentSheet(context, 'Media', Icons.slow_motion_video_rounded, Colors.pink);
+                    } else if (key == 'Submit Help Ticket') {
+                      _openDepartmentSheet(context, 'Maintenance', Icons.build_rounded, Colors.amber);
+                    } else if (key == 'Request Asset') {
+                      _openDepartmentSheet(context, 'Inventory', Icons.devices_rounded, Colors.cyan);
+                    } else if (key == 'Catering Order') {
+                      _openDepartmentSheet(context, 'HOB', Icons.restaurant_menu_rounded, Colors.amber);
+                    } else if (key == 'Event Media Request') {
+                      _openDepartmentSheet(context, 'Media', Icons.video_camera_back_outlined, Colors.red);
+                    } else if (key == 'HR Policies') {
+                      _openDepartmentSheet(context, 'HR', Icons.people_outline, Colors.teal);
+                    }
+                  },
+                );
+              },
             ),
-            itemBuilder: (context, idx) {
-              final key = _activeQuickActions[idx];
-              final config = _allQuickActions[key]!;
-              return _buildQuickActionBtn(
-                context,
-                icon: config['icon'] as IconData,
-                label: key,
-                color: config['color'] as Color,
-                onTap: () {
-                  if (key == 'Apply Leave') {
-                    context.go('/me');
-                  } else if (key == 'Claim Expense') {
-                    _openDepartmentSheet(context, 'Finance', Icons.account_balance_wallet_rounded, Colors.green);
-                  } else if (key == 'IT Support') {
-                    _openDepartmentSheet(context, 'IT', Icons.computer_rounded, Colors.indigo);
-                  } else if (key == 'Staff Directory') {
-                    _openDepartmentSheet(context, 'Media', Icons.slow_motion_video_rounded, Colors.pink);
-                  } else if (key == 'Submit Help Ticket') {
-                    _openDepartmentSheet(context, 'Maintenance', Icons.build_rounded, Colors.amber);
-                  } else if (key == 'Request Asset') {
-                    _openDepartmentSheet(context, 'Inventory', Icons.devices_rounded, Colors.cyan);
-                  } else if (key == 'Catering Order') {
-                    _openDepartmentSheet(context, 'HOB', Icons.restaurant_menu_rounded, Colors.amber);
-                  } else if (key == 'Event Media Request') {
-                    _openDepartmentSheet(context, 'Media', Icons.video_camera_back_outlined, Colors.red);
-                  } else if (key == 'HR Policies') {
-                    _openDepartmentSheet(context, 'HR', Icons.people_outline, Colors.teal);
-                  }
-                },
-              );
-            },
           ),
         ],
       ),
@@ -1263,23 +1263,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: color.withOpacity(0.06),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: color.withOpacity(0.15)),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textDark),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+            Icon(icon, color: color, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textDark),
             ),
           ],
         ),
