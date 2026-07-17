@@ -873,9 +873,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         const SizedBox(height: 16),
         _buildAnnouncementsFeed(),
         const SizedBox(height: 16),
-        _buildCelebrationsWidget(),
-        const SizedBox(height: 16),
-        _buildHolidaysWidget(),
+        if (isDesktop)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _buildCelebrationsWidget()),
+              const SizedBox(width: 16),
+              Expanded(child: _buildHolidaysWidget()),
+            ],
+          )
+        else ...[
+          _buildCelebrationsWidget(),
+          const SizedBox(height: 16),
+          _buildHolidaysWidget(),
+        ],
       ],
     );
 
@@ -959,7 +970,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.white.withOpacity(0.3)),
                       image: const DecorationImage(
-                        image: AssetImage('assets/waving_hand_illustration.jpg'),
+                        image: AssetImage('assets/passport_photo.jpg'),
                         fit: BoxFit.cover,
                       ),
                     ),
