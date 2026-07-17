@@ -1804,7 +1804,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       'peter parker', 'tony stark', 'robert bruce', 'grace hopper',
       'ada lovelace', 'emma watson', 'paul rudd', 'wilson fisk', 'steven rogers',
       'bulb', 'light', 'mixer', 'software', 'install', 'rehearsal', 'annual',
-      'work from home', 'office', 'help', 'onboarding', 'support', 'mix'
+      'work from home', 'office', 'help', 'onboarding', 'support', 'mix',
+      'how', 'what', 'where', 'who', 'when', 'can you', 'explain', 'feature',
+      'menu', 'page', 'app', 'application', 'system', 'portal', 'view', 'show',
+      'find', 'get', 'apply', 'salary', 'payroll', 'pay', 'reimbursement', 'expense',
+      'announcement', 'poll', 'vote', 'profile', 'shift'
     ];
     
     for (final kw in keywords) {
@@ -1841,6 +1845,112 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       // Check if we are in a pending flow
       if (_pendingAction == 'raise_ticket') {
         _handlePendingTicketFlow(userText);
+        return;
+      }
+
+      // Application FAQ and guidance mappings
+      if (text.contains('leave') || text.contains('holiday') || text.contains('vacation')) {
+        _addAssistantReply("📅 **Leaves & Leave Balances**:\n\n"
+            "You can view your remaining leave balances and apply for leaves under the **Me** section in the sidebar, and clicking the **Leave** tab.\n\n"
+            "This tab shows detailed cards for casual leave, sick leave, earned leave, etc. with compact animations.");
+        return;
+      }
+
+      if (text.contains('attendance') || text.contains('clock') || text.contains('check-in') || text.contains('check-out') || text.contains('check in') || text.contains('check out') || text.contains('shift')) {
+        _addAssistantReply("⏰ **Attendance & Shifts**:\n\n"
+            "* **Clock-In/Out**: You can perform a Web Clock-In or Web Clock-Out directly from the top banner of the **Home Dashboard** page.\n"
+            "* **Work Mode**: Select your current work mode (Office, Home, Field) from the dropdown next to the check-in button.\n"
+            "* **Details**: Go to **Me** -> **Attendance** tab to see your monthly logs, active shift timing, and total hours.");
+        return;
+      }
+
+      if (text.contains('poll') || text.contains('vote') || text.contains('announcement')) {
+        _addAssistantReply("📢 **Announcements & Polls**:\n\n"
+            "Active company news and quick polls are displayed in the middle section of the **Home Dashboard**.\n"
+            "You can vote on polls (e.g. choosing your favorite beverage) and read announcements instantly in real-time.");
+        return;
+      }
+
+      if (text.contains('staff') || text.contains('directory') || text.contains('members') || text.contains('contact') || text.contains('email')) {
+        _addAssistantReply("👥 **Staff Directory & Presence**:\n\n"
+            "To view the staff directory and their presence details:\n"
+            "1. Go to the **Home Dashboard**.\n"
+            "2. Click on any of the **Department Icons** in the departments grid (e.g. IT, HR, Maintenance, Media, HOB).\n"
+            "3. A modal sheet will open showing all staff members in that department, their roles, emails, location, and active status (IN/OUT) with their profile images.");
+        return;
+      }
+
+      if (text.contains('finance') || text.contains('reimburse') || text.contains('salary') || text.contains('pay') || text.contains('expense')) {
+        _addAssistantReply("💰 **Finance Portal**:\n\n"
+            "Click on the **Finance** icon in the Home Dashboard departments grid to:\n"
+            "- Submit expense reimbursement requests (e.g. travel, internet, food invoices).\n"
+            "- Submit queries regarding salary or payroll.\n"
+            "- Track pending finance reimbursement status.");
+        return;
+      }
+
+      if (text.contains('cpd') || text.contains('workshop') || text.contains('training')) {
+        _addAssistantReply("🎓 **CPD Portal (Continuous Professional Development)**:\n\n"
+            "Click on the **CPD** icon in the Home Dashboard departments grid to:\n"
+            "- Browse upcoming professional training sessions and workshops.\n"
+            "- Register for technical or soft-skills workshops.\n"
+            "- View training schedules.");
+        return;
+      }
+
+      if (text.contains('hob') || text.contains('food') || text.contains('catering') || text.contains('pantry')) {
+        _addAssistantReply("🍳 **HOB Portal (Host of Bureau)**:\n\n"
+            "Click on the **HOB** icon in the Home Dashboard departments grid to:\n"
+            "- Order event catering or buffet meals for official meetings.\n"
+            "- Request pantry supplies or beverages.\n"
+            "- Coordinate catering details.");
+        return;
+      }
+
+      if (text.contains('inventory') || text.contains('laptop') || text.contains('charger') || text.contains('chair') || text.contains('accessory') || text.contains('accessories')) {
+        _addAssistantReply("💻 **Inventory Portal**:\n\n"
+            "Click on the **Inventory** icon in the Home Dashboard departments grid to:\n"
+            "- Request office assets (laptops, monitors, ergonomic chairs).\n"
+            "- Request accessories (chargers, keyboards, adapters, mice).\n"
+            "- Log damaged asset replacement tickets.");
+        return;
+      }
+
+      if (text.contains('media') || text.contains('video') || text.contains('stream') || text.contains('mixer') || text.contains('recording')) {
+        _addAssistantReply("📹 **Media Portal**:\n\n"
+            "Click on the **Media** icon in the Home Dashboard departments grid to:\n"
+            "- Request video coverage or photography for events.\n"
+            "- Request audio-visual mixer setups or stream testing.\n"
+            "- Schedule live stream broadcasts.");
+        return;
+      }
+
+      if (text.contains('it') || text.contains('software') || text.contains('hardware') || text.contains('network') || text.contains('vpn') || text.contains('password')) {
+        _addAssistantReply("🛠️ **IT Support Portal**:\n\n"
+            "Click on the **IT** icon in the Home Dashboard departments grid to:\n"
+            "- Raise support tickets for software installation or hardware troubleshooting.\n"
+            "- Request Network/VPN credentials or password resets.\n"
+            "- Reset/configure email or ERP accounts.");
+        return;
+      }
+
+      if (text.contains('hr') || text.contains('policy') || text.contains('rule') || text.contains('guideline')) {
+        _addAssistantReply("📋 **HR Help Desk**:\n\n"
+            "Click on the **HR** icon in the Home Dashboard departments grid to:\n"
+            "- Query company HR policies, code of conduct, or employee guidelines.\n"
+            "- Submit general queries or raise HR grievances.\n"
+            "- View leave policies.");
+        return;
+      }
+
+      if (text.contains('help') || text.contains('menu') || text.contains('feature') || text.contains('app') || text.contains('application') || text.contains('portal')) {
+        _addAssistantReply("ℹ️ **ACA Portal Features**:\n\n"
+            "I can answer any questions regarding the application! Here are the core areas:\n"
+            "1. **Me Tab**: Attendance logs, leaves & leave balances, work modes.\n"
+            "2. **Home Dashboard**: Quick clock-in/out, announcements, live timer, and polls.\n"
+            "3. **Department Grid**: IT, HR, Maintenance, Finance, HOB, CPD, Inventory, and Media portals.\n"
+            "4. **Staff Directory**: Click any department icon on the dashboard to view details and presence of all staff in that department.\n\n"
+            "Ask me about any specific feature or how to use it!");
         return;
       }
 
