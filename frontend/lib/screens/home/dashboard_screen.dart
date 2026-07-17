@@ -1839,18 +1839,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       }
     }
 
+    // Clean up request phrases
+    String cleanDesc = originalText;
+    cleanDesc = cleanDesc.replaceAll(RegExp(r'(?i)raise\s+a\s+ticket(?:\s+to\s+(?:it|hr|maintenance|finance|cpd|inventory|hob|media))?', caseSensitive: false), '');
+    cleanDesc = cleanDesc.replaceAll(RegExp(r'(?i)\bcan\s+u\b', caseSensitive: false), '');
+    cleanDesc = cleanDesc.replaceAll(RegExp(r'(?i)\bplease\b', caseSensitive: false), '');
+    cleanDesc = cleanDesc.trim();
+    if (cleanDesc.toLowerCase().startsWith('to ')) {
+      cleanDesc = cleanDesc.substring(3).trim();
+    }
+    if (cleanDesc.isNotEmpty) {
+      cleanDesc = cleanDesc[0].toUpperCase() + cleanDesc.substring(1);
+    } else {
+      cleanDesc = "Requested support service.";
+    }
+
+    final authState = ref.read(authProvider);
+    final employeeName = authState.employee?.fullName ?? 'Employee';
+    final formattedDesc = "Dear Sir,\n\n$cleanDesc\n\nWith Regards,\n$employeeName.";
+
     setState(() {
       _recentTickets.insert(0, {
         'dept': deptName,
         'service': serviceName,
-        'desc': originalText,
+        'desc': formattedDesc,
         'status': 'Pending'
       });
     });
 
     _addAssistantReply("I have automatically raised a **$deptName** ticket for you! 🎫\n\n"
         "* **Service**: $serviceName\n"
-        "* **Details**: $originalText\n"
+        "* **Details**:\n$formattedDesc\n"
         "* **Status**: Pending\n\n"
         "You can track this instantly in the **$deptName Department Portal** under recent tickets!");
   }
