@@ -511,8 +511,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         const SizedBox(height: 16),
         _buildTimeTodayWidget(),
         const SizedBox(height: 16),
-        _buildLeaveBalancesWidget(),
-        const SizedBox(height: 16),
         const InteractiveCalendarWidget(),
         const SizedBox(height: 16),
         _buildHolidaysWidget(),
@@ -1274,24 +1272,32 @@ class _DotGridPainter extends CustomPainter {
 
 // ── Interactive Calendar & Blinking Event Widgets ────────────────────────────
 
-class BlinkingContainer extends StatefulWidget {
+class PulsatingEventContainer extends StatefulWidget {
   final Widget child;
-  const BlinkingContainer({required this.child, super.key});
+  const PulsatingEventContainer({required this.child, super.key});
 
   @override
-  State<BlinkingContainer> createState() => _BlinkingContainerState();
+  State<PulsatingEventContainer> createState() => _PulsatingEventContainerState();
 }
 
-class _BlinkingContainerState extends State<BlinkingContainer> with SingleTickerProviderStateMixin {
+class _PulsatingEventContainerState extends State<PulsatingEventContainer> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _glowAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
+    
+    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   @override
@@ -1303,26 +1309,76 @@ class _BlinkingContainerState extends State<BlinkingContainer> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: _glowAnimation,
       builder: (context, child) {
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: const Color(0xFFD97706).withOpacity(_controller.value),
-              width: 2.0,
-            ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFD97706).withOpacity(_controller.value * 0.25),
-                blurRadius: 4,
-                spreadRadius: 1,
-              )
+                color: const Color(0xFFF59E0B).withOpacity(0.15 + (_glowAnimation.value * 0.2)),
+                blurRadius: 4 + (_glowAnimation.value * 6),
+                spreadRadius: _glowAnimation.value * 1.5,
+              ),
             ],
           ),
           child: widget.child,
         );
       },
+    );
+  }
+}
+
+class InteractiveCalendarCell extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  const InteractiveCalendarCell({required this.child, required this.onTap, super.key});
+
+  @override
+  State<InteractiveCalendarCell> createState() => _InteractiveCalendarCellState();
+}
+
+class _InteractiveCalendarCellState extends State<InteractiveCalendarCell> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      lowerBound: 0.9,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) {
+          _controller.animateTo(0.9, curve: Curves.easeOutCubic);
+        },
+        onTapUp: (_) {
+          _controller.animateTo(1.0, curve: Curves.elasticOut);
+          widget.onTap();
+        },
+        onTapCancel: () {
+          _controller.animateTo(1.0, curve: Curves.easeOutCubic);
+        },
+        child: ScaleTransition(
+          scale: _controller,
+          child: widget.child,
+        ),
+      ),
     );
   }
 }
@@ -1334,25 +1390,39 @@ class InteractiveCalendarWidget extends ConsumerStatefulWidget {
   ConsumerState<InteractiveCalendarWidget> createState() => _InteractiveCalendarWidgetState();
 }
 
-class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarWidget> {
+class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarWidget> with TickerProviderStateMixin {
   late DateTime _currentMonth;
+  late AnimationController _staggerController;
 
   @override
   void initState() {
     super.initState();
     _currentMonth = DateTime.now();
+    _staggerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _staggerController.forward();
+  }
+
+  @override
+  void dispose() {
+    _staggerController.dispose();
+    super.dispose();
   }
 
   void _nextMonth() {
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 1);
     });
+    _staggerController.forward(from: 0.0);
   }
 
   void _prevMonth() {
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1, 1);
     });
+    _staggerController.forward(from: 0.0);
   }
 
   int _daysInMonth(DateTime date) {
@@ -1390,7 +1460,7 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
     return Card(
       elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -1398,30 +1468,34 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.chevron_left_rounded, size: 20),
+                  icon: const Icon(Icons.chevron_left_rounded, size: 18),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: _prevMonth,
                 ),
                 Text(
                   monthName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textDark),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.chevron_right_rounded, size: 20),
+                  icon: const Icon(Icons.chevron_right_rounded, size: 18),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: _nextMonth,
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: weekdays.map((day) {
                 return SizedBox(
-                  width: 32,
+                  width: 28,
                   child: Text(
                     day,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textMuted,
                     ),
@@ -1429,16 +1503,16 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
                 );
               }).toList(),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: startOffset + totalDays,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 7,
-                mainAxisSpacing: 6,
-                crossAxisSpacing: 6,
-                childAspectRatio: 1.0,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                childAspectRatio: 1.25,
               ),
               itemBuilder: (context, index) {
                 if (index < startOffset) {
@@ -1459,11 +1533,22 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
 
                 final hasEvents = dayEvents.isNotEmpty;
 
+                final cellAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+                  CurvedAnimation(
+                    parent: _staggerController,
+                    curve: Interval(
+                      ((index - startOffset) * 0.012).clamp(0.0, 0.6),
+                      (((index - startOffset) * 0.012) + 0.35).clamp(0.0, 1.0),
+                      curve: Curves.easeOutBack,
+                    ),
+                  ),
+                );
+
                 Widget dayCell = Container(
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isToday ? AppTheme.primary : (hasEvents ? const Color(0xFFFEF3C7) : Colors.transparent),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                     border: isToday
                         ? null
                         : Border.all(
@@ -1477,7 +1562,7 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
                       Text(
                         '$dayNum',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: isToday
                               ? Colors.white
@@ -1486,11 +1571,11 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
                       ),
                       if (hasEvents)
                         Padding(
-                          padding: const EdgeInsets.only(top: 2.0),
+                          padding: const EdgeInsets.only(top: 1.0),
                           child: Text(
                             _shortEventTitle(dayEvents.first.title),
                             style: const TextStyle(
-                              fontSize: 8,
+                              fontSize: 7,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFB45309),
                               overflow: TextOverflow.ellipsis,
@@ -1502,10 +1587,18 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
                 );
 
                 if (hasEvents) {
-                  dayCell = BlinkingContainer(child: dayCell);
+                  dayCell = PulsatingEventContainer(child: dayCell);
                 }
 
-                return InkWell(
+                dayCell = ScaleTransition(
+                  scale: cellAnimation,
+                  child: FadeTransition(
+                    opacity: cellAnimation,
+                    child: dayCell,
+                  ),
+                );
+
+                return InteractiveCalendarCell(
                   onTap: () {
                     if (hasEvents) {
                       _showDayEventsDialog(context, targetDate, dayEvents);
@@ -1513,7 +1606,6 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
                       _showAddEventDirectDialog(context, targetDate);
                     }
                   },
-                  borderRadius: BorderRadius.circular(8),
                   child: dayCell,
                 );
               },
