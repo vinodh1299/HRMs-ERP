@@ -494,7 +494,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       if (desc.isEmpty) return;
                       
                       setState(() {
-                        _recentTickets.insert(0, {
+                        _recentTickets.insert(0, <String, String>{
                           'dept': deptName,
                           'service': selectedService,
                           'desc': desc,
@@ -1824,23 +1824,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     });
     _scrollToBottom();
 
-    final isAppRelated = _checkIfAppRelated(text);
-    if (!isAppRelated) {
-      _addAssistantReply("I am only authorized to assist with ACA HRMs-ERP application operations, such as checking staff presence, raising department tickets, or portal info. Please ask a question related to this app.");
-      return;
-    }
+    try {
+      final isAppRelated = _checkIfAppRelated(text);
+      if (!isAppRelated) {
+        _addAssistantReply("I am only authorized to assist with ACA HRMs-ERP application operations, such as checking staff presence, raising department tickets, or portal info. Please ask a question related to this app.");
+        return;
+      }
 
-    if (text.contains('ticket') || text.contains('raise') || text.contains('create') || text.contains('change') || text.contains('issue') || text.contains('reimburse') || text.contains('request')) {
-      _handleTicketCreationIntent(userText);
-      return;
-    }
+      if (text.contains('ticket') || text.contains('raise') || text.contains('create') || text.contains('change') || text.contains('issue') || text.contains('reimburse') || text.contains('request')) {
+        _handleTicketCreationIntent(userText);
+        return;
+      }
 
-    if (text.contains('presence') || text.contains('is ') || text.contains('status') || text.contains('in today') || text.contains('out today') || text.contains('here')) {
-      _handlePresenceQueryIntent(text);
-      return;
-    }
+      if (text.contains('presence') || text.contains('is ') || text.contains('status') || text.contains('in today') || text.contains('out today') || text.contains('here')) {
+        _handlePresenceQueryIntent(text);
+        return;
+      }
 
-    _addAssistantReply("I can help you with two main actions:\n1. **Raise a ticket**: Ask me to 'Raise a ticket to IT to change the light bulb in the auditorium'.\n2. **Check staff presence**: Ask me 'Is Vinodh from Media in today?'");
+      _addAssistantReply("I can help you with two main actions:\n1. **Raise a ticket**: Ask me to 'Raise a ticket to IT to change the light bulb in the auditorium'.\n2. **Check staff presence**: Ask me 'Is Vinodh from Media in today?'");
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isAiTyping = false;
+        });
+      }
+      _addAssistantReply("Apologies, I encountered an error processing that request. Please try again.");
+    }
   }
 
   void _handleTicketCreationIntent(String originalText) {
@@ -1902,7 +1911,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final formattedDesc = "Dear Sir,\n\n$cleanDesc\n\nWith Regards,\n$employeeName.";
 
     setState(() {
-      _recentTickets.insert(0, {
+      _recentTickets.insert(0, <String, String>{
         'dept': deptName,
         'service': serviceName,
         'desc': formattedDesc,
