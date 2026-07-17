@@ -12,6 +12,7 @@ import '../../providers/attendance_provider.dart';
 import '../../providers/leave_provider.dart';
 import '../../providers/events_provider.dart';
 import '../../services/api_service.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -810,6 +811,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         _buildTimeTodayWidget(),
         const SizedBox(height: 16),
         const InteractiveCalendarWidget(),
+        const SizedBox(height: 16),
+        _buildQuickActionsWidget(context),
       ],
     );
 
@@ -1074,6 +1077,102 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsWidget(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Quick Actions', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 12),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 2.2,
+            children: [
+              _buildQuickActionBtn(
+                context,
+                icon: Icons.flight_takeoff_rounded,
+                label: 'Apply Leave',
+                color: Colors.blue,
+                onTap: () {
+                  context.go('/me');
+                },
+              ),
+              _buildQuickActionBtn(
+                context,
+                icon: Icons.receipt_long_rounded,
+                label: 'Claim Expense',
+                color: Colors.green,
+                onTap: () {
+                  _openDepartmentSheet(context, 'Finance', Icons.account_balance_wallet_rounded, Colors.green);
+                },
+              ),
+              _buildQuickActionBtn(
+                context,
+                icon: Icons.confirmation_number_outlined,
+                label: 'IT Support',
+                color: Colors.orange,
+                onTap: () {
+                  _openDepartmentSheet(context, 'IT', Icons.computer_rounded, Colors.indigo);
+                },
+              ),
+              _buildQuickActionBtn(
+                context,
+                icon: Icons.contact_mail_outlined,
+                label: 'Staff Directory',
+                color: Colors.purple,
+                onTap: () {
+                  _openDepartmentSheet(context, 'Media', Icons.slow_motion_video_rounded, Colors.pink);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionBtn(BuildContext context, {required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.15)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textDark),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
