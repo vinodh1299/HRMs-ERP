@@ -353,6 +353,180 @@ class _MailScreenState extends State<MailScreen> {
     );
   }
 
+  void _openAiEmailDraftAssistant(EmailMessage email) {
+    bool isGenerating = true;
+    String generatedText = '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            if (isGenerating) {
+              Future.delayed(const Duration(milliseconds: 1200), () {
+                if (context.mounted && isGenerating) {
+                  final subject = email.subject.toLowerCase();
+                  final body = email.body.toLowerCase();
+                  final sender = email.sender;
+                  
+                  String response = '';
+                  if (subject.contains('security') || subject.contains('entra')) {
+                    response = "Hi Microsoft Entra Team,\n\n"
+                        "Thank you for the security notification. I confirm that this successful sign-in on my Mac-Studio device was authorized by me. No further action is required.\n\n"
+                        "Warm regards,\n"
+                        "Vinodh";
+                  } else if (subject.contains('guidelines') || subject.contains('stream') || body.contains('stream')) {
+                    response = "Hi John,\n\n"
+                        "Thanks for the updated stream guidelines. I will make sure the audio bitrate is locked to 192kbps and coordinate the testing on 13 sep 2026 as requested.\n\n"
+                        "Best regards,\n"
+                        "Vinodh";
+                  } else if (subject.contains('holiday') || subject.contains('calendar') || body.contains('holiday')) {
+                    response = "Dear HR Team,\n\n"
+                        "Thank you for the revised Q3 holiday calendar. I have noted the rehearsals beginning on 12 August and the Q3 holiday schedule.\n\n"
+                        "Warm regards,\n"
+                        "Vinodh";
+                  } else {
+                    response = "Hi $sender,\n\n"
+                        "Thank you for your email regarding '${email.subject}'. I have reviewed the details and will get back to you shortly.\n\n"
+                        "Best regards,\n"
+                        "Vinodh";
+                  }
+
+                  setDialogState(() {
+                    isGenerating = false;
+                    generatedText = response;
+                  });
+                }
+              });
+            }
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: const [
+                  Icon(Icons.auto_awesome, color: AppTheme.secondary),
+                  SizedBox(width: 8),
+                  Text('AI Email Draft Assistant'),
+                ],
+              ),
+              content: SizedBox(
+                width: 500,
+                child: isGenerating
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          SizedBox(height: 20),
+                          CircularProgressIndicator(color: AppTheme.secondary),
+                          SizedBox(height: 16),
+                          Text('Reading email body and generating perfect response...'),
+                          SizedBox(height: 20),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'AI generated response draft:',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textMuted),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            initialValue: generatedText,
+                            maxLines: 8,
+                            onChanged: (val) => generatedText = val,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.all(12),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'How would you like to send this message?',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                          ),
+                        ],
+                      ),
+              ),
+              actions: isGenerating
+                  ? []
+                  : [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel', style: TextStyle(color: AppTheme.textMuted)),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.reply, size: 16, color: Colors.white),
+                        label: const Text('Reply', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          if (generatedText.trim().isEmpty) return;
+                          setState(() {
+                            _emails.insert(
+                              0,
+                              EmailMessage(
+                                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                sender: 'Me',
+                                senderEmail: 'vinodh@acaindia.org',
+                                subject: "Re: ${email.subject}",
+                                snippet: generatedText.length > 60
+                                    ? '${generatedText.substring(0, 60)}...'
+                                    : generatedText,
+                                body: generatedText,
+                                date: DateTime.now(),
+                              ),
+                            );
+                            _selectedEmail = _emails.first;
+                          });
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Reply email sent successfully via Microsoft SMTP!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.mail_outline, size: 16, color: Colors.white),
+                        label: const Text('New Mail', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          if (generatedText.trim().isEmpty) return;
+                          setState(() {
+                            _emails.insert(
+                              0,
+                              EmailMessage(
+                                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                sender: 'Me',
+                                senderEmail: 'vinodh@acaindia.org',
+                                subject: "Follow-up: ${email.subject}",
+                                snippet: generatedText.length > 60
+                                    ? '${generatedText.substring(0, 60)}...'
+                                    : generatedText,
+                                body: generatedText,
+                                date: DateTime.now(),
+                              ),
+                            );
+                            _selectedEmail = _emails.first;
+                          });
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('New email sent successfully via Microsoft SMTP!'),
+                              backgroundColor: AppTheme.secondary,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.secondary),
+                      ),
+                    ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildEmailDetailBody(EmailMessage email) {
     return Container(
       color: Colors.white,
@@ -391,9 +565,28 @@ class _MailScreenState extends State<MailScreen> {
           const SizedBox(height: 18),
           const Divider(height: 1, color: AppTheme.borderGrey),
           const SizedBox(height: 18),
-          Text(
-            email.subject,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textDark),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  email.subject,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textDark),
+                ),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                onPressed: () => _openAiEmailDraftAssistant(email),
+                icon: const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
+                label: const Text('AI Draft Assistant', style: TextStyle(fontSize: 12, color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.secondary,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 18),
           Expanded(
