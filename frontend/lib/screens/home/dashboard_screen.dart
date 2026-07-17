@@ -53,143 +53,60 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _chatScrollController = ScrollController();
 
+  List<String> _activeQuickActions = [
+    'Apply Leave',
+    'Claim Expense',
+    'IT Support',
+    'Staff Directory',
+  ];
+
+  static final Map<String, Map<String, dynamic>> _allQuickActions = {
+    'Apply Leave': {
+      'icon': Icons.flight_takeoff_rounded,
+      'color': Colors.blue,
+    },
+    'Claim Expense': {
+      'icon': Icons.receipt_long_rounded,
+      'color': Colors.green,
+    },
+    'IT Support': {
+      'icon': Icons.confirmation_number_outlined,
+      'color': Colors.orange,
+    },
+    'Staff Directory': {
+      'icon': Icons.contact_mail_outlined,
+      'color': Colors.purple,
+    },
+    'Submit Help Ticket': {
+      'icon': Icons.help_outline_rounded,
+      'color': Colors.teal,
+    },
+    'Request Asset': {
+      'icon': Icons.devices_other_rounded,
+      'color': Colors.cyan,
+    },
+    'Catering Order': {
+      'icon': Icons.restaurant_rounded,
+      'color': Colors.amber,
+    },
+    'Event Media Request': {
+      'icon': Icons.video_camera_back_outlined,
+      'color': Colors.red,
+    },
+    'HR Policies': {
+      'icon': Icons.menu_book_rounded,
+      'color': Colors.indigo,
+    },
+  };
+
+  late Map<String, List<Map<String, dynamic>>> _presenceData;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
-    // Live Clock timer
-    _currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
-        });
-      }
-    });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadDashboardData();
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _timer.cancel();
-    _chatController.dispose();
-    _chatScrollController.dispose();
-    super.dispose();
-  }
-
-  void _loadDashboardData() {
-    ref.read(attendanceProvider.notifier).fetchLogs();
-    ref.read(leaveProvider.notifier).fetchLeaveData();
-    _fetchAnnouncementsAndPolls();
-  }
-
-  void _fetchAnnouncementsAndPolls() async {
-    try {
-      final ann = await _apiService.getAnnouncements();
-      final pl = await _apiService.getPolls();
-      if (mounted) {
-        setState(() {
-          _announcements = ann;
-          _polls = pl;
-        });
-      }
-    } catch (_) {}
-  }
-
-  Widget _buildDepartmentPortalsRow() {
-    final list = [
-      {'name': 'Media', 'icon': Icons.video_camera_back_outlined, 'color': Colors.blue},
-      {'name': 'Maintenance', 'icon': Icons.build_outlined, 'color': Colors.amber},
-      {'name': 'Finance', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.green},
-      {'name': 'CPD', 'icon': Icons.school_outlined, 'color': Colors.purple},
-      {'name': 'HR', 'icon': Icons.badge_outlined, 'color': Colors.pink},
-      {'name': 'Inventory', 'icon': Icons.inventory_2_outlined, 'color': Colors.teal},
-      {'name': 'HOB', 'icon': Icons.cookie_outlined, 'color': Colors.orange},
-      {'name': 'IT', 'icon': Icons.computer_outlined, 'color': Colors.indigo},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-          child: Text(
-            'DEPARTMENT PORTALS',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textMuted,
-              letterSpacing: 1.1,
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 90,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              final dept = list[index];
-              final name = dept['name'] as String;
-              final icon = dept['icon'] as IconData;
-              final color = dept['color'] as Color;
-
-              return Container(
-                margin: const EdgeInsets.only(right: 12),
-                width: 95,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.borderGrey, width: 1),
-                ),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () => _openDepartmentSheet(context, name, icon, color),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(icon, color: color, size: 24),
-                      const SizedBox(height: 6),
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textDark,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _openDepartmentSheet(BuildContext context, String deptName, IconData icon, Color color) {
-    final Map<String, List<String>> services = {
-      'Media': ['Video editing request', 'Livestream setup', 'AV equipment request', 'Photography booking'],
-      'Maintenance': ['Light bulb change', 'Plumbing repair', 'Carpentry fix', 'AC maintenance', 'Electrical issues'],
-      'Finance': ['Expense reimbursement', 'Invoice processing request', 'Salary discrepancy query', 'Tax declaration support'],
-      'CPD': ['Register for workshop', 'Course material request', 'Certificate collection', 'Training log approval'],
-      'HR': ['Leave policy query', 'Address proof request', 'Update bank details', 'Provident fund issue'],
-      'Inventory': ['Request laptop accessories', 'Stationary requisition', 'Office chair replacement'],
-      'HOB': ['Event catering order', 'Bread order placement', 'Pantry issue report', 'Kitchen cleaning request'],
-      'IT': ['Software installation request', 'Hardware troubleshooting', 'Network & VPN access', 'Email / account setup'],
-    };
-
-    final Map<String, List<Map<String, dynamic>>> presence = {
+    _presenceData = {
       'Media': [
         {
           'name': 'Ananya Hari',
@@ -200,7 +117,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           'avatar': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
         },
         {
-          'name': 'Athul Jospeh Alex',
+          'name': 'Athul Joseph Alex',
           'role': 'Sound Engineer',
           'location': 'Home',
           'email': 'athul.alex@acaindia.org',
@@ -367,9 +284,140 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         },
       ],
     };
+    
+    // Live Clock timer
+    _currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentTime = DateFormat('hh:mm:ss a').format(DateTime.now());
+        });
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDashboardData();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _timer.cancel();
+    _chatController.dispose();
+    _chatScrollController.dispose();
+    super.dispose();
+  }
+
+  void _loadDashboardData() {
+    ref.read(attendanceProvider.notifier).fetchLogs();
+    ref.read(leaveProvider.notifier).fetchLeaveData();
+    _fetchAnnouncementsAndPolls();
+  }
+
+  void _fetchAnnouncementsAndPolls() async {
+    try {
+      final ann = await _apiService.getAnnouncements();
+      final pl = await _apiService.getPolls();
+      if (mounted) {
+        setState(() {
+          _announcements = ann;
+          _polls = pl;
+        });
+      }
+    } catch (_) {}
+  }
+
+  Widget _buildDepartmentPortalsRow() {
+    final list = [
+      {'name': 'Media', 'icon': Icons.video_camera_back_outlined, 'color': Colors.blue},
+      {'name': 'Maintenance', 'icon': Icons.build_outlined, 'color': Colors.amber},
+      {'name': 'Finance', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.green},
+      {'name': 'CPD', 'icon': Icons.school_outlined, 'color': Colors.purple},
+      {'name': 'HR', 'icon': Icons.badge_outlined, 'color': Colors.pink},
+      {'name': 'Inventory', 'icon': Icons.inventory_2_outlined, 'color': Colors.teal},
+      {'name': 'HOB', 'icon': Icons.cookie_outlined, 'color': Colors.orange},
+      {'name': 'IT', 'icon': Icons.computer_outlined, 'color': Colors.indigo},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          child: Text(
+            'DEPARTMENT PORTALS',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textMuted,
+              letterSpacing: 1.1,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 90,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              final dept = list[index];
+              final name = dept['name'] as String;
+              final icon = dept['icon'] as IconData;
+              final color = dept['color'] as Color;
+
+              return Container(
+                margin: const EdgeInsets.only(right: 12),
+                width: 95,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.borderGrey, width: 1),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => _openDepartmentSheet(context, name, icon, color),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: color, size: 24),
+                      const SizedBox(height: 6),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textDark,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _openDepartmentSheet(BuildContext context, String deptName, IconData icon, Color color) {
+    final Map<String, List<String>> services = {
+      'Media': ['Video editing request', 'Livestream setup', 'AV equipment request', 'Photography booking'],
+      'Maintenance': ['Light bulb change', 'Plumbing repair', 'Carpentry fix', 'AC maintenance', 'Electrical issues'],
+      'Finance': ['Expense reimbursement', 'Invoice processing request', 'Salary discrepancy query', 'Tax declaration support'],
+      'CPD': ['Register for workshop', 'Course material request', 'Certificate collection', 'Training log approval'],
+      'HR': ['Leave policy query', 'Address proof request', 'Update bank details', 'Provident fund issue'],
+      'Inventory': ['Request laptop accessories', 'Stationary requisition', 'Office chair replacement'],
+      'HOB': ['Event catering order', 'Bread order placement', 'Pantry issue report', 'Kitchen cleaning request'],
+      'IT': ['Software installation request', 'Hardware troubleshooting', 'Network & VPN access', 'Email / account setup'],
+    };
 
     final deptServices = services[deptName] ?? ['General Support Request'];
-    final deptPresence = presence[deptName] ?? [];
+    final deptPresence = _presenceData[deptName] ?? [];
 
     String selectedService = deptServices.first;
     final descController = TextEditingController();
@@ -654,6 +702,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                           ),
                         ),
                         const SizedBox(width: 4),
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined, size: 12, color: AppTheme.textMuted),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => _showEditStaffNameDialog(context, staff, deptName),
+                        ),
+                        const SizedBox(width: 4),
                         Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
@@ -727,6 +782,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           ),
         ],
       ),
+    );
+  }
+
+  void _showEditStaffNameDialog(BuildContext context, Map<String, dynamic> staff, String deptName) {
+    final controller = TextEditingController(text: staff['name'] as String);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Name for ${staff['role']}'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Staff Name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final newName = controller.text.trim();
+                if (newName.isNotEmpty) {
+                  setState(() {
+                    staff['name'] = newName;
+                  });
+                  Navigator.pop(context);
+                  Navigator.pop(context); // close bottom sheet to refresh state
+                  _openDepartmentSheet(context, deptName, Icons.slow_motion_video_rounded, Colors.pink); // re-open to show updated name instantly
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Name updated to $newName successfully!')),
+                  );
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1095,56 +1192,116 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Quick Actions', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
-          const SizedBox(height: 12),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 2.2,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildQuickActionBtn(
-                context,
-                icon: Icons.flight_takeoff_rounded,
-                label: 'Apply Leave',
-                color: Colors.blue,
-                onTap: () {
-                  context.go('/me');
-                },
-              ),
-              _buildQuickActionBtn(
-                context,
-                icon: Icons.receipt_long_rounded,
-                label: 'Claim Expense',
-                color: Colors.green,
-                onTap: () {
-                  _openDepartmentSheet(context, 'Finance', Icons.account_balance_wallet_rounded, Colors.green);
-                },
-              ),
-              _buildQuickActionBtn(
-                context,
-                icon: Icons.confirmation_number_outlined,
-                label: 'IT Support',
-                color: Colors.orange,
-                onTap: () {
-                  _openDepartmentSheet(context, 'IT', Icons.computer_rounded, Colors.indigo);
-                },
-              ),
-              _buildQuickActionBtn(
-                context,
-                icon: Icons.contact_mail_outlined,
-                label: 'Staff Directory',
-                color: Colors.purple,
-                onTap: () {
-                  _openDepartmentSheet(context, 'Media', Icons.slow_motion_video_rounded, Colors.pink);
-                },
+              const Text('Quick Actions', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+              IconButton(
+                icon: const Icon(Icons.settings, size: 16, color: AppTheme.textMuted),
+                onPressed: () => _showEditQuickActionsDialog(),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _activeQuickActions.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 2.2,
+            ),
+            itemBuilder: (context, idx) {
+              final key = _activeQuickActions[idx];
+              final config = _allQuickActions[key]!;
+              return _buildQuickActionBtn(
+                context,
+                icon: config['icon'] as IconData,
+                label: key,
+                color: config['color'] as Color,
+                onTap: () {
+                  if (key == 'Apply Leave') {
+                    context.go('/me');
+                  } else if (key == 'Claim Expense') {
+                    _openDepartmentSheet(context, 'Finance', Icons.account_balance_wallet_rounded, Colors.green);
+                  } else if (key == 'IT Support') {
+                    _openDepartmentSheet(context, 'IT', Icons.computer_rounded, Colors.indigo);
+                  } else if (key == 'Staff Directory') {
+                    _openDepartmentSheet(context, 'Media', Icons.slow_motion_video_rounded, Colors.pink);
+                  } else if (key == 'Submit Help Ticket') {
+                    _openDepartmentSheet(context, 'Maintenance', Icons.build_rounded, Colors.amber);
+                  } else if (key == 'Request Asset') {
+                    _openDepartmentSheet(context, 'Inventory', Icons.devices_rounded, Colors.cyan);
+                  } else if (key == 'Catering Order') {
+                    _openDepartmentSheet(context, 'HOB', Icons.restaurant_menu_rounded, Colors.amber);
+                  } else if (key == 'Event Media Request') {
+                    _openDepartmentSheet(context, 'Media', Icons.video_camera_back_outlined, Colors.red);
+                  } else if (key == 'HR Policies') {
+                    _openDepartmentSheet(context, 'HR', Icons.people_outline, Colors.teal);
+                  }
+                },
+              );
+            },
+          ),
         ],
       ),
+    );
+  }
+
+  void _showEditQuickActionsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Customize Quick Actions'),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _allQuickActions.keys.map((key) {
+                      final isChecked = _activeQuickActions.contains(key);
+                      return CheckboxListTile(
+                        title: Text(key, style: const TextStyle(fontSize: 13.5)),
+                        value: isChecked,
+                        dense: true,
+                        activeColor: AppTheme.primary,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        onChanged: (val) {
+                          setDialogState(() {
+                            if (val == true) {
+                              if (!_activeQuickActions.contains(key)) {
+                                _activeQuickActions.add(key);
+                              }
+                            } else {
+                              if (_activeQuickActions.length > 1) { // keep at least one
+                                _activeQuickActions.remove(key);
+                              }
+                            }
+                          });
+                          setState(() {}); // update dashboard widget immediately
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -2201,28 +2358,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   }
 
   void _handlePresenceQueryIntent(String text) {
-    final staffList = [
-      {'name': 'Ananya Hari', 'dept': 'Media', 'role': 'Graphic Designer', 'location': 'Home', 'email': 'ananya.hari@acaindia.org', 'status': 'IN'},
-      {'name': 'Athul Jospeh Alex', 'dept': 'Media', 'role': 'Sound Engineer', 'location': 'Home', 'email': 'athul.alex@acaindia.org', 'status': 'IN'},
-      {'name': 'Bevan Thomson', 'dept': 'Media', 'role': 'Audio Visual Specialist', 'location': 'Home', 'email': 'bevan.thomson@acaindia.org', 'status': 'IN'},
-      {'name': 'Vinodhkumar Lakshmanan', 'dept': 'Media', 'role': 'Full-Stack Developer', 'location': 'Home', 'email': 'vinodhkumar@acaindia.org', 'status': 'IN'},
-      {'name': 'Peter Parker', 'dept': 'Maintenance', 'role': 'Plumber', 'location': 'Office', 'email': 'peter.parker@acaindia.org', 'status': 'IN'},
-      {'name': 'Robert Bruce', 'dept': 'Maintenance', 'role': 'Electrician', 'location': 'Home', 'email': 'robert.bruce@acaindia.org', 'status': 'OUT'},
-      {'name': 'Tony Stark', 'dept': 'Maintenance', 'role': 'HVAC Specialist', 'location': 'Office', 'email': 'tony.stark@acaindia.org', 'status': 'IN'},
-      {'name': 'Grace Hopper', 'dept': 'Finance', 'role': 'Accountant', 'location': 'Office', 'email': 'grace.hopper@acaindia.org', 'status': 'IN'},
-      {'name': 'Charles Babbage', 'dept': 'Finance', 'role': 'Financial Controller', 'location': 'Home', 'email': 'charles.babbage@acaindia.org', 'status': 'OUT'},
-      {'name': 'James Gosling', 'dept': 'CPD', 'role': 'Training Lead', 'location': 'Office', 'email': 'james.gosling@acaindia.org', 'status': 'IN'},
-      {'name': 'Ada Lovelace', 'dept': 'CPD', 'role': 'CPD Coordinator', 'location': 'Home', 'email': 'ada.lovelace@acaindia.org', 'status': 'IN'},
-      {'name': 'Emma Watson', 'dept': 'HR', 'role': 'HR Operations Manager', 'location': 'Office', 'email': 'emma.watson@acaindia.org', 'status': 'IN'},
-      {'name': 'Paul Rudd', 'dept': 'HR', 'role': 'Talent Recruiter', 'location': 'Home', 'email': 'paul.rudd@acaindia.org', 'status': 'OUT'},
-      {'name': 'Wilson Fisk', 'dept': 'Inventory', 'role': 'Asset Auditor', 'location': 'Office', 'email': 'wilson.fisk@acaindia.org', 'status': 'IN'},
-      {'name': 'Steven Rogers', 'dept': 'Inventory', 'role': 'Inventory Clerk', 'location': 'Home', 'email': 'steven.rogers@acaindia.org', 'status': 'OUT'},
-      {'name': 'Chef Pierre', 'dept': 'HOB', 'role': 'Head Chef', 'location': 'Office', 'email': 'chef.pierre@acaindia.org', 'status': 'IN'},
-      {'name': 'Assistant Jean', 'dept': 'HOB', 'role': 'Sous Chef', 'location': 'Office', 'email': 'assistant.jean@acaindia.org', 'status': 'IN'},
-      {'name': 'Linus Torvalds', 'dept': 'IT', 'role': 'IT Support Specialist', 'location': 'Office', 'email': 'linus.torvalds@acaindia.org', 'status': 'IN'},
-      {'name': 'Steve Wozniak', 'dept': 'IT', 'role': 'Systems Admin', 'location': 'Office', 'email': 'steve.wozniak@acaindia.org', 'status': 'IN'},
-      {'name': 'Guido van Rossum', 'dept': 'IT', 'role': 'IT Architect', 'location': 'Home', 'email': 'guido.rossum@acaindia.org', 'status': 'OUT'},
-    ];
+    final List<Map<String, dynamic>> staffList = [];
+    _presenceData.forEach((dept, list) {
+      for (final staff in list) {
+        staffList.add({
+          'name': staff['name'] as String,
+          'dept': dept,
+          'role': staff['role'] as String,
+          'location': staff['location'] as String,
+          'email': staff['email'] as String,
+          'status': staff['status'] as String,
+        });
+      }
+    });
 
     Map<String, dynamic>? foundStaff;
     for (final staff in staffList) {
