@@ -46,6 +46,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
 
   bool _isChatOpen = false;
   bool _isAiTyping = false;
+  String? _pendingAction;
+  String? _pendingDept;
   final List<Map<String, dynamic>> _chatMessages = [];
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _chatScrollController = ScrollController();
@@ -1827,12 +1829,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     try {
       final isAppRelated = _checkIfAppRelated(text);
       if (!isAppRelated) {
+        if (mounted) {
+          setState(() {
+            _isAiTyping = false;
+          });
+        }
         _addAssistantReply("I am only authorized to assist with ACA HRMs-ERP application operations, such as checking staff presence, raising department tickets, or portal info. Please ask a question related to this app.");
         return;
       }
 
+      // Check if we are in a pending flow
+      if (_pendingAction == 'raise_ticket') {
+        _handlePendingTicketFlow(userText);
+        return;
+      }
+
       if (text.contains('ticket') || text.contains('raise') || text.contains('create') || text.contains('change') || text.contains('issue') || text.contains('reimburse') || text.contains('request')) {
-        _handleTicketCreationIntent(userText);
+        // If the ticket prompt is too generic/short, ask clarifying questions
+        final cleanText = text.replaceAll('raise a ticket', '').replaceAll('create a ticket', '').trim();
+        if (cleanText.length < 15) {
+          setState(() {
+            _pendingAction = 'raise_ticket';
+          });
+          _addAssistantReply("I would be glad to help you raise a ticket. 🎫\n\nCould you please describe the issue/request, and let me know which department (e.g. IT, HR, Maintenance, HOB) it is for?");
+        } else {
+          _handleTicketCreationIntent(userText);
+        }
         return;
       }
 
@@ -1842,13 +1864,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       }
 
       _addAssistantReply("I can help you with two main actions:\n1. **Raise a ticket**: Ask me to 'Raise a ticket to IT to change the light bulb in the auditorium'.\n2. **Check staff presence**: Ask me 'Is Vinodh from Media in today?'");
-    } catch (e) {
+    } catch (e, stack) {
+      print('AI AGENT ERROR: $e\n$stack');
       if (mounted) {
         setState(() {
           _isAiTyping = false;
         });
       }
-      _addAssistantReply("Apologies, I encountered an error processing that request. Please try again.");
+      _addAssistantReply("Apologies, I encountered an error: $e. Please verify details and try again.");
     }
   }
 
@@ -1924,6 +1947,76 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         "* **Details**:\n$formattedDesc\n"
         "* **Status**: Pending\n\n"
         "You can track this instantly in the **$deptName Department Portal** under recent tickets!");
+  }
+
+  void _handlePendingTicketFlow(String input) {
+    final text = input.toLowerCase();
+    
+    // Find department in input
+    String? matchedDept;
+    final depts = ['it', 'hr', 'maintenance', 'finance', 'cpd', 'inventory', 'hob', 'media'];
+    for (final dept in depts) {
+      if (text.contains(dept)) {
+        matchedDept = dept == 'it' ? 'IT' : (dept == 'hr' ? 'HR' : dept[0].toUpperCase() + dept.substring(1));
+        break;
+      }
+    }
+
+    if (_pendingDept == null && matchedDept != null) {
+      _pendingDept = matchedDept;
+    }
+
+    // If we still don't have department, ask for it
+    if (_pendingDept == null) {
+      _addAssistantReply("Which department should this ticket be routed to? (IT, HR, Maintenance, Finance, CPD, Inventory, HOB, or Media)");
+      return;
+    }
+
+    // Now we have the department, if we don't have the description, check if the input is just the department name itself
+    final desc = input.trim();
+    if (desc.isEmpty || depts.contains(desc.toLowerCase())) {
+      _addAssistantReply("Got it. Routing to $_pendingDept. What are the details/description for this ticket request?");
+      return;
+    }
+
+    // Determine service name based on description
+    String serviceName = 'Support request';
+    final descLower = desc.toLowerCase();
+    if (descLower.contains('bulb') || descLower.contains('light') || descLower.contains('plumb') || descLower.contains('repair')) {
+      serviceName = 'Light bulb change';
+    } else if (descLower.contains('leave') || descLower.contains('policy')) {
+      serviceName = 'Leave policy query';
+    } else if (descLower.contains('reimburse') || descLower.contains('salary') || descLower.contains('invoice')) {
+      serviceName = 'Expense reimbursement';
+    } else if (descLower.contains('laptop') || descLower.contains('chair') || descLower.contains('accessory')) {
+      serviceName = 'Request laptop accessories';
+    } else if (descLower.contains('catering') || descLower.contains('food')) {
+      serviceName = 'Event catering order';
+    } else if (descLower.contains('video') || descLower.contains('stream') || descLower.contains('mixer')) {
+      serviceName = 'Live stream setup';
+    }
+
+    // Format description professionally
+    final authState = ref.read(authProvider);
+    final employeeName = authState.employee?.fullName ?? 'Employee';
+    final formattedDesc = "Dear Sir,\n\n$desc\n\nWith Regards,\n$employeeName.";
+
+    setState(() {
+      _recentTickets.insert(0, <String, String>{
+        'dept': _pendingDept!,
+        'service': serviceName,
+        'desc': formattedDesc,
+        'status': 'Pending'
+      });
+      _pendingAction = null;
+      _pendingDept = null;
+    });
+
+    _addAssistantReply("I have raised the ticket for you! 🎫\n\n"
+        "* **Department**: ${_recentTickets.first['dept']}\n"
+        "* **Service**: $serviceName\n"
+        "* **Details**:\n$formattedDesc\n\n"
+        "You can track this instantly in the portal sheet.");
   }
 
   void _handlePresenceQueryIntent(String text) {
