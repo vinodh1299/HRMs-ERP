@@ -131,34 +131,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
               return Container(
                 margin: const EdgeInsets.only(right: 12),
                 width: 95,
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: AppTheme.borderGrey, width: 1),
-                  ),
+                decoration: BoxDecoration(
                   color: color.withOpacity(0.05),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => _openDepartmentSheet(context, name, icon, color),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(icon, color: color, size: 24),
-                        const SizedBox(height: 6),
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textDark,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.borderGrey, width: 1),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => _openDepartmentSheet(context, name, icon, color),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: color, size: 24),
+                      const SizedBox(height: 6),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textDark,
                         ),
-                      ],
-                    ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -959,171 +956,195 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final leaveState = ref.watch(leaveProvider);
     final holidays = leaveState.holidays;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Upcoming Holidays', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
-            const SizedBox(height: 16),
-            if (holidays.isEmpty)
-              const Text('No holidays listed.')
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: holidays.length > 3 ? 3 : holidays.length,
-                separatorBuilder: (context, idx) => const Divider(color: AppTheme.borderGrey),
-                itemBuilder: (context, idx) {
-                  final h = holidays[idx];
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                    leading: const Icon(Icons.celebration, color: AppTheme.primary),
-                    title: Text(h.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(h.date),
-                  );
-                },
-              ),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Upcoming Holidays', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 16),
+          if (holidays.isEmpty)
+            const Text('No holidays listed.')
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: holidays.length > 3 ? 3 : holidays.length,
+              separatorBuilder: (context, idx) => const Divider(color: AppTheme.borderGrey),
+              itemBuilder: (context, idx) {
+                final h = holidays[idx];
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  leading: const Icon(Icons.celebration, color: AppTheme.primary),
+                  title: Text(h.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(h.date),
+                );
+              },
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildAnnouncementsFeed() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Announcements', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
-            const SizedBox(height: 16),
-            if (_announcements.isEmpty)
-              const Text('No company announcements posted.')
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _announcements.length,
-                separatorBuilder: (context, idx) => const SizedBox(height: 12),
-                itemBuilder: (context, idx) {
-                  final a = _announcements[idx];
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppTheme.bgLight,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                              child: Text(
-                                a['category'] ?? 'General',
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.primary),
-                              ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Announcements', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 16),
+          if (_announcements.isEmpty)
+            const Text('No company announcements posted.')
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _announcements.length,
+              separatorBuilder: (context, idx) => const SizedBox(height: 12),
+              itemBuilder: (context, idx) {
+                final a = _announcements[idx];
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.bgLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                            child: Text(
+                              a['category'] ?? 'General',
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.primary),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          a['title'] ?? '',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textDark),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          a['content'] ?? '',
-                          style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-          ],
-        ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        a['title'] ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textDark),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        a['content'] ?? '',
+                        style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildCelebrationsWidget() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Celebrations Today', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: AppTheme.primary.withOpacity(0.1),
-                  child: const Text('SR', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(width: 12),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Suresh Raina', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Birthday Today!', style: TextStyle(fontSize: 12, color: AppTheme.accent)),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Celebrations Today', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: AppTheme.primary.withOpacity(0.1),
+                child: const Text('SR', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Suresh Raina', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Birthday Today!', style: TextStyle(fontSize: 12, color: AppTheme.accent)),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildPollsWidget() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Pulse Polls', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
-            const SizedBox(height: 16),
-            if (_polls.isEmpty)
-              const Text('No polls currently active.')
-            else
-              ..._polls.map((p) {
-                final List options = p['options'] ?? [];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(p['question'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    const SizedBox(height: 12),
-                    ...options.map((opt) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            alignment: Alignment.centerLeft,
-                            minimumSize: const Size(double.infinity, 40),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                          ),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thank you for voting!')));
-                          },
-                          child: Text(opt.toString()),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Pulse Polls', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+          const SizedBox(height: 16),
+          if (_polls.isEmpty)
+            const Text('No polls currently active.')
+          else
+            ..._polls.map((p) {
+              final List options = p['options'] ?? [];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(p['question'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 12),
+                  ...options.map((opt) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                          minimumSize: const Size(double.infinity, 40),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                         ),
-                      );
-                    }).toList(),
-                  ],
-                );
-              }).toList(),
-          ],
-        ),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thank you for voting!')));
+                        },
+                        child: Text(opt.toString()),
+                      ),
+                    );
+                  }).toList(),
+                ],
+              );
+            }).toList(),
+        ],
       ),
     );
   }
@@ -1474,161 +1495,166 @@ class _InteractiveCalendarWidgetState extends ConsumerState<InteractiveCalendarW
     final monthName = DateFormat('MMMM yyyy').format(_currentMonth);
     const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-    return Card(
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left_rounded, size: 18),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: _prevMonth,
-                ),
-                Text(
-                  monthName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right_rounded, size: 18),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: _nextMonth,
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: weekdays.map((day) {
-                return SizedBox(
-                  width: 28,
-                  child: Text(
-                    day,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textMuted,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 4),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: startOffset + totalDays,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                childAspectRatio: 1.25,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left_rounded, size: 18),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: _prevMonth,
               ),
-              itemBuilder: (context, index) {
-                if (index < startOffset) {
-                  return const SizedBox.shrink();
-                }
+              Text(
+                monthName,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right_rounded, size: 18),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: _nextMonth,
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekdays.map((day) {
+              return SizedBox(
+                width: 28,
+                child: Text(
+                  day,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMuted,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 4),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: startOffset + totalDays,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              childAspectRatio: 1.25,
+            ),
+            itemBuilder: (context, index) {
+              if (index < startOffset) {
+                return const SizedBox.shrink();
+              }
 
-                final dayNum = index - startOffset + 1;
-                final targetDate = DateTime(year, month, dayNum);
-                final isToday = targetDate.year == now.year &&
-                    targetDate.month == now.month &&
-                    targetDate.day == now.day;
+              final dayNum = index - startOffset + 1;
+              final targetDate = DateTime(year, month, dayNum);
+              final isToday = targetDate.year == now.year &&
+                  targetDate.month == now.month &&
+                  targetDate.day == now.day;
 
-                final dayEvents = events.where((e) {
-                  return e.date.year == targetDate.year &&
-                      e.date.month == targetDate.month &&
-                      e.date.day == targetDate.day;
-                }).toList();
+              final dayEvents = events.where((e) {
+                return e.date.year == targetDate.year &&
+                    e.date.month == targetDate.month &&
+                    e.date.day == targetDate.day;
+              }).toList();
 
-                final hasEvents = dayEvents.isNotEmpty;
+              final hasEvents = dayEvents.isNotEmpty;
 
-                final cellAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-                  CurvedAnimation(
-                    parent: _staggerController,
-                    curve: Interval(
-                      ((index - startOffset) * 0.012).clamp(0.0, 0.6),
-                      (((index - startOffset) * 0.012) + 0.35).clamp(0.0, 1.0),
-                      curve: Curves.easeOutBack,
+              final cellAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(
+                  parent: _staggerController,
+                  curve: Interval(
+                    ((index - startOffset) * 0.012).clamp(0.0, 0.6),
+                    (((index - startOffset) * 0.012) + 0.35).clamp(0.0, 1.0),
+                    curve: Curves.easeOutBack,
+                  ),
+                ),
+              );
+
+              Widget dayCell = Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isToday ? AppTheme.primary : (hasEvents ? const Color(0xFFFEF3C7) : Colors.transparent),
+                  borderRadius: BorderRadius.circular(6),
+                  border: isToday
+                      ? null
+                      : Border.all(
+                          color: hasEvents ? const Color(0xFFF59E0B) : Colors.transparent,
+                          width: 1,
+                        ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$dayNum',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: isToday
+                            ? Colors.white
+                            : (hasEvents ? const Color(0xFFB45309) : AppTheme.textDark),
+                      ),
                     ),
-                  ),
-                );
-
-                Widget dayCell = Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isToday ? AppTheme.primary : (hasEvents ? const Color(0xFFFEF3C7) : Colors.transparent),
-                    borderRadius: BorderRadius.circular(6),
-                    border: isToday
-                        ? null
-                        : Border.all(
-                            color: hasEvents ? const Color(0xFFF59E0B) : Colors.transparent,
-                            width: 1,
+                    if (hasEvents)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 1.0),
+                        child: Text(
+                          _shortEventTitle(dayEvents.first.title),
+                          style: const TextStyle(
+                            fontSize: 7,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFB45309),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$dayNum',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isToday
-                              ? Colors.white
-                              : (hasEvents ? const Color(0xFFB45309) : AppTheme.textDark),
                         ),
                       ),
-                      if (hasEvents)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 1.0),
-                          child: Text(
-                            _shortEventTitle(dayEvents.first.title),
-                            style: const TextStyle(
-                              fontSize: 7,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFB45309),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                );
+                  ],
+                ),
+              );
 
-                if (hasEvents) {
-                  dayCell = PulsatingEventContainer(child: dayCell);
-                }
+              if (hasEvents) {
+                dayCell = PulsatingEventContainer(child: dayCell);
+              }
 
-                dayCell = ScaleTransition(
-                  scale: cellAnimation,
-                  child: FadeTransition(
-                    opacity: cellAnimation,
-                    child: dayCell,
-                  ),
-                );
-
-                return InteractiveCalendarCell(
-                  onTap: () {
-                    if (hasEvents) {
-                      _showDayEventsDialog(context, targetDate, dayEvents);
-                    } else {
-                      _showAddEventDirectDialog(context, targetDate);
-                    }
-                  },
+              dayCell = ScaleTransition(
+                scale: cellAnimation,
+                child: FadeTransition(
+                  opacity: cellAnimation,
                   child: dayCell,
-                );
-              },
-            ),
-          ],
-        ),
+                ),
+              );
+
+              return InteractiveCalendarCell(
+                onTap: () {
+                  if (hasEvents) {
+                    _showDayEventsDialog(context, targetDate, dayEvents);
+                  } else {
+                    _showAddEventDirectDialog(context, targetDate);
+                  }
+                },
+                child: dayCell,
+              );
+            },
+          ),
+        ],
       ),
     );
   }
