@@ -180,45 +180,185 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
 
     final Map<String, List<Map<String, dynamic>>> presence = {
       'Media': [
-        {'name': 'John Doe', 'status': 'IN'},
-        {'name': 'Sarah Connor', 'status': 'IN'},
-        {'name': 'David Miller', 'status': 'OUT'},
+        {
+          'name': 'Ananya Hari',
+          'role': 'Graphic Designer',
+          'location': 'Home',
+          'email': 'ananya.hari@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Athul Jospeh Alex',
+          'role': 'Sound Engineer',
+          'location': 'Home',
+          'email': 'athul.alex@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Bevan Thomson',
+          'role': 'Audio Visual Specialist',
+          'location': 'Home',
+          'email': 'bevan.thomson@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Vinodhkumar Lakshmanan',
+          'role': 'Full-Stack Developer',
+          'location': 'Home',
+          'email': 'vinodhkumar@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'Maintenance': [
-        {'name': 'Peter Parker', 'status': 'IN'},
-        {'name': 'Robert Bruce', 'status': 'OUT'},
-        {'name': 'Tony Stark', 'status': 'IN'},
+        {
+          'name': 'Peter Parker',
+          'role': 'Plumber',
+          'location': 'Office',
+          'email': 'peter.parker@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Robert Bruce',
+          'role': 'Electrician',
+          'location': 'Home',
+          'email': 'robert.bruce@acaindia.org',
+          'status': 'OUT',
+          'avatar': 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Tony Stark',
+          'role': 'HVAC Specialist',
+          'location': 'Office',
+          'email': 'tony.stark@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'Finance': [
-        {'name': 'Grace Hopper', 'status': 'IN'},
-        {'name': 'Charles Babbage', 'status': 'OUT'},
+        {
+          'name': 'Grace Hopper',
+          'role': 'Accountant',
+          'location': 'Office',
+          'email': 'grace.hopper@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Charles Babbage',
+          'role': 'Financial Controller',
+          'location': 'Home',
+          'email': 'charles.babbage@acaindia.org',
+          'status': 'OUT',
+          'avatar': 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'CPD': [
-        {'name': 'James Gosling', 'status': 'IN'},
-        {'name': 'Ada Lovelace', 'status': 'IN'},
+        {
+          'name': 'James Gosling',
+          'role': 'Training Lead',
+          'location': 'Office',
+          'email': 'james.gosling@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Ada Lovelace',
+          'role': 'CPD Coordinator',
+          'location': 'Home',
+          'email': 'ada.lovelace@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'HR': [
-        {'name': 'Emma Watson', 'status': 'IN'},
-        {'name': 'Paul Rudd', 'status': 'OUT'},
+        {
+          'name': 'Emma Watson',
+          'role': 'HR Operations Manager',
+          'location': 'Office',
+          'email': 'emma.watson@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Paul Rudd',
+          'role': 'Talent Recruiter',
+          'location': 'Home',
+          'email': 'paul.rudd@acaindia.org',
+          'status': 'OUT',
+          'avatar': 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'Inventory': [
-        {'name': 'Wilson Fisk', 'status': 'IN'},
-        {'name': 'Steven Rogers', 'status': 'OUT'},
+        {
+          'name': 'Wilson Fisk',
+          'role': 'Asset Auditor',
+          'location': 'Office',
+          'email': 'wilson.fisk@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Steven Rogers',
+          'role': 'Inventory Clerk',
+          'location': 'Home',
+          'email': 'steven.rogers@acaindia.org',
+          'status': 'OUT',
+          'avatar': 'https://images.unsplash.com/photo-1489980508314-941910ded1f4?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'HOB': [
-        {'name': 'Chef Pierre', 'status': 'IN'},
-        {'name': 'Assistant Jean', 'status': 'IN'},
-        {'name': 'Gaston Cleaner', 'status': 'OUT'},
+        {
+          'name': 'Chef Pierre',
+          'role': 'Head Chef',
+          'location': 'Office',
+          'email': 'chef.pierre@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Assistant Jean',
+          'role': 'Sous Chef',
+          'location': 'Office',
+          'email': 'assistant.jean@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=150&auto=format&fit=crop&q=80',
+        },
       ],
       'IT': [
-        {'name': 'Linus Torvalds', 'status': 'IN'},
-        {'name': 'Steve Wozniak', 'status': 'IN'},
-        {'name': 'Guido van Rossum', 'status': 'OUT'},
+        {
+          'name': 'Linus Torvalds',
+          'role': 'IT Support Specialist',
+          'location': 'Office',
+          'email': 'linus.torvalds@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1547037579-f0fc020ac3be?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Steve Wozniak',
+          'role': 'Systems Admin',
+          'location': 'Office',
+          'email': 'steve.wozniak@acaindia.org',
+          'status': 'IN',
+          'avatar': 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&auto=format&fit=crop&q=80',
+        },
+        {
+          'name': 'Guido van Rossum',
+          'role': 'IT Architect',
+          'location': 'Home',
+          'email': 'guido.rossum@acaindia.org',
+          'status': 'OUT',
+          'avatar': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+        },
       ],
     };
 
     final deptServices = services[deptName] ?? ['General Support Request'];
-    final deptPresence = presence[deptName] ?? [{'name': 'Staff Member', 'status': 'IN'}];
+    final deptPresence = presence[deptName] ?? [];
 
     String selectedService = deptServices.first;
     final descController = TextEditingController();
@@ -279,48 +419,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       letterSpacing: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: deptPresence.map((p) {
-                      final name = p['name'] as String;
-                      final isIN = p['status'] == 'IN';
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isIN ? Colors.green.withOpacity(0.06) : Colors.red.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isIN ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: isIN ? Colors.green : Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isIN ? Colors.green[800] : Colors.red[800],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                  const SizedBox(height: 10),
+                  if (deptPresence.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text('No team presence information listed.'),
+                    )
+                  else
+                    SizedBox(
+                      height: 112,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: deptPresence.length,
+                        itemBuilder: (context, index) {
+                          return _buildStaffCard(deptPresence[index], deptName);
+                        },
+                      ),
+                    ),
                   const SizedBox(height: 24),
                   // Section 2: Helpdesk Ticket
                   Text(
@@ -461,6 +576,146 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           },
         );
       },
+    );
+  }
+
+  Widget _buildStaffCard(Map<String, dynamic> staff, String deptName) {
+    final name = staff['name'] as String;
+    final role = staff['role'] as String;
+    final location = staff['location'] as String;
+    final email = staff['email'] as String;
+    final isIN = staff['status'] == 'IN';
+    final avatarUrl = staff['avatar'] as String;
+
+    return Container(
+      width: 280,
+      margin: const EdgeInsets.only(right: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Stack(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipOval(
+                child: Image.network(
+                  avatarUrl,
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppTheme.primary.withOpacity(0.1),
+                    child: Text(
+                      name.substring(0, 2).toUpperCase(),
+                      style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textDark,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppTheme.borderGrey),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Icon(
+                            location == 'Home' ? Icons.laptop_mac_rounded : Icons.apartment_rounded,
+                            size: 10,
+                            color: AppTheme.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      role,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Location : $location',
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Department : $deptName',
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Email : $email',
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+              decoration: BoxDecoration(
+                color: isIN ? const Color(0xFF84CC16) : Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                isIN ? 'IN' : 'OUT',
+                style: const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
