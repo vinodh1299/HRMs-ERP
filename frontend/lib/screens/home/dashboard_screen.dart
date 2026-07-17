@@ -45,6 +45,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   ];
 
   bool _isChatOpen = false;
+  bool _isAiTyping = false;
   final List<Map<String, dynamic>> _chatMessages = [];
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _chatScrollController = ScrollController();
@@ -1656,8 +1657,49 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
               child: ListView.builder(
                 controller: _chatScrollController,
                 padding: const EdgeInsets.all(12),
-                itemCount: _chatMessages.length,
+                itemCount: _chatMessages.length + (_isAiTyping ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (index == _chatMessages.length && _isAiTyping) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          border: Border.all(color: AppTheme.borderGrey),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              width: 8,
+                              height: 8,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                color: AppTheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'AI is typing...',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.textMuted,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
                   final msg = _chatMessages[index];
                   final isUser = msg['sender'] == 'user';
                   return Align(
@@ -1778,6 +1820,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         'text': userText,
         'time': DateTime.now(),
       });
+      _isAiTyping = true;
     });
     _scrollToBottom();
 
@@ -1930,9 +1973,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   }
 
   void _addAssistantReply(String text) {
-    Future.delayed(const Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) {
         setState(() {
+          _isAiTyping = false;
           _chatMessages.add({
             'sender': 'assistant',
             'text': text,
