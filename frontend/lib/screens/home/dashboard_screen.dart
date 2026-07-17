@@ -109,34 +109,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     _presenceData = {
       'Media': [
         {
-          'name': 'Ananya Hari',
+          'name': 'Sarah Jenkins',
           'role': 'Graphic Designer',
           'location': 'Home',
-          'email': 'ananya.hari@acaindia.org',
+          'email': 'sarah.jenkins@acaindia.org',
           'status': 'IN',
           'avatar': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
         },
         {
-          'name': 'Athul Joseph Alex',
+          'name': 'David Miller',
           'role': 'Sound Engineer',
           'location': 'Home',
-          'email': 'athul.alex@acaindia.org',
+          'email': 'david.miller@acaindia.org',
           'status': 'IN',
           'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
         },
         {
-          'name': 'Bevan Thomson',
+          'name': 'Michael Vance',
           'role': 'Audio Visual Specialist',
           'location': 'Home',
-          'email': 'bevan.thomson@acaindia.org',
+          'email': 'michael.vance@acaindia.org',
           'status': 'IN',
           'avatar': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
         },
         {
-          'name': 'Vinodhkumar Lakshmanan',
+          'name': 'Alex Mercer',
           'role': 'Full-Stack Developer',
           'location': 'Home',
-          'email': 'vinodhkumar@acaindia.org',
+          'email': 'alex.mercer@acaindia.org',
           'status': 'IN',
           'avatar': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
         },
@@ -702,13 +702,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                           ),
                         ),
                         const SizedBox(width: 4),
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 12, color: AppTheme.textMuted),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () => _showEditStaffNameDialog(context, staff, deptName),
-                        ),
-                        const SizedBox(width: 4),
                         Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
@@ -785,47 +778,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     );
   }
 
-  void _showEditStaffNameDialog(BuildContext context, Map<String, dynamic> staff, String deptName) {
-    final controller = TextEditingController(text: staff['name'] as String);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Edit Name for ${staff['role']}'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Staff Name',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final newName = controller.text.trim();
-                if (newName.isNotEmpty) {
-                  setState(() {
-                    staff['name'] = newName;
-                  });
-                  Navigator.pop(context);
-                  Navigator.pop(context); // close bottom sheet to refresh state
-                  _openDepartmentSheet(context, deptName, Icons.slow_motion_video_rounded, Colors.pink); // re-open to show updated name instantly
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Name updated to $newName successfully!')),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
