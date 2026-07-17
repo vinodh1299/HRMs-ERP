@@ -1465,12 +1465,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           if (nextHoliday == null)
             const Text('No upcoming holidays listed.')
           else
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              leading: const Icon(Icons.celebration, color: AppTheme.primary),
-              title: Text(nextHoliday.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(nextHoliday.date),
+            Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.celebration, color: AppTheme.primary, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      nextHoliday.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      nextHoliday.date,
+                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    ),
+                  ],
+                ),
+              ],
             ),
         ],
       ),
@@ -1564,14 +1586,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           Row(
             children: [
               CircleAvatar(
+                radius: 18,
                 backgroundColor: AppTheme.primary.withOpacity(0.1),
-                child: const Text('SR', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                child: const Text('SR', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 13)),
               ),
               const SizedBox(width: 12),
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Suresh Raina', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Suresh Raina', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark)),
+                  SizedBox(height: 2),
                   Text('Birthday Today!', style: TextStyle(fontSize: 12, color: AppTheme.accent)),
                 ],
               ),
