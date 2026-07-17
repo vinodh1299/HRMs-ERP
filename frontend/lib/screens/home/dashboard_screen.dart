@@ -44,6 +44,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     }
   ];
 
+  bool _isChatOpen = false;
+  final List<Map<String, dynamic>> _chatMessages = [];
+  final TextEditingController _chatController = TextEditingController();
+  final ScrollController _chatScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +73,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   void dispose() {
     _tabController.dispose();
     _timer.cancel();
+    _chatController.dispose();
+    _chatScrollController.dispose();
     super.dispose();
   }
 
@@ -743,12 +750,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Stack(
         children: [
-          _buildDashboardTab(context, employee?.fullName ?? 'Employee'),
-          _buildWelcomeTab(context, employee?.fullName ?? 'Employee'),
+          TabBarView(
+            controller: _tabController,
+            children: [
+              _buildDashboardTab(context, employee?.fullName ?? 'Employee'),
+              _buildWelcomeTab(context, employee?.fullName ?? 'Employee'),
+            ],
+          ),
+          if (_isChatOpen)
+            Positioned(
+              right: 20,
+              bottom: 80,
+              child: _buildChatDrawerWidget(),
+            ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _isChatOpen = !_isChatOpen;
+            if (_isChatOpen && _chatMessages.isEmpty) {
+              _chatMessages.add({
+                'sender': 'assistant',
+                'text': 'Hello! I am your ACA Portal AI Assistant. I can help you check employee presence (e.g. "Is Vinodh in today?") or raise a ticket (e.g. "Raise a ticket to IT to change the light bulb in the auditorium"). What can I do for you today?',
+                'time': DateTime.now(),
+              });
+            }
+          });
+        },
+        backgroundColor: AppTheme.primary,
+        child: Icon(_isChatOpen ? Icons.close_rounded : Icons.chat_bubble_outline_rounded, color: Colors.white),
       ),
     );
   }
@@ -1541,6 +1574,367 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         ],
       ),
     );
+  }
+
+  Widget _buildChatDrawerWidget() {
+    final width = MediaQuery.of(context).size.width;
+    final isSmall = width < 500;
+    final drawerWidth = isSmall ? width - 40 : 360.0;
+    final drawerHeight = isSmall ? 420.0 : 500.0;
+
+    return Container(
+      width: drawerWidth,
+      height: drawerHeight,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppTheme.primary, AppTheme.secondary],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(19),
+                topRight: Radius.circular(19),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.psychology_rounded, color: Colors.white, size: 24),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text(
+                        'ACA Portal AI Assistant',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        'Secure Domain Guardrail Active',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    setState(() {
+                      _isChatOpen = false;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: AppTheme.bgLight,
+              child: ListView.builder(
+                controller: _chatScrollController,
+                padding: const EdgeInsets.all(12),
+                itemCount: _chatMessages.length,
+                itemBuilder: (context, index) {
+                  final msg = _chatMessages[index];
+                  final isUser = msg['sender'] == 'user';
+                  return Align(
+                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      constraints: BoxConstraints(maxWidth: drawerWidth * 0.75),
+                      decoration: BoxDecoration(
+                        color: isUser ? AppTheme.primary : Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(12),
+                          topRight: const Radius.circular(12),
+                          bottomLeft: isUser ? const Radius.circular(12) : Radius.zero,
+                          bottomRight: isUser ? Radius.zero : const Radius.circular(12),
+                        ),
+                        border: isUser ? null : Border.all(color: AppTheme.borderGrey),
+                        boxShadow: isUser
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.015),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                      ),
+                      child: Text(
+                        msg['text'] as String,
+                        style: TextStyle(
+                          color: isUser ? Colors.white : AppTheme.textDark,
+                          fontSize: 12.5,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(19),
+                bottomRight: Radius.circular(19),
+              ),
+              border: Border(
+                top: BorderSide(color: AppTheme.borderGrey),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _chatController,
+                    style: const TextStyle(fontSize: 13),
+                    decoration: const InputDecoration(
+                      hintText: 'Ask about staff presence or raising a ticket...',
+                      hintStyle: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    onSubmitted: (val) {
+                      final txt = val.trim();
+                      if (txt.isNotEmpty) {
+                        _chatController.clear();
+                        _processAgentMessage(txt);
+                      }
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send_rounded, color: AppTheme.primary, size: 20),
+                  onPressed: () {
+                    final txt = _chatController.text.trim();
+                    if (txt.isNotEmpty) {
+                      _chatController.clear();
+                      _processAgentMessage(txt);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _checkIfAppRelated(String text) {
+    final keywords = [
+      'ticket', 'raise', 'create', 'submit', 'issue', 'request', 'reimburse',
+      'it', 'maintenance', 'finance', 'cpd', 'hr', 'inventory', 'hob', 'media',
+      'attendance', 'clock', 'check', 'in', 'out', 'leave', 'holiday',
+      'vinodh', 'ananya', 'athul', 'bevan', 'presence', 'staff', 'employee',
+      'suresh', 'linus', 'steve', 'guido', 'chef pierre', 'assistant jean',
+      'peter parker', 'tony stark', 'robert bruce', 'grace hopper',
+      'ada lovelace', 'emma watson', 'paul rudd', 'wilson fisk', 'steven rogers',
+      'bulb', 'light', 'mixer', 'software', 'install', 'rehearsal', 'annual',
+      'work from home', 'office', 'help', 'onboarding', 'support', 'mix'
+    ];
+    
+    for (final kw in keywords) {
+      if (text.contains(kw)) return true;
+    }
+    return false;
+  }
+
+  void _processAgentMessage(String userText) {
+    final text = userText.trim().toLowerCase();
+    
+    setState(() {
+      _chatMessages.add({
+        'sender': 'user',
+        'text': userText,
+        'time': DateTime.now(),
+      });
+    });
+    _scrollToBottom();
+
+    final isAppRelated = _checkIfAppRelated(text);
+    if (!isAppRelated) {
+      _addAssistantReply("I am only authorized to assist with ACA HRMs-ERP application operations, such as checking staff presence, raising department tickets, or portal info. Please ask a question related to this app.");
+      return;
+    }
+
+    if (text.contains('ticket') || text.contains('raise') || text.contains('create') || text.contains('change') || text.contains('issue') || text.contains('reimburse') || text.contains('request')) {
+      _handleTicketCreationIntent(userText);
+      return;
+    }
+
+    if (text.contains('presence') || text.contains('is ') || text.contains('status') || text.contains('in today') || text.contains('out today') || text.contains('here')) {
+      _handlePresenceQueryIntent(text);
+      return;
+    }
+
+    _addAssistantReply("I can help you with two main actions:\n1. **Raise a ticket**: Ask me to 'Raise a ticket to IT to change the light bulb in the auditorium'.\n2. **Check staff presence**: Ask me 'Is Vinodh from Media in today?'");
+  }
+
+  void _handleTicketCreationIntent(String originalText) {
+    final text = originalText.toLowerCase();
+    String deptName = 'IT';
+    String serviceName = 'Support request';
+    
+    if (text.contains('maintenance') || text.contains('bulb') || text.contains('light') || text.contains('plumb') || text.contains('repair')) {
+      deptName = 'Maintenance';
+      serviceName = 'Light bulb change';
+    } else if (text.contains('hr') || text.contains('leave') || text.contains('policy')) {
+      deptName = 'HR';
+      serviceName = 'Leave policy query';
+    } else if (text.contains('finance') || text.contains('reimburse') || text.contains('salary') || text.contains('invoice')) {
+      deptName = 'Finance';
+      serviceName = 'Expense reimbursement';
+    } else if (text.contains('cpd') || text.contains('training') || text.contains('workshop')) {
+      deptName = 'CPD';
+      serviceName = 'Register for workshop';
+    } else if (text.contains('inventory') || text.contains('laptop') || text.contains('chair') || text.contains('accessory')) {
+      deptName = 'Inventory';
+      serviceName = 'Request laptop accessories';
+    } else if (text.contains('hob') || text.contains('catering') || text.contains('food') || text.contains('pantry')) {
+      deptName = 'HOB';
+      serviceName = 'Event catering order';
+    } else if (text.contains('media') || text.contains('video') || text.contains('stream') || text.contains('photography') || text.contains('mixer')) {
+      deptName = 'Media';
+      serviceName = 'Live stream setup';
+    } else {
+      deptName = 'IT';
+      if (text.contains('software')) {
+        serviceName = 'Software installation request';
+      } else if (text.contains('hardware')) {
+        serviceName = 'Hardware troubleshooting';
+      } else if (text.contains('vpn') || text.contains('network') || text.contains('internet')) {
+        serviceName = 'Network & VPN access';
+      } else {
+        serviceName = 'Email / account setup';
+      }
+    }
+
+    setState(() {
+      _recentTickets.insert(0, {
+        'dept': deptName,
+        'service': serviceName,
+        'desc': originalText,
+        'status': 'Pending'
+      });
+    });
+
+    _addAssistantReply("I have automatically raised a **$deptName** ticket for you! 🎫\n\n"
+        "* **Service**: $serviceName\n"
+        "* **Details**: $originalText\n"
+        "* **Status**: Pending\n\n"
+        "You can track this instantly in the **$deptName Department Portal** under recent tickets!");
+  }
+
+  void _handlePresenceQueryIntent(String text) {
+    final staffList = [
+      {'name': 'Ananya Hari', 'dept': 'Media', 'role': 'Graphic Designer', 'location': 'Home', 'email': 'ananya.hari@acaindia.org', 'status': 'IN'},
+      {'name': 'Athul Jospeh Alex', 'dept': 'Media', 'role': 'Sound Engineer', 'location': 'Home', 'email': 'athul.alex@acaindia.org', 'status': 'IN'},
+      {'name': 'Bevan Thomson', 'dept': 'Media', 'role': 'Audio Visual Specialist', 'location': 'Home', 'email': 'bevan.thomson@acaindia.org', 'status': 'IN'},
+      {'name': 'Vinodhkumar Lakshmanan', 'dept': 'Media', 'role': 'Full-Stack Developer', 'location': 'Home', 'email': 'vinodhkumar@acaindia.org', 'status': 'IN'},
+      {'name': 'Peter Parker', 'dept': 'Maintenance', 'role': 'Plumber', 'location': 'Office', 'email': 'peter.parker@acaindia.org', 'status': 'IN'},
+      {'name': 'Robert Bruce', 'dept': 'Maintenance', 'role': 'Electrician', 'location': 'Home', 'email': 'robert.bruce@acaindia.org', 'status': 'OUT'},
+      {'name': 'Tony Stark', 'dept': 'Maintenance', 'role': 'HVAC Specialist', 'location': 'Office', 'email': 'tony.stark@acaindia.org', 'status': 'IN'},
+      {'name': 'Grace Hopper', 'dept': 'Finance', 'role': 'Accountant', 'location': 'Office', 'email': 'grace.hopper@acaindia.org', 'status': 'IN'},
+      {'name': 'Charles Babbage', 'dept': 'Finance', 'role': 'Financial Controller', 'location': 'Home', 'email': 'charles.babbage@acaindia.org', 'status': 'OUT'},
+      {'name': 'James Gosling', 'dept': 'CPD', 'role': 'Training Lead', 'location': 'Office', 'email': 'james.gosling@acaindia.org', 'status': 'IN'},
+      {'name': 'Ada Lovelace', 'dept': 'CPD', 'role': 'CPD Coordinator', 'location': 'Home', 'email': 'ada.lovelace@acaindia.org', 'status': 'IN'},
+      {'name': 'Emma Watson', 'dept': 'HR', 'role': 'HR Operations Manager', 'location': 'Office', 'email': 'emma.watson@acaindia.org', 'status': 'IN'},
+      {'name': 'Paul Rudd', 'dept': 'HR', 'role': 'Talent Recruiter', 'location': 'Home', 'email': 'paul.rudd@acaindia.org', 'status': 'OUT'},
+      {'name': 'Wilson Fisk', 'dept': 'Inventory', 'role': 'Asset Auditor', 'location': 'Office', 'email': 'wilson.fisk@acaindia.org', 'status': 'IN'},
+      {'name': 'Steven Rogers', 'dept': 'Inventory', 'role': 'Inventory Clerk', 'location': 'Home', 'email': 'steven.rogers@acaindia.org', 'status': 'OUT'},
+      {'name': 'Chef Pierre', 'dept': 'HOB', 'role': 'Head Chef', 'location': 'Office', 'email': 'chef.pierre@acaindia.org', 'status': 'IN'},
+      {'name': 'Assistant Jean', 'dept': 'HOB', 'role': 'Sous Chef', 'location': 'Office', 'email': 'assistant.jean@acaindia.org', 'status': 'IN'},
+      {'name': 'Linus Torvalds', 'dept': 'IT', 'role': 'IT Support Specialist', 'location': 'Office', 'email': 'linus.torvalds@acaindia.org', 'status': 'IN'},
+      {'name': 'Steve Wozniak', 'dept': 'IT', 'role': 'Systems Admin', 'location': 'Office', 'email': 'steve.wozniak@acaindia.org', 'status': 'IN'},
+      {'name': 'Guido van Rossum', 'dept': 'IT', 'role': 'IT Architect', 'location': 'Home', 'email': 'guido.rossum@acaindia.org', 'status': 'OUT'},
+    ];
+
+    Map<String, dynamic>? foundStaff;
+    for (final staff in staffList) {
+      final nameParts = staff['name']!.toLowerCase().split(' ');
+      for (final part in nameParts) {
+        if (part.length > 2 && text.contains(part)) {
+          foundStaff = staff;
+          break;
+        }
+      }
+      if (foundStaff != null) break;
+    }
+
+    if (foundStaff != null) {
+      final name = foundStaff['name'];
+      final status = foundStaff['status'];
+      final role = foundStaff['role'];
+      final dept = foundStaff['dept'];
+      final location = foundStaff['location'];
+      final email = foundStaff['email'];
+      
+      _addAssistantReply("Let me check employee presence... 🔍\n\n"
+          "**$name** is **$status** today.\n"
+          "* **Role**: $role\n"
+          "* **Department**: $dept\n"
+          "* **Work Location**: $location\n"
+          "* **Email**: $email");
+    } else {
+      _addAssistantReply("I couldn't find that employee in the presence directory. Please check the name (e.g. 'Vinodh', 'Ananya', 'Linus').");
+    }
+  }
+
+  void _addAssistantReply(String text) {
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) {
+        setState(() {
+          _chatMessages.add({
+            'sender': 'assistant',
+            'text': text,
+            'time': DateTime.now(),
+          });
+        });
+        _scrollToBottom();
+      }
+    });
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_chatScrollController.hasClients) {
+        _chatScrollController.animateTo(
+          _chatScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 }
 
