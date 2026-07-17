@@ -1147,7 +1147,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
 
   Widget _buildQuickActionsWidget(BuildContext context) {
     return Container(
-      height: 115,
+      height: 120,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1156,7 +1156,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1447,7 +1447,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     }
 
     return Container(
-      height: 115,
+      height: 120,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1456,7 +1456,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1568,7 +1568,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
 
   Widget _buildCelebrationsWidget() {
     return Container(
-      height: 115,
+      height: 120,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -1577,7 +1577,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
