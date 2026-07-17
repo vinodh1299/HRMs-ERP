@@ -180,34 +180,121 @@ class _LeaveTabState extends ConsumerState<LeaveTab> {
           ),
           const SizedBox(height: 16),
           // Balances cards
-          if (leaveState.isLoading && balances.isEmpty)
+          if (leaveState.isLoading)
             const Center(child: CircularProgressIndicator())
           else
-            Row(
-              children: balances.map((b) {
-                return Expanded(
-                  child: Card(
-                    margin: const EdgeInsets.only(right: 8),
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(b.leaveTypeName, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${b.balance}',
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primary),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.borderGrey),
+                boxShadow: [
+                  BoxShadow(color: AppTheme.primary.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, 4)),
+                ],
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(children: [
+                        Container(
+                          width: 32, height: 32,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppTheme.primary, AppTheme.secondary],
+                              begin: Alignment.topLeft, end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const SizedBox(height: 4),
-                          Text('Opening: ${b.opening} | Used: ${b.used}', style: const TextStyle(fontSize: 10, color: AppTheme.textMuted)),
-                        ],
+                          child: const Icon(Icons.beach_access_rounded, color: Colors.white, size: 17),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text('Leave Balances', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                      ]),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withOpacity(0.07),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text('Leave Summary', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primary)),
                       ),
-                    ),
+                    ],
                   ),
-                );
-              }).toList(),
+                  const SizedBox(height: 14),
+
+                  if (balances.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text('No leave balances available.', style: TextStyle(color: AppTheme.textMuted, fontSize: 13)),
+                    )
+                  else
+                    ...List.generate(balances.length, (index) {
+                      final b = balances[index];
+                      final val = double.tryParse('${b.balance}') ?? 0.0;
+                      final total = 15.0;
+                      final fraction = (val / total).clamp(0.0, 1.0);
+                      final Color color = [
+                        const Color(0xFF003471),
+                        const Color(0xFF7C3AED),
+                        const Color(0xFF059669),
+                        const Color(0xFFD97706),
+                        const Color(0xFFDC2626),
+                        const Color(0xFF00AEEF),
+                      ][index % 6];
+
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: index < balances.length - 1 ? 12 : 0),
+                        child: Row(
+                          children: [
+                            // Colour dot
+                            Container(
+                              width: 10, height: 10,
+                              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                            ),
+                            const SizedBox(width: 10),
+                            // Leave type name
+                            SizedBox(
+                              width: 110,
+                              child: Text(
+                                b.leaveTypeName,
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            // Progress bar
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: LinearProgressIndicator(
+                                  value: fraction,
+                                  minHeight: 6,
+                                  backgroundColor: color.withOpacity(0.10),
+                                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            // Balance
+                            SizedBox(
+                              width: 38,
+                              child: Text(
+                                '${b.balance} d',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color),
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                ],
+              ),
             ),
           const SizedBox(height: 24),
           const Text('Leave Application History', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
