@@ -359,6 +359,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       ]
     ];
 
+    final isDesktop = Responsive.isDesktop(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -374,11 +376,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
             ),
           ),
         ),
-        SizedBox(
-          height: 90,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
+        if (isAdmin)
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: list.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isDesktop ? 8 : 4,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: isDesktop ? 1.25 : 1.0,
+            ),
             itemBuilder: (context, index) {
               final dept = list[index];
               final name = dept['name'] as String;
@@ -386,8 +394,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
               final color = dept['color'] as Color;
 
               return Container(
-                margin: const EdgeInsets.only(right: 12),
-                width: 95,
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(16),
@@ -404,7 +410,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       Text(
                         name,
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textDark,
                         ),
@@ -417,8 +423,53 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                 ),
               );
             },
+          )
+        else
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                final dept = list[index];
+                final name = dept['name'] as String;
+                final icon = dept['icon'] as IconData;
+                final color = dept['color'] as Color;
+
+                return Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  width: 95,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.borderGrey, width: 1),
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => _openDepartmentSheet(context, name, icon, color),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(icon, color: color, size: 24),
+                        const SizedBox(height: 6),
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textDark,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
       ],
     );
   }
