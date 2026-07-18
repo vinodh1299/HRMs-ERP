@@ -7,21 +7,21 @@ import '../models/finance.dart';
 
 class ApiService {
   // ─── Local State/Mock Database (Static to persist during application runtime) ───
-  static final User _currentUser = User(
+  static User _currentUser = User(
     id: 1,
-    email: 'demo@aca.com',
+    email: 'staff@acaindia.org',
     employeeId: 1,
     role: 'Employee',
   );
 
-  static final Employee _currentEmployee = Employee(
+  static Employee _currentEmployee = Employee(
     id: 1,
     employeeCode: 'ACA-001',
     firstName: 'John',
     lastName: 'Doe',
     dob: '1990-01-01',
     gender: 'Male',
-    personalEmail: 'demo@aca.com',
+    personalEmail: 'staff@acaindia.org',
     phone: '9876543210',
     departmentId: 1,
     departmentName: 'Software Engineering',
@@ -314,7 +314,65 @@ class ApiService {
   // ─── Auth APIs ───
   Future<Map<String, dynamic>> login(String email, String password) async {
     await Future.delayed(const Duration(milliseconds: 600)); // Simulate networking
-    // Allow any demo login
+    
+    if (email.toLowerCase().trim() == 'admin@acaindia.org') {
+      _currentUser = User(
+        id: 2,
+        email: 'admin@acaindia.org',
+        employeeId: 2,
+        role: 'Admin',
+      );
+      _currentEmployee = Employee(
+        id: 2,
+        employeeCode: 'ACA-002',
+        firstName: 'Admin',
+        lastName: 'User',
+        dob: '1985-05-05',
+        gender: 'Male',
+        personalEmail: 'admin@acaindia.org',
+        phone: '9999999999',
+        departmentId: 2,
+        departmentName: 'Administration',
+        designationId: 2,
+        designationTitle: 'System Administrator',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 0,
+        managerName: 'None',
+        dateOfJoining: '2018-01-01',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else {
+      _currentUser = User(
+        id: 1,
+        email: 'staff@acaindia.org',
+        employeeId: 1,
+        role: 'Employee',
+      );
+      _currentEmployee = Employee(
+        id: 1,
+        employeeCode: 'ACA-001',
+        firstName: 'John',
+        lastName: 'Doe',
+        dob: '1990-01-01',
+        gender: 'Male',
+        personalEmail: 'staff@acaindia.org',
+        phone: '9876543210',
+        departmentId: 1,
+        departmentName: 'Software Engineering',
+        designationId: 1,
+        designationTitle: 'Senior Software Engineer',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 2,
+        managerName: 'Jane Smith',
+        dateOfJoining: '2020-06-15',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    }
+
     return {
       'token': 'demo-token-12345',
       'user': _currentUser.toJson(),

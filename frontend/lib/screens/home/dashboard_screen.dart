@@ -329,6 +329,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   }
 
   Widget _buildDepartmentPortalsRow() {
+    final authState = ref.watch(authProvider);
+    final isAdmin = authState.user?.role == 'Admin';
+
     final list = [
       {'name': 'Media', 'icon': Icons.video_camera_back_outlined, 'color': Colors.blue},
       {'name': 'Maintenance', 'icon': Icons.build_outlined, 'color': Colors.amber},
@@ -338,6 +341,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       {'name': 'Inventory', 'icon': Icons.inventory_2_outlined, 'color': Colors.teal},
       {'name': 'HOB', 'icon': Icons.cookie_outlined, 'color': Colors.orange},
       {'name': 'IT', 'icon': Icons.computer_outlined, 'color': Colors.indigo},
+      if (isAdmin) ...[
+        {'name': 'ETS', 'icon': Icons.terminal_outlined, 'color': Colors.blueGrey},
+        {'name': 'AGAPE', 'icon': Icons.favorite_border_rounded, 'color': Colors.redAccent},
+        {'name': 'ACHS', 'icon': Icons.health_and_safety_outlined, 'color': Colors.cyan},
+        {'name': 'ROH', 'icon': Icons.hotel_class_outlined, 'color': Colors.pinkAccent},
+        {'name': 'ACCASI', 'icon': Icons.security_outlined, 'color': Colors.blueAccent},
+        {'name': 'HOJ', 'icon': Icons.gavel_outlined, 'color': Colors.brown},
+        {'name': 'ACCOT', 'icon': Icons.precision_manufacturing_outlined, 'color': Colors.deepOrange},
+        {'name': 'LTP', 'icon': Icons.model_training_outlined, 'color': Colors.deepPurple},
+        {'name': 'Farm', 'icon': Icons.agriculture_outlined, 'color': Colors.green},
+        {'name': 'Library', 'icon': Icons.local_library_outlined, 'color': Colors.indigo},
+        {'name': 'Fitness Centre', 'icon': Icons.fitness_center_outlined, 'color': Colors.lime},
+        {'name': 'PTP', 'icon': Icons.psychology_outlined, 'color': Colors.teal},
+        {'name': 'ACASC', 'icon': Icons.science_outlined, 'color': Colors.lightBlue},
+        {'name': 'Facilities', 'icon': Icons.business_outlined, 'color': Colors.amber},
+      ]
     ];
 
     return Column(
@@ -414,6 +433,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       'Inventory': ['Request laptop accessories', 'Stationary requisition', 'Office chair replacement'],
       'HOB': ['Event catering order', 'Bread order placement', 'Pantry issue report', 'Kitchen cleaning request'],
       'IT': ['Software installation request', 'Hardware troubleshooting', 'Network & VPN access', 'Email / account setup'],
+      'ETS': ['Server deployment request', 'Database migration support', 'API access request'],
+      'AGAPE': ['Request volunteer assistance', 'Community outreach submission', 'Charity donation support'],
+      'ACHS': ['Health clearance booking', 'First-aid kit replenishment', 'Medical consultation request'],
+      'ROH': ['Guest room booking', 'Lounge access request', 'VIP dining reservation'],
+      'ACCASI': ['Access card authorization', 'CCTV footage review', 'Visitor pass request'],
+      'HOJ': ['Legal document notary', 'Contract review request', 'Policy compliance query'],
+      'ACCOT': ['Machinery service request', 'Technical calibration', 'Workshop booking'],
+      'LTP': ['Language coaching slot', 'Translation request', 'Interpreter booking'],
+      'Farm': ['Fresh produce order', 'Farm tour booking', 'Equipment lease request'],
+      'Library': ['Book renewal request', 'Research database access', 'Quiet room reservation'],
+      'Fitness Centre': ['Trainer session booking', 'Gym membership renewal', 'Locker allocation request'],
+      'PTP': ['Counseling appointment', 'Wellness assessment', 'Stress management request'],
+      'ACASC': ['Lab equipment reservation', 'Chemical storage access', 'Research grant query'],
+      'Facilities': ['Desk relocation request', 'Event venue booking', 'Cleaning schedule change'],
     };
 
     final deptServices = services[deptName] ?? ['General Support Request'];

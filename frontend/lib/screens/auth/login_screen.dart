@@ -12,7 +12,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController = TextEditingController(text: 'employee@acaindia.org');
+  final _emailController = TextEditingController(text: 'staff@acaindia.org');
   bool _isLoading = false;
 
   @override
@@ -31,10 +31,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (!mounted) return;
 
-    // Direct dummy sign in as standard employee profile
+    // Direct dummy sign in as standard employee profile or admin profile
+    final inputEmail = _emailController.text.trim();
+    final password = inputEmail == 'admin@acaindia.org' ? 'admin123' : 'staff123';
     final success = await ref.read(authProvider.notifier).login(
-          'employee@acaindia.org',
-          'employee123',
+          inputEmail,
+          password,
         );
 
     setState(() {
@@ -116,6 +118,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       borderSide: const BorderSide(color: Color(0xFF5E4EBD), width: 1.5),
                     ),
                   ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Text('Quick Login: ', style: TextStyle(fontSize: 12, color: Color(0xFF666666))),
+                    const SizedBox(width: 4),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _emailController.text = 'staff@acaindia.org';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF5E4EBD).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: const Color(0xFF5E4EBD).withOpacity(0.2)),
+                        ),
+                        child: const Text('Staff', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF5E4EBD))),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _emailController.text = 'admin@acaindia.org';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF5E4EBD).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: const Color(0xFF5E4EBD).withOpacity(0.2)),
+                        ),
+                        child: const Text('Admin', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF5E4EBD))),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 14),
                 // Continue Button
