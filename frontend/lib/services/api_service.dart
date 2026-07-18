@@ -7,6 +7,53 @@ import '../models/finance.dart';
 
 class ApiService {
   // ─── Local State/Mock Database (Static to persist during application runtime) ───
+  static final List<Map<String, dynamic>> _mockDepartments = [
+    {'id': 1, 'name': 'Software Engineering'},
+    {'id': 2, 'name': 'Operations'},
+    {'id': 3, 'name': 'HR Office'},
+  ];
+
+  static final List<Map<String, dynamic>> _mockDesignations = [
+    {'id': 1, 'title': 'Senior Software Engineer'},
+    {'id': 2, 'title': 'Engineering Manager'},
+    {'id': 3, 'title': 'Operations Manager'},
+  ];
+
+  static final List<Map<String, dynamic>> _mockDocuments = [
+    {
+      'id': 1,
+      'employeeId': 1,
+      'fileName': 'Offer_Letter.pdf',
+      'fileType': 'Offer Letter',
+      'uploadDate': '2026-07-10 10:00 AM',
+      'size': '1.2 MB',
+    },
+    {
+      'id': 2,
+      'employeeId': 1,
+      'fileName': 'Aadhaar_Card.pdf',
+      'fileType': 'ID Proof',
+      'uploadDate': '2026-07-10 10:05 AM',
+      'size': '850 KB',
+    },
+    {
+      'id': 3,
+      'employeeId': 2,
+      'fileName': 'Degree_Certificate.pdf',
+      'fileType': 'Education',
+      'uploadDate': '2026-07-12 11:30 AM',
+      'size': '2.1 MB',
+    },
+  ];
+
+  static final List<Map<String, dynamic>> _mockAuditLogs = [
+    {
+      'action': 'Staff Logged In',
+      'details': 'Staff account logged in from web portal.',
+      'timestamp': '2026-07-18 09:00 AM',
+    },
+  ];
+
   static User _currentUser = User(
     id: 1,
     email: 'staff@acaindia.org',
@@ -418,6 +465,11 @@ class ApiService {
   Future<void> createEmployee(Map<String, dynamic> data) async {
     await Future.delayed(const Duration(milliseconds: 400));
     final newId = _mockEmployees.length + 1;
+    final deptId = data['department_id'] ?? 1;
+    final deptObj = _mockDepartments.firstWhere((d) => d['id'] == deptId, orElse: () => {'name': 'General'});
+    final desigId = data['designation_id'] ?? 1;
+    final desigObj = _mockDesignations.firstWhere((d) => d['id'] == desigId, orElse: () => {'title': 'Associate'});
+
     final newEmp = Employee(
       id: newId,
       employeeCode: 'ACA-00${newId}',
@@ -427,17 +479,18 @@ class ApiService {
       gender: data['gender'] ?? 'Male',
       personalEmail: data['personal_email'] ?? '',
       phone: data['phone'] ?? '',
-      departmentId: data['department_id'],
-      departmentName: data['department_id'] == 1 ? 'Software Engineering' : 'Operations',
-      designationId: data['designation_id'],
-      designationTitle: 'Associate',
-      locationId: data['location_id'],
+      departmentId: deptId,
+      departmentName: deptObj['name'],
+      designationId: desigId,
+      designationTitle: desigObj['title'],
+      locationId: data['location_id'] ?? 1,
       locationName: 'ACA Campus',
       dateOfJoining: data['date_of_joining'] ?? '',
       employmentType: data['employment_type'] ?? 'Full-Time',
       status: 'Active',
     );
     _mockEmployees.add(newEmp);
+    await logAdminAction('Add Staff', 'Added new employee profile "${newEmp.fullName}" (Code: ${newEmp.employeeCode}).');
   }
 
   Future<void> updateEmployee(int id, Map<String, dynamic> data) async {
@@ -445,7 +498,12 @@ class ApiService {
     final idx = _mockEmployees.indexWhere((e) => e.id == id);
     if (idx != -1) {
       final existing = _mockEmployees[idx];
-      _mockEmployees[idx] = Employee(
+      final deptId = data['department_id'] ?? existing.departmentId;
+      final deptObj = _mockDepartments.firstWhere((d) => d['id'] == deptId, orElse: () => {'name': 'General'});
+      final desigId = data['designation_id'] ?? existing.designationId;
+      final desigObj = _mockDesignations.firstWhere((d) => d['id'] == desigId, orElse: () => {'title': 'Associate'});
+
+      final updated = Employee(
         id: id,
         employeeCode: existing.employeeCode,
         firstName: data['first_name'] ?? existing.firstName,
@@ -454,16 +512,18 @@ class ApiService {
         gender: data['gender'] ?? existing.gender,
         personalEmail: data['personal_email'] ?? existing.personalEmail,
         phone: data['phone'] ?? existing.phone,
-        departmentId: data['department_id'] ?? existing.departmentId,
-        departmentName: existing.departmentName,
-        designationId: data['designation_id'] ?? existing.designationId,
-        designationTitle: existing.designationTitle,
+        departmentId: deptId,
+        departmentName: deptObj['name'],
+        designationId: desigId,
+        designationTitle: desigObj['title'],
         locationId: data['location_id'] ?? existing.locationId,
         locationName: existing.locationName,
         dateOfJoining: data['date_of_joining'] ?? existing.dateOfJoining,
         employmentType: data['employment_type'] ?? existing.employmentType,
         status: data['status'] ?? existing.status,
       );
+      _mockEmployees[idx] = updated;
+      await logAdminAction('Edit Staff', 'Updated employee profile details for "${updated.fullName}".');
     }
   }
 
@@ -474,19 +534,62 @@ class ApiService {
   }
 
   Future<List<Map<String, dynamic>>> getDepartments() async {
-    return [
-      {'id': 1, 'name': 'Software Engineering'},
-      {'id': 2, 'name': 'Operations'},
-      {'id': 3, 'name': 'HR Office'},
-    ];
+    return _mockDepartments;
+  }
+
+  Future<void> createDepartment(Map<String, dynamic> data) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final newId = _mockDepartments.length + 1;
+    _mockDepartments.add({
+      'id': newId,
+      'name': data['name'] ?? 'New Department',
+    });
+    await logAdminAction('Create Department', 'Created new department "${data['name']}".');
   }
 
   Future<List<Map<String, dynamic>>> getDesignations() async {
-    return [
-      {'id': 1, 'title': 'Senior Software Engineer'},
-      {'id': 2, 'title': 'Engineering Manager'},
-      {'id': 3, 'title': 'Operations Manager'},
-    ];
+    return _mockDesignations;
+  }
+
+  Future<List<Map<String, dynamic>>> getEmployeeDocuments(int employeeId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    return _mockDocuments.where((doc) => doc['employeeId'] == employeeId).toList();
+  }
+
+  Future<void> uploadEmployeeDocument(int employeeId, Map<String, dynamic> doc) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final newId = _mockDocuments.length + 1;
+    final nowStr = DateFormat('yyyy-MM-dd hh:mm a').format(DateTime.now());
+    _mockDocuments.add({
+      'id': newId,
+      'employeeId': employeeId,
+      'fileName': doc['fileName'] ?? 'Document.pdf',
+      'fileType': doc['fileType'] ?? 'General',
+      'uploadDate': nowStr,
+      'size': doc['size'] ?? '1.0 MB',
+    });
+    final emp = _mockEmployees.firstWhere((e) => e.id == employeeId);
+    await logAdminAction('Upload Document', 'Uploaded document "${doc['fileName']}" for employee ${emp.fullName}.');
+  }
+
+  Future<void> deleteEmployeeDocument(int employeeId, int docId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    _mockDocuments.removeWhere((doc) => doc['id'] == docId && doc['employeeId'] == employeeId);
+    final emp = _mockEmployees.firstWhere((e) => e.id == employeeId);
+    await logAdminAction('Delete Document', 'Deleted a document for employee ${emp.fullName}.');
+  }
+
+  Future<List<Map<String, dynamic>>> getAuditLogs() async {
+    return _mockAuditLogs.reversed.toList();
+  }
+
+  Future<void> logAdminAction(String action, String details) async {
+    final nowStr = DateFormat('yyyy-MM-dd hh:mm a').format(DateTime.now());
+    _mockAuditLogs.add({
+      'action': action,
+      'details': details,
+      'timestamp': nowStr,
+    });
   }
 
   Future<List<Map<String, dynamic>>> getOrgTree() async {
@@ -781,17 +884,7 @@ class ApiService {
     };
   }
 
-  // ─── Admin Audit Logs ───
-  Future<List<Map<String, dynamic>>> getAuditLogs() async {
-    return [
-      {
-        'id': 1,
-        'actor_name': 'Admin Support',
-        'action': 'Added new holiday: Independence Day',
-        'created_at': '12 Jul 2026',
-      }
-    ];
-  }
+
 
   // ─── Dashboard Feeds ───
   Future<List<Map<String, dynamic>>> getAnnouncements() async {

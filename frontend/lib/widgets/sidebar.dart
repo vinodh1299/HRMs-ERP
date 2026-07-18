@@ -23,14 +23,6 @@ class NavigationShell extends ConsumerWidget {
 
   const NavigationShell({super.key, required this.child});
 
-  static const List<NavItem> _navItems = [
-    NavItem(title: 'Home', icon: Icons.home_outlined, path: '/'),
-    NavItem(title: 'Me', icon: Icons.person_outline, path: '/me'),
-    NavItem(title: 'Mail', icon: Icons.mail_outline_rounded, path: '/mail'),
-    NavItem(title: 'Chat', icon: Icons.chat_bubble_outline_rounded, path: '/chat'),
-    NavItem(title: 'Org', icon: Icons.corporate_fare_outlined, path: '/org'),
-  ];
-
   static const List<NavItem> _stubItems = [
     NavItem(title: 'Performance', icon: Icons.speed, path: '/stubs/performance'),
     NavItem(title: 'Recruitment', icon: Icons.work_outline, path: '/stubs/recruitment'),
@@ -39,12 +31,26 @@ class NavigationShell extends ConsumerWidget {
     NavItem(title: 'Reports', icon: Icons.bar_chart_outlined, path: '/stubs/reports'),
   ];
 
-  int _getSelectedIndex(BuildContext context) {
+  List<NavItem> _getNavItems(WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final isAdmin = authState.user?.role == 'Admin';
+    return [
+      const NavItem(title: 'Home', icon: Icons.home_outlined, path: '/'),
+      const NavItem(title: 'Me', icon: Icons.person_outline, path: '/me'),
+      const NavItem(title: 'Mail', icon: Icons.mail_outline_rounded, path: '/mail'),
+      const NavItem(title: 'Chat', icon: Icons.chat_bubble_outline_rounded, path: '/chat'),
+      const NavItem(title: 'Org', icon: Icons.corporate_fare_outlined, path: '/org'),
+      if (isAdmin)
+        const NavItem(title: 'Admin Control', icon: Icons.admin_panel_settings_outlined, path: '/admin'),
+    ];
+  }
+
+  int _getSelectedIndex(BuildContext context, List<NavItem> navItems) {
     final location = GoRouterState.of(context).matchedLocation;
     
     // Exact matching for main items
-    for (int i = 0; i < _navItems.length; i++) {
-      if (location == _navItems[i].path || location.startsWith('${_navItems[i].path}/')) {
+    for (int i = 0; i < navItems.length; i++) {
+      if (location == navItems[i].path || location.startsWith('${navItems[i].path}/')) {
         return i;
       }
     }
@@ -52,17 +58,17 @@ class NavigationShell extends ConsumerWidget {
     // For stub items, return a negative index or map if needed
     for (int i = 0; i < _stubItems.length; i++) {
       if (location == _stubItems[i].path) {
-        return _navItems.length + i;
+        return navItems.length + i;
       }
     }
     return 0;
   }
 
-  void _onItemTapped(BuildContext context, int index) {
-    if (index < _navItems.length) {
-      context.go(_navItems[index].path);
+  void _onItemTapped(BuildContext context, int index, List<NavItem> navItems) {
+    if (index < navItems.length) {
+      context.go(navItems[index].path);
     } else {
-      final stubIndex = index - _navItems.length;
+      final stubIndex = index - navItems.length;
       context.go(_stubItems[stubIndex].path);
     }
   }
@@ -75,7 +81,7 @@ class NavigationShell extends ConsumerWidget {
     return 4; // 'More'
   }
 
-  void _onMobileItemTapped(BuildContext context, int index) {
+  void _onMobileItemTapped(BuildContext context, int index, WidgetRef ref) {
     switch (index) {
       case 0:
         context.go('/');
@@ -90,12 +96,15 @@ class NavigationShell extends ConsumerWidget {
         context.go('/chat');
         break;
       case 4:
-        _showMobileMoreSheet(context);
+        _showMobileMoreSheet(context, ref);
         break;
     }
   }
 
-  void _showMobileMoreSheet(BuildContext context) {
+  void _showMobileMoreSheet(BuildContext context, WidgetRef ref) {
+    final authState = ref.read(authProvider);
+    final isAdmin = authState.user?.role == 'Admin';
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -142,6 +151,8 @@ class NavigationShell extends ConsumerWidget {
                   childAspectRatio: 0.95,
                   children: [
                     _buildMoreGridItem(context, 'Org', Icons.corporate_fare_outlined, AppTheme.primary, '/org'),
+                    if (isAdmin)
+                      _buildMoreGridItem(context, 'Admin Control', Icons.admin_panel_settings_outlined, Colors.redAccent, '/admin'),
                     _buildMoreGridItem(context, 'Performance', Icons.speed, Colors.teal, '/stubs/performance'),
                     _buildMoreGridItem(context, 'Recruitment', Icons.work_outline, Colors.blue, '/stubs/recruitment'),
                     _buildMoreGridItem(context, 'Expenses', Icons.receipt_long_outlined, Colors.purple, '/stubs/expenses'),
@@ -202,7 +213,8 @@ class NavigationShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedIndex = _getSelectedIndex(context);
+    final navItems = _getNavItems(ref);
+    final selectedIndex = _getSelectedIndex(context, navItems);
     final isMobile = Responsive.isMobile(context);
     final isTablet = Responsive.isTablet(context);
 
@@ -333,7 +345,7 @@ class NavigationShell extends ConsumerWidget {
           selectedItemColor: AppTheme.primary,
           unselectedItemColor: AppTheme.textMuted,
           currentIndex: mobileSelectedIndex,
-          onTap: (index) => _onMobileItemTapped(context, index),
+          onTap: (index) => _onMobileItemTapped(context, index, ref),
           selectedLabelStyle: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
           unselectedLabelStyle: const TextStyle(fontSize: 10.5),
           items: const [
@@ -381,7 +393,7 @@ class NavigationShell extends ConsumerWidget {
                 unselectedLabelTextStyle: TextStyle(color: AppTheme.sidebarText.withOpacity(0.6), fontSize: 12),
                 labelType: NavigationRailLabelType.all,
                 destinations: [
-                  ..._navItems.map((item) => NavigationRailDestination(
+                  ...navItems.map((item) => NavigationRailDestination(
                         icon: Icon(item.icon),
                         label: Text(item.title),
                       )),
@@ -391,7 +403,7 @@ class NavigationShell extends ConsumerWidget {
                       )),
                 ],
                 selectedIndex: selectedIndex,
-                onDestinationSelected: (index) => _onItemTapped(context, index),
+                onDestinationSelected: (index) => _onItemTapped(context, index, navItems),
               ),
             ),
             const VerticalDivider(width: 1, thickness: 1, color: AppTheme.borderGrey),
@@ -430,10 +442,10 @@ class NavigationShell extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      ...List.generate(_navItems.length, (index) {
-                        final item = _navItems[index];
+                      ...List.generate(navItems.length, (index) {
+                        final item = navItems[index];
                         final isSelected = selectedIndex == index;
-                        return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, index));
+                        return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, index, navItems));
                       }),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -453,9 +465,9 @@ class NavigationShell extends ConsumerWidget {
                       ),
                       ...List.generate(_stubItems.length, (index) {
                         final item = _stubItems[index];
-                        final globalIndex = _navItems.length + index;
+                        final globalIndex = navItems.length + index;
                         final isSelected = selectedIndex == globalIndex;
-                        return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, globalIndex));
+                        return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, globalIndex, navItems));
                       }),
                     ],
                   ),

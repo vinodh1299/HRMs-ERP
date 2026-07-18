@@ -9,6 +9,7 @@ class EmployeeState {
   final List<Map<String, dynamic>> designations;
   final List<Map<String, dynamic>> orgTreeData;
   final List<Map<String, dynamic>> auditLogs;
+  final List<Map<String, dynamic>> employeeDocuments;
   final bool isLoading;
   final String? errorMessage;
 
@@ -19,6 +20,7 @@ class EmployeeState {
     required this.designations,
     required this.orgTreeData,
     required this.auditLogs,
+    required this.employeeDocuments,
     required this.isLoading,
     this.errorMessage,
   });
@@ -30,6 +32,7 @@ class EmployeeState {
         designations: [],
         orgTreeData: [],
         auditLogs: [],
+        employeeDocuments: [],
         isLoading: false,
       );
 
@@ -40,6 +43,7 @@ class EmployeeState {
     List<Map<String, dynamic>>? designations,
     List<Map<String, dynamic>>? orgTreeData,
     List<Map<String, dynamic>>? auditLogs,
+    List<Map<String, dynamic>>? employeeDocuments,
     bool? isLoading,
     String? errorMessage,
   }) {
@@ -50,6 +54,7 @@ class EmployeeState {
       designations: designations ?? this.designations,
       orgTreeData: orgTreeData ?? this.orgTreeData,
       auditLogs: auditLogs ?? this.auditLogs,
+      employeeDocuments: employeeDocuments ?? this.employeeDocuments,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
     );
@@ -109,6 +114,16 @@ class EmployeeNotifier extends StateNotifier<EmployeeState> {
     }
   }
 
+  Future<void> fetchEmployeeDocuments(int employeeId) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final docs = await _apiService.getEmployeeDocuments(employeeId);
+      state = state.copyWith(employeeDocuments: docs, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
   Future<bool> addEmployee(Map<String, dynamic> data) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
@@ -126,6 +141,42 @@ class EmployeeNotifier extends StateNotifier<EmployeeState> {
     try {
       await _apiService.updateEmployee(id, data);
       await fetchEmployees();
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> addDepartment(Map<String, dynamic> data) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _apiService.createDepartment(data);
+      await fetchMetadata();
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> uploadDocument(int employeeId, Map<String, dynamic> doc) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _apiService.uploadEmployeeDocument(employeeId, doc);
+      await fetchEmployeeDocuments(employeeId);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> deleteDocument(int employeeId, int docId) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _apiService.deleteEmployeeDocument(employeeId, docId);
+      await fetchEmployeeDocuments(employeeId);
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
