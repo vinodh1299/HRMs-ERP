@@ -502,189 +502,370 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> with Single
   // MODALS & DIALOGS
   // ───────────────────────────────────────────────────────────────────────────
   void _showAddStaffDialog(BuildContext context, EmployeeState state) {
+    _showAnimatedStaffForm(context: context, state: state);
+  }
+
+  void _showEditStaffDialog(BuildContext context, Employee emp, EmployeeState state) {
+    _showAnimatedStaffForm(context: context, state: state, existingEmployee: emp);
+  }
+
+  void _showAnimatedStaffForm({
+    required BuildContext context,
+    required EmployeeState state,
+    Employee? existingEmployee,
+  }) {
     final formKey = GlobalKey<FormState>();
+    final isEdit = existingEmployee != null;
+
     final Map<String, dynamic> data = {
-      'first_name': '',
-      'last_name': '',
-      'dob': '1995-01-01',
-      'gender': 'Male',
-      'personal_email': '',
-      'phone': '',
-      'department_id': state.departments.isNotEmpty ? state.departments.first['id'] : 1,
-      'designation_id': state.designations.isNotEmpty ? state.designations.first['id'] : 1,
-      'date_of_joining': '2026-07-18',
-      'employment_type': 'Full-Time',
+      'first_name': existingEmployee?.firstName ?? '',
+      'last_name': existingEmployee?.lastName ?? '',
+      'dob': existingEmployee?.dob ?? '1995-01-01',
+      'gender': existingEmployee?.gender ?? 'Male',
+      'personal_email': existingEmployee?.personalEmail ?? '',
+      'phone': existingEmployee?.phone ?? '',
+      'department_id': existingEmployee?.departmentId ?? (state.departments.isNotEmpty ? state.departments.first['id'] : 1),
+      'designation_id': existingEmployee?.designationId ?? (state.designations.isNotEmpty ? state.designations.first['id'] : 1),
+      'date_of_joining': existingEmployee?.dateOfJoining ?? '2026-07-18',
+      'employment_type': existingEmployee?.employmentType ?? 'Full-Time',
     };
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Add Staff Profile'),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'First Name'),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    onSaved: (v) => data['first_name'] = v,
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Last Name'),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    onSaved: (v) => data['last_name'] = v,
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Personal Email'),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    onSaved: (v) => data['personal_email'] = v,
-                  ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Phone'),
-                    onSaved: (v) => data['phone'] = v,
-                  ),
-                  DropdownButtonFormField<int>(
-                    value: data['department_id'],
-                    decoration: const InputDecoration(labelText: 'Department'),
-                    items: state.departments.map((d) {
-                      return DropdownMenuItem<int>(value: d['id'], child: Text(d['name']));
-                    }).toList(),
-                    onChanged: (v) => data['department_id'] = v,
-                  ),
-                  DropdownButtonFormField<int>(
-                    value: data['designation_id'],
-                    decoration: const InputDecoration(labelText: 'Designation'),
-                    items: state.designations.map((d) {
-                      return DropdownMenuItem<int>(value: d['id'], child: Text(d['title']));
-                    }).toList(),
-                    onChanged: (v) => data['designation_id'] = v,
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: data['employment_type'],
-                    decoration: const InputDecoration(labelText: 'Employment Type'),
-                    items: const [
-                      DropdownMenuItem(value: 'Full-Time', child: Text('Full-Time')),
-                      DropdownMenuItem(value: 'Part-Time', child: Text('Part-Time')),
-                      DropdownMenuItem(value: 'Contract', child: Text('Contract')),
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        final curve = Curves.easeOutBack.transform(anim1.value);
+        return Transform.scale(
+          scale: 0.9 + 0.1 * curve,
+          child: Opacity(
+            opacity: anim1.value,
+            child: Align(
+              alignment: Alignment.center,
+              child: Dialog(
+                elevation: 24,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                clipBehavior: Clip.antiAlias,
+                child: Container(
+                  width: MediaQuery.of(ctx).size.width > 680 ? 640 : MediaQuery.of(ctx).size.width * 0.92,
+                  constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Header Banner
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                        decoration: const BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              isEdit ? Icons.edit_document : Icons.person_add_alt_1,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 14),
+                            Text(
+                              isEdit ? 'Edit Staff Profile' : 'Add New Staff Profile',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              icon: const Icon(Icons.close, color: Colors.white70),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Form Body
+                      Flexible(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(24),
+                          child: Form(
+                            key: formKey,
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final useTwoCols = constraints.maxWidth > 500;
+                                return Column(
+                                  children: [
+                                    _buildFormRow(
+                                      useTwoCols,
+                                      _buildTextField(
+                                        label: 'First Name',
+                                        icon: Icons.person_outline,
+                                        initialValue: data['first_name'],
+                                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                        onSaved: (v) => data['first_name'] = v,
+                                      ),
+                                      _buildTextField(
+                                        label: 'Last Name',
+                                        icon: Icons.person_outline,
+                                        initialValue: data['last_name'],
+                                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                        onSaved: (v) => data['last_name'] = v,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    _buildFormRow(
+                                      useTwoCols,
+                                      _buildTextField(
+                                        label: 'Personal Email',
+                                        icon: Icons.mail_outlined,
+                                        initialValue: data['personal_email'],
+                                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                        onSaved: (v) => data['personal_email'] = v,
+                                      ),
+                                      _buildTextField(
+                                        label: 'Phone Number',
+                                        icon: Icons.phone_outlined,
+                                        initialValue: data['phone'],
+                                        onSaved: (v) => data['phone'] = v,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    _buildFormRow(
+                                      useTwoCols,
+                                      _buildDropdownField<String>(
+                                        label: 'Gender',
+                                        icon: Icons.wc_outlined,
+                                        value: data['gender'],
+                                        items: const ['Male', 'Female', 'Other'],
+                                        onChanged: (v) => data['gender'] = v,
+                                      ),
+                                      _buildDropdownField<String>(
+                                        label: 'Employment Type',
+                                        icon: Icons.work_outline,
+                                        value: data['employment_type'],
+                                        items: const ['Full-Time', 'Part-Time', 'Contract'],
+                                        onChanged: (v) => data['employment_type'] = v,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    _buildFormRow(
+                                      useTwoCols,
+                                      _buildDropdownFieldMap<int>(
+                                        label: 'Department',
+                                        icon: Icons.corporate_fare_outlined,
+                                        value: data['department_id'],
+                                        items: state.departments.map((d) => MapEntry(d['id'] as int, d['name'] as String)).toList(),
+                                        onChanged: (v) => data['department_id'] = v,
+                                      ),
+                                      _buildDropdownFieldMap<int>(
+                                        label: 'Designation',
+                                        icon: Icons.badge_outlined,
+                                        value: data['designation_id'],
+                                        items: state.designations.map((d) => MapEntry(d['id'] as int, d['title'] as String)).toList(),
+                                        onChanged: (v) => data['designation_id'] = v,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Actions Footer
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.bgLight,
+                          border: Border(top: BorderSide(color: AppTheme.borderGrey)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppTheme.borderGrey),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Text('CANCEL', style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(width: 12),
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (formKey.currentState!.validate()) {
+                                  formKey.currentState!.save();
+                                  final ok = isEdit
+                                      ? await ref.read(employeeProvider.notifier).editEmployee(existingEmployee!.id, data)
+                                      : await ref.read(employeeProvider.notifier).addEmployee(data);
+                                  if (ok && mounted) {
+                                    Navigator.pop(ctx);
+                                    ref.read(employeeProvider.notifier).fetchAuditLogs();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          isEdit ? 'Staff profile successfully updated.' : 'Staff profile successfully created.',
+                                        ),
+                                        backgroundColor: AppTheme.successGreen,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primary,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text(
+                                isEdit ? 'UPDATE PROFILE' : 'SAVE PROFILE',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                    onChanged: (v) => data['employment_type'] = v,
                   ),
-                ],
+                ),
               ),
             ),
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  formKey.currentState!.save();
-                  final ok = await ref.read(employeeProvider.notifier).addEmployee(data);
-                  if (ok && mounted) {
-                    Navigator.pop(ctx);
-                    ref.read(employeeProvider.notifier).fetchAuditLogs();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Staff profile successfully created.')));
-                  }
-                }
-              },
-              child: const Text('SAVE'),
-            ),
-          ],
         );
       },
     );
   }
 
-  void _showEditStaffDialog(BuildContext context, Employee emp, EmployeeState state) {
-    final formKey = GlobalKey<FormState>();
-    final Map<String, dynamic> data = {
-      'first_name': emp.firstName,
-      'last_name': emp.lastName,
-      'personal_email': emp.personalEmail,
-      'phone': emp.phone,
-      'department_id': emp.departmentId,
-      'designation_id': emp.designationId,
-      'employment_type': emp.employmentType,
-    };
+  Widget _buildFormRow(bool useTwoCols, Widget child1, Widget child2) {
+    if (useTwoCols) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: child1),
+          const SizedBox(width: 16),
+          Expanded(child: child2),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          child1,
+          const SizedBox(height: 16),
+          child2,
+        ],
+      );
+    }
+  }
 
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: Text('Edit Profile: ${emp.fullName}'),
-          content: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    initialValue: data['first_name'],
-                    decoration: const InputDecoration(labelText: 'First Name'),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    onSaved: (v) => data['first_name'] = v,
-                  ),
-                  TextFormField(
-                    initialValue: data['last_name'],
-                    decoration: const InputDecoration(labelText: 'Last Name'),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    onSaved: (v) => data['last_name'] = v,
-                  ),
-                  TextFormField(
-                    initialValue: data['personal_email'],
-                    decoration: const InputDecoration(labelText: 'Personal Email'),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    onSaved: (v) => data['personal_email'] = v,
-                  ),
-                  TextFormField(
-                    initialValue: data['phone'],
-                    decoration: const InputDecoration(labelText: 'Phone'),
-                    onSaved: (v) => data['phone'] = v,
-                  ),
-                  DropdownButtonFormField<int>(
-                    value: data['department_id'],
-                    decoration: const InputDecoration(labelText: 'Department'),
-                    items: state.departments.map((d) {
-                      return DropdownMenuItem<int>(value: d['id'], child: Text(d['name']));
-                    }).toList(),
-                    onChanged: (v) => data['department_id'] = v,
-                  ),
-                  DropdownButtonFormField<int>(
-                    value: data['designation_id'],
-                    decoration: const InputDecoration(labelText: 'Designation'),
-                    items: state.designations.map((d) {
-                      return DropdownMenuItem<int>(value: d['id'], child: Text(d['title']));
-                    }).toList(),
-                    onChanged: (v) => data['designation_id'] = v,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  formKey.currentState!.save();
-                  final ok = await ref.read(employeeProvider.notifier).editEmployee(emp.id, data);
-                  if (ok && mounted) {
-                    Navigator.pop(ctx);
-                    ref.read(employeeProvider.notifier).fetchAuditLogs();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Staff profile successfully updated.')));
-                  }
-                }
-              },
-              child: const Text('UPDATE'),
-            ),
-          ],
+  Widget _buildTextField({
+    required String label,
+    required IconData icon,
+    String? initialValue,
+    String? Function(String?)? validator,
+    required void Function(String?) onSaved,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      validator: validator,
+      onSaved: onSaved,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: AppTheme.primary.withOpacity(0.6), size: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.borderGrey),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.borderGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField<T>({
+    required String label,
+    required IconData icon,
+    required T value,
+    required List<T> items,
+    required void Function(T?) onChanged,
+  }) {
+    return DropdownButtonFormField<T>(
+      value: value,
+      items: items.map((item) {
+        return DropdownMenuItem<T>(
+          value: item,
+          child: Text(item.toString()),
         );
-      },
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: AppTheme.primary.withOpacity(0.6), size: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.borderGrey),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.borderGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+    );
+  }
+
+  Widget _buildDropdownFieldMap<T>({
+    required String label,
+    required IconData icon,
+    required T value,
+    required List<MapEntry<T, String>> items,
+    required void Function(T?) onChanged,
+  }) {
+    return DropdownButtonFormField<T>(
+      value: value,
+      items: items.map((entry) {
+        return DropdownMenuItem<T>(
+          value: entry.key,
+          child: Text(entry.value),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: AppTheme.primary.withOpacity(0.6), size: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.borderGrey),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.borderGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
     );
   }
 
