@@ -12,6 +12,7 @@ import '../../providers/attendance_provider.dart';
 import '../../providers/leave_provider.dart';
 import '../../providers/events_provider.dart';
 import '../../services/api_service.dart';
+import '../../services/voice_helper.dart';
 import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -47,6 +48,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
 
   bool _isChatOpen = false;
   bool _isAiTyping = false;
+  bool _isListening = false;
   String? _pendingAction;
   String? _pendingDept;
   final List<Map<String, dynamic>> _chatMessages = [];
@@ -2058,15 +2060,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
             ),
             child: Row(
               children: [
+                IconButton(
+                  icon: Icon(
+                    _isListening ? Icons.mic : Icons.mic_none_outlined,
+                    color: _isListening ? Colors.red : AppTheme.textMuted,
+                    size: 20,
+                  ),
+                  tooltip: 'Voice Command',
+                  onPressed: _toggleVoiceRecording,
+                ),
                 Expanded(
                   child: TextField(
                     controller: _chatController,
                     style: const TextStyle(fontSize: 13),
-                    decoration: const InputDecoration(
-                      hintText: 'Ask about staff presence or raising a ticket...',
-                      hintStyle: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    decoration: InputDecoration(
+                      hintText: _isListening ? 'Listening...' : 'Ask about staff presence or raising a ticket...',
+                      hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                     onSubmitted: (val) {
                       final txt = val.trim();
@@ -2116,6 +2127,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
       if (text.contains(kw)) return true;
     }
     return false;
+  }
+
+  void _toggleVoiceRecording() {
+    if (_isListening) {
+      setState(() => _isListening = false);
+      return;
+    }
+
+    setState(() => _isListening = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Listening... speak now!'), duration: Duration(seconds: 2)),
+    );
+
+    VoiceHelper.startRecognition(
+      onResult: (text) {
+        if (!mounted) return;
+        setState(() {
+          _chatController.text = text;
+        });
+      },
+      onError: (err) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Voice error: $err')),
+        );
+      },
+      onEnd: () {
+        if (!mounted) return;
+        setState(() => _isListening = false);
+      },
+    );
   }
 
   void _processAgentMessage(String userText) {

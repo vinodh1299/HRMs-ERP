@@ -41,6 +41,36 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>
+    window.startSpeechRecognition = function(onResult, onError, onEnd) {
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        onError("Speech recognition not supported in this browser.");
+        return null;
+      }
+      var recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = function(event) {
+        var text = event.results[0][0].transcript;
+        onResult(text);
+      };
+      recognition.onerror = function(event) {
+        onError(event.error);
+      };
+      recognition.onend = function() {
+        onEnd();
+      };
+      try {
+        recognition.start();
+      } catch (e) {
+        onError(e.message);
+      }
+      return recognition;
+    };
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

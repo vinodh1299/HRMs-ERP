@@ -5,6 +5,7 @@ import '../../core/responsive.dart';
 import '../../core/theme.dart';
 import '../../core/date_parser_helper.dart';
 import '../../services/ai_service.dart';
+import '../../services/voice_helper.dart';
 
 class ChatMessage {
   final String sender;
@@ -47,6 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
   
   late ChatTarget _activeTarget;
   bool _isTyping = false;
+  bool _isListening = false;
 
   final List<ChatTarget> _targets = [
     ChatTarget(name: '#general', isChannel: true),
@@ -296,13 +298,22 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             child: Row(
               children: [
+                IconButton(
+                  icon: Icon(
+                    _isListening ? Icons.mic : Icons.mic_none_outlined,
+                    color: _isListening ? Colors.red : AppTheme.textMuted,
+                  ),
+                  tooltip: 'Voice Type',
+                  onPressed: _toggleVoiceRecording,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
                     controller: _msgController,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your message...',
+                    decoration: InputDecoration(
+                      hintText: _isListening ? 'Listening...' : 'Type your message...',
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
@@ -470,6 +481,37 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _toggleVoiceRecording() {
+    if (_isListening) {
+      setState(() => _isListening = false);
+      return;
+    }
+
+    setState(() => _isListening = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Listening... speak now!'), duration: Duration(seconds: 2)),
+    );
+
+    VoiceHelper.startRecognition(
+      onResult: (text) {
+        if (!mounted) return;
+        setState(() {
+          _msgController.text = text;
+        });
+      },
+      onError: (err) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Voice error: $err')),
+        );
+      },
+      onEnd: () {
+        if (!mounted) return;
+        setState(() => _isListening = false);
+      },
     );
   }
 
