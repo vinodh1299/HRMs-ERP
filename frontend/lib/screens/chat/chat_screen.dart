@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/responsive.dart';
 import '../../core/theme.dart';
 import '../../core/date_parser_helper.dart';
+import '../../services/ai_service.dart';
 
 class ChatMessage {
   final String sender;
@@ -51,6 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
     ChatTarget(name: '#general', isChannel: true),
     ChatTarget(name: '#maintenance-updates', isChannel: true),
     ChatTarget(name: '#finance-reimbursements', isChannel: true),
+    ChatTarget(name: 'Gemini AI Assistant', isChannel: false, isOnline: true, status: 'Online'),
     ChatTarget(name: 'Vinodh', isChannel: false, isOnline: true, status: 'Online'),
     ChatTarget(name: 'John Doe', isChannel: false, isOnline: true, status: 'Online'),
     ChatTarget(name: 'Jane Smith', isChannel: false, isOnline: true, status: 'Away'),
@@ -67,6 +69,14 @@ class _ChatScreenState extends State<ChatScreen> {
     ],
     '#finance-reimbursements': [
       ChatMessage(sender: 'Accounts', text: 'Please upload bills before the 25th of this month.', timestamp: DateTime.now().subtract(const Duration(days: 1)), isMe: false),
+    ],
+    'Gemini AI Assistant': [
+      ChatMessage(
+        sender: 'Gemini AI Assistant',
+        text: 'Hello! I am your Google Gemini HR Assistant. How can I help you today? (You can configure my API key using the Settings gear in the header)',
+        timestamp: DateTime.now(),
+        isMe: false,
+      ),
     ],
     'Vinodh': [
       ChatMessage(sender: 'Vinodh', text: 'Hey there! How is the new navigation bar layout looking? Our review is on 13 sep 2026.', timestamp: DateTime.now().subtract(const Duration(minutes: 30)), isMe: false),
@@ -104,7 +114,29 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollToBottom();
 
     // Simulated auto-response/typing indicator logic
-    if (!_activeTarget.isChannel) {
+    if (_activeTarget.name == 'Gemini AI Assistant') {
+      setState(() {
+        _isTyping = true;
+      });
+      _scrollToBottom();
+
+      Future.microtask(() async {
+        final responseText = await GeminiService.getChatResponse(text);
+        if (!mounted) return;
+        setState(() {
+          _isTyping = false;
+          _conversations[_activeTarget.name]!.add(
+            ChatMessage(
+              sender: 'Gemini AI Assistant',
+              text: responseText,
+              timestamp: DateTime.now(),
+              isMe: false,
+            ),
+          );
+        });
+        _scrollToBottom();
+      });
+    } else if (!_activeTarget.isChannel) {
       setState(() {
         _isTyping = true;
       });
@@ -196,12 +228,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                   ),
                 CircleAvatar(
-                  backgroundColor: _activeTarget.isChannel
-                      ? AppTheme.primary.withOpacity(0.12)
-                      : (_activeTarget.isOnline ? Colors.green.withOpacity(0.12) : AppTheme.borderGrey),
+                  backgroundColor: _activeTarget.name == 'Gemini AI Assistant'
+                      ? Colors.deepPurple.withOpacity(0.12)
+                      : (_activeTarget.isChannel
+                          ? AppTheme.primary.withOpacity(0.12)
+                          : (_activeTarget.isOnline ? Colors.green.withOpacity(0.12) : AppTheme.borderGrey)),
                   child: Icon(
-                    _activeTarget.isChannel ? Icons.tag : Icons.person,
-                    color: _activeTarget.isChannel ? AppTheme.primary : Colors.green,
+                    _activeTarget.name == 'Gemini AI Assistant'
+                        ? Icons.psychology_outlined
+                        : (_activeTarget.isChannel ? Icons.tag : Icons.person),
+                    color: _activeTarget.name == 'Gemini AI Assistant'
+                        ? Colors.deepPurple
+                        : (_activeTarget.isChannel ? AppTheme.primary : Colors.green),
                     size: 20,
                   ),
                 ),
@@ -225,6 +263,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ),
                 ),
+                if (_activeTarget.name == 'Gemini AI Assistant') ...[
+                  IconButton(
+                    icon: const Icon(Icons.settings, color: AppTheme.primary),
+                    tooltip: 'Configure API Key',
+                    onPressed: () => _showApiKeyDialog(),
+                  ),
+                ],
               ],
             ),
           ),
@@ -387,11 +432,17 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CircleAvatar(
               radius: 14,
-              backgroundColor: target.isChannel ? AppTheme.primary.withOpacity(0.12) : AppTheme.borderGrey,
+              backgroundColor: target.name == 'Gemini AI Assistant'
+                  ? Colors.deepPurple.withOpacity(0.12)
+                  : (target.isChannel ? AppTheme.primary.withOpacity(0.12) : AppTheme.borderGrey),
               child: Icon(
-                target.isChannel ? Icons.tag : Icons.person,
+                target.name == 'Gemini AI Assistant'
+                    ? Icons.psychology_outlined
+                    : (target.isChannel ? Icons.tag : Icons.person),
                 size: 16,
-                color: target.isChannel ? AppTheme.primary : AppTheme.textDark,
+                color: target.name == 'Gemini AI Assistant'
+                    ? Colors.deepPurple
+                    : (target.isChannel ? AppTheme.primary : AppTheme.textDark),
               ),
             ),
             if (!target.isChannel)
@@ -419,6 +470,74 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showApiKeyDialog() async {
+    final formKey = GlobalKey<FormState>();
+    final currentKey = await GeminiService.getApiKey() ?? '';
+    final controller = TextEditingController(text: currentKey);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Configure Gemini API Key'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Enter your Google AI Studio Gemini API Key. It will be stored securely on your local device.',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: controller,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Gemini API Key',
+                    prefixIcon: Icon(Icons.vpn_key),
+                  ),
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                GeminiService.deleteApiKey();
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('API Key cleared.')),
+                );
+              },
+              child: const Text('CLEAR KEY', style: TextStyle(color: AppTheme.errorRed)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('CANCEL'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  await GeminiService.saveApiKey(controller.text.trim());
+                  if (mounted) {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('API Key saved successfully.')),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white),
+              child: const Text('SAVE'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

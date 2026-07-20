@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme.dart';
 import '../../models/attendance.dart';
 import '../../providers/attendance_provider.dart';
+import '../../services/ai_service.dart';
 
 class AttendanceTab extends ConsumerStatefulWidget {
   const AttendanceTab({super.key});
@@ -77,7 +78,27 @@ class _AttendanceTabState extends ConsumerState<AttendanceTab> {
                     TextField(
                       controller: _reasonController,
                       maxLines: 2,
-                      decoration: const InputDecoration(labelText: 'Reason for regularization'),
+                      decoration: InputDecoration(
+                        labelText: 'Reason for regularization',
+                        suffixIcon: TextButton.icon(
+                          onPressed: () async {
+                            final txt = _reasonController.text.trim();
+                            if (txt.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please write a brief reason first (e.g. traffic delay).')),
+                              );
+                              return;
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Rewriting with Gemini AI...')),
+                            );
+                            final justification = await GeminiService.generateJustification(txt);
+                            _reasonController.text = justification;
+                          },
+                          icon: const Icon(Icons.psychology_outlined, size: 16),
+                          label: const Text('AI Justify', style: TextStyle(fontSize: 12)),
+                        ),
+                      ),
                     ),
                   ],
                 ),
