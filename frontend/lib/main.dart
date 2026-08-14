@@ -12,6 +12,7 @@ import 'screens/mail/mail_screen.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/org/org_screen.dart';
 import 'screens/admin/admin_panel_screen.dart';
+import 'screens/admin/manager_panel_screen.dart';
 import 'screens/stubs/empty_state_screen.dart';
 import 'widgets/sidebar.dart';
 
@@ -81,6 +82,10 @@ class MyApp extends ConsumerWidget {
             GoRoute(
               path: '/admin',
               builder: (context, state) => const AdminPanelScreen(),
+            ),
+            GoRoute(
+              path: '/manager',
+              builder: (context, state) => const ManagerPanelScreen(),
             ),
             GoRoute(
               path: '/stubs/:module',

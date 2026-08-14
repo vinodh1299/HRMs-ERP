@@ -111,7 +111,7 @@ class ApiService {
       lastName: 'Smith',
       dob: '1985-05-12',
       gender: 'Female',
-      personalEmail: 'jane.smith@aca.com',
+      personalEmail: 'manager@acaindia.org',
       phone: '9876543211',
       departmentId: 1,
       departmentName: 'Media',
@@ -143,6 +143,48 @@ class ApiService {
       reportingManagerId: null,
       managerName: null,
       dateOfJoining: '2021-02-01',
+      employmentType: 'Full-Time',
+      status: 'Active',
+    ),
+    Employee(
+      id: 4,
+      employeeCode: 'ACA-004',
+      firstName: 'Liam',
+      lastName: 'Neeson',
+      dob: '1995-10-10',
+      gender: 'Male',
+      personalEmail: 'liam.neeson@aca.com',
+      phone: '9876543213',
+      departmentId: 1,
+      departmentName: 'Media',
+      designationId: 4,
+      designationTitle: 'Graphic Designer',
+      locationId: 1,
+      locationName: 'ACA Campus',
+      reportingManagerId: 2,
+      managerName: 'Jane Smith',
+      dateOfJoining: '2022-04-15',
+      employmentType: 'Full-Time',
+      status: 'Active',
+    ),
+    Employee(
+      id: 5,
+      employeeCode: 'ACA-005',
+      firstName: 'Sophia',
+      lastName: 'Loren',
+      dob: '1997-03-24',
+      gender: 'Female',
+      personalEmail: 'sophia.loren@aca.com',
+      phone: '9876543214',
+      departmentId: 1,
+      departmentName: 'Media',
+      designationId: 5,
+      designationTitle: 'Content Editor',
+      locationId: 1,
+      locationName: 'ACA Campus',
+      reportingManagerId: 2,
+      managerName: 'Jane Smith',
+      dateOfJoining: '2023-01-10',
       employmentType: 'Full-Time',
       status: 'Active',
     ),
@@ -329,6 +371,221 @@ class ApiService {
 
   static List<Map<String, dynamic>> _tickets = [
     {
+      'id': 1012,
+      'subject': 'Maintenance Workshop: Projector setup issues',
+      'category': 'Media',
+      'sub_category': 'Hardware',
+      'raised_by': 'Alex Rivera',
+      'designation': 'Operations Manager',
+      'phone': '9876543212',
+      'location': 'ACA Campus',
+      'created_at': '20 Jul 2026',
+      'priority': 'HIGH',
+      'assigned_to': null,
+      'assigned_to_name': 'Unassigned',
+      'status': 'Open',
+      'is_read': false,
+      'description': 'The Maintenance department workshop projector has a red tint. We need the Media AV team to inspect it.',
+      'public_messages': [
+        {
+          'sender': 'Alex Rivera',
+          'content': 'Hi Media Team, the main projector in the Maintenance conference room is displaying incorrect colors. Please check.',
+          'time': '10:15 am',
+        }
+      ],
+      'internal_messages': [],
+    },
+    {
+      'id': 1001,
+      'subject': 'Live Broadcast setup for Auditorium',
+      'category': 'Media',
+      'sub_category': 'Broadcast',
+      'raised_by': 'Sophia Loren',
+      'designation': 'CPD Coordinator',
+      'phone': '9876543201',
+      'location': 'ACA Campus',
+      'created_at': '19 Jul 2026',
+      'priority': 'HIGH',
+      'assigned_to': null,
+      'assigned_to_name': 'Unassigned',
+      'status': 'Open',
+      'description': 'Configure the live streaming server, cameras, and audio mix matrices for the upcoming webinar in the main auditorium.',
+      'public_messages': [],
+      'internal_messages': [],
+    },
+    {
+      'id': 1002,
+      'subject': 'Hero Banner Graphic Design',
+      'category': 'Media',
+      'sub_category': 'Graphics',
+      'raised_by': 'Liam Neeson',
+      'designation': 'Marketing Lead',
+      'phone': '9876543202',
+      'location': 'ACA Campus',
+      'created_at': '18 Jul 2026',
+      'priority': 'MEDIUM',
+      'assigned_to': null,
+      'assigned_to_name': 'Unassigned',
+      'status': 'Open',
+      'description': 'Create a modern hero landing banner graphic highlighting the Admissions 2026 campaign.',
+      'messages': []
+    },
+    {
+      'id': 1003,
+      'subject': 'Classroom 2A Audio Mixer replacement',
+      'category': 'Media',
+      'sub_category': 'Hardware',
+      'raised_by': 'Emma Watson',
+      'designation': 'HR Operations Manager',
+      'phone': '9876543203',
+      'location': 'ACA Campus',
+      'created_at': '18 Jul 2026',
+      'priority': 'MEDIUM',
+      'assigned_to': null,
+      'assigned_to_name': 'Unassigned',
+      'status': 'Open',
+      'description': 'Replace the noisy audio mixer console in Classroom 2A. The old unit has bad pots.',
+      'messages': []
+    },
+    {
+      'id': 1004,
+      'subject': 'Sound Check for Chapel Choir rehearsal',
+      'category': 'Media',
+      'sub_category': 'Sound Engineering',
+      'raised_by': 'John Doe',
+      'designation': 'Senior Software Engineer',
+      'phone': '9876543210',
+      'location': 'ACA Campus',
+      'created_at': '17 Jul 2026',
+      'priority': 'HIGH',
+      'assigned_to': 1,
+      'assigned_to_name': 'John Doe',
+      'status': 'In Progress',
+      'description': 'Setup vocal microphones and run feedback tests for the Saturday evening rehearsals.',
+      'messages': []
+    },
+    {
+      'id': 1005,
+      'subject': 'Video editing for graduation ceremony',
+      'category': 'Media',
+      'sub_category': 'Video Editing',
+      'raised_by': 'Robert Bruce',
+      'designation': 'Electrician',
+      'phone': '9876543205',
+      'location': 'ACA Campus',
+      'created_at': '16 Jul 2026',
+      'priority': 'HIGH',
+      'assigned_to': 1,
+      'assigned_to_name': 'John Doe',
+      'status': 'Not Attended',
+      'description': 'Process the raw 4K footages, add titles, lower thirds, and export the final 1080p highlights reel.',
+      'messages': []
+    },
+    {
+      'id': 1006,
+      'subject': 'Podcast Audio Master file mixdown',
+      'category': 'Media',
+      'sub_category': 'Sound Engineering',
+      'raised_by': 'Jane Smith',
+      'designation': 'Engineering Manager',
+      'phone': '9876543211',
+      'location': 'ACA Campus',
+      'created_at': '15 Jul 2026',
+      'priority': 'MEDIUM',
+      'assigned_to': 1,
+      'assigned_to_name': 'John Doe',
+      'status': 'Not Attended',
+      'description': 'Apply compression, noise gate, EQ, and master loudness adjustments to Episode 5 of the campus talks.',
+      'messages': []
+    },
+    {
+      'id': 1007,
+      'subject': 'Classroom 4B microphone repairs',
+      'category': 'Media',
+      'sub_category': 'Hardware',
+      'raised_by': 'Emma Watson',
+      'designation': 'HR Manager',
+      'phone': '9876543207',
+      'location': 'ACA Campus',
+      'created_at': '15 Jul 2026',
+      'priority': 'LOW',
+      'assigned_to': null,
+      'assigned_to_name': 'Unassigned',
+      'status': 'Open',
+      'is_read': false,
+      'description': 'Lapel mic cable is loose. Needs soldering and heat shrink cover replacement.',
+      'messages': []
+    },
+    {
+      'id': 1008,
+      'subject': 'Camera battery chargers replacement',
+      'category': 'Media',
+      'sub_category': 'Hardware',
+      'raised_by': 'Robert Downey',
+      'designation': 'Finance Manager',
+      'phone': '9876543211',
+      'location': 'ACA Campus',
+      'created_at': '14 Jul 2026',
+      'priority': 'LOW',
+      'assigned_to': null,
+      'assigned_to_name': 'Unassigned',
+      'status': 'Open',
+      'is_read': false,
+      'description': 'Purchase three dual-slot batteries chargers for Sony mirrorless video cameras.',
+      'messages': []
+    },
+    {
+      'id': 1009,
+      'subject': 'Press Release layouts formatting',
+      'category': 'Media',
+      'sub_category': 'Graphics',
+      'raised_by': 'Liam Neeson',
+      'designation': 'Marketing Lead',
+      'phone': '9876543202',
+      'location': 'ACA Campus',
+      'created_at': '13 Jul 2026',
+      'priority': 'MEDIUM',
+      'assigned_to': 1,
+      'assigned_to_name': 'John Doe',
+      'status': 'Not Attended',
+      'description': 'Convert the raw word documents layouts into brand-compliant PDF assets.',
+      'messages': []
+    },
+    {
+      'id': 1010,
+      'subject': 'Newsletter proofing & digital delivery',
+      'category': 'Media',
+      'sub_category': 'Operations',
+      'raised_by': 'Sophia Loren',
+      'designation': 'CPD Coordinator',
+      'phone': '9876543201',
+      'location': 'ACA Campus',
+      'created_at': '12 Jul 2026',
+      'priority': 'MEDIUM',
+      'assigned_to': 1,
+      'assigned_to_name': 'John Doe',
+      'status': 'Not Attended',
+      'description': 'Deliver the proof copy of ACA July newsletter to managers and sync distributions lists.',
+      'messages': []
+    },
+    {
+      'id': 1011,
+      'subject': 'Annual day promotion teaser final cut',
+      'category': 'Media',
+      'sub_category': 'Video Editing',
+      'raised_by': 'John Doe',
+      'designation': 'Senior Software Engineer',
+      'phone': '9876543210',
+      'location': 'ACA Campus',
+      'created_at': '11 Jul 2026',
+      'priority': 'HIGH',
+      'assigned_to': 1,
+      'assigned_to_name': 'John Doe',
+      'status': 'Not Attended',
+      'description': 'Compile a 30-second teaser highlighting theater performances and upload it to social channels.',
+      'messages': []
+    },
+    {
       'id': 9280,
       'subject': 'Request to update service schedules',
       'category': 'General Support',
@@ -381,16 +638,17 @@ class ApiService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     await Future.delayed(const Duration(milliseconds: 600)); // Simulate networking
     
-    if (email.toLowerCase().trim() == 'admin@acaindia.org') {
+    final emailLower = email.toLowerCase().trim();
+    if (emailLower == 'admin@acaindia.org') {
       _currentUser = User(
-        id: 2,
+        id: 3,
         email: 'admin@acaindia.org',
-        employeeId: 2,
+        employeeId: 3,
         role: 'Admin',
       );
       _currentEmployee = Employee(
-        id: 2,
-        employeeCode: 'ACA-002',
+        id: 3,
+        employeeCode: 'ACA-003',
         firstName: 'Admin',
         lastName: 'User',
         dob: '1985-05-05',
@@ -409,34 +667,273 @@ class ApiService {
         employmentType: 'Full-Time',
         status: 'Active',
       );
-    } else {
+    } else if (emailLower == 'manager@acaindia.org' || emailLower == 'media.manager@acaindia.org') {
+      _currentUser = User(
+        id: 2,
+        email: emailLower,
+        employeeId: 2,
+        role: 'Manager',
+      );
+      _currentEmployee = _mockEmployees.firstWhere((e) => e.id == 2);
+
+      // Demo Injector: Reset 3 tickets to unread & open from Maintenance, HR, and Finance
+      final t1 = _tickets.firstWhere((t) => t['id'] == 1012, orElse: () => {});
+      if (t1.isNotEmpty) {
+        t1['status'] = 'Open';
+        t1['assigned_to'] = null;
+        t1['assigned_to_name'] = 'Unassigned';
+        t1['is_read'] = false;
+        t1['raised_by'] = 'Alex Rivera';
+      }
+
+      final t2 = _tickets.firstWhere((t) => t['id'] == 1007, orElse: () => {});
+      if (t2.isNotEmpty) {
+        t2['status'] = 'Open';
+        t2['assigned_to'] = null;
+        t2['assigned_to_name'] = 'Unassigned';
+        t2['is_read'] = false;
+        t2['raised_by'] = 'Emma Watson';
+        t2['designation'] = 'HR Manager';
+      }
+
+      final t3 = _tickets.firstWhere((t) => t['id'] == 1008, orElse: () => {});
+      if (t3.isNotEmpty) {
+        t3['status'] = 'Open';
+        t3['assigned_to'] = null;
+        t3['assigned_to_name'] = 'Unassigned';
+        t3['is_read'] = false;
+        t3['raised_by'] = 'Robert Downey';
+        t3['designation'] = 'Finance Manager';
+      }
+    } else if (emailLower == 'liam.neeson@aca.com') {
+      _currentUser = User(
+        id: 4,
+        email: emailLower,
+        employeeId: 4,
+        role: 'Employee',
+      );
+      _currentEmployee = _mockEmployees.firstWhere((e) => e.id == 4);
+    } else if (emailLower == 'sophia.loren@aca.com') {
+      _currentUser = User(
+        id: 5,
+        email: emailLower,
+        employeeId: 5,
+        role: 'Employee',
+      );
+      _currentEmployee = _mockEmployees.firstWhere((e) => e.id == 5);
+    } else if (emailLower == 'staff@acaindia.org' || emailLower == 'john.doe@aca.com') {
       _currentUser = User(
         id: 1,
-        email: 'staff@acaindia.org',
+        email: emailLower,
         employeeId: 1,
         role: 'Employee',
       );
+      _currentEmployee = _mockEmployees.firstWhere((e) => e.id == 1);
+    } else if (emailLower == 'maintenance.manager@aca.com' || emailLower == 'alex.rivera@aca.com') {
+      _currentUser = User(
+        id: 11,
+        email: emailLower,
+        employeeId: 11,
+        role: 'Manager',
+      );
       _currentEmployee = Employee(
-        id: 1,
-        employeeCode: 'ACA-001',
-        firstName: 'John',
-        lastName: 'Doe',
-        dob: '1990-01-01',
+        id: 11,
+        employeeCode: 'ACA-011',
+        firstName: 'Alex',
+        lastName: 'Rivera',
+        dob: '1988-08-08',
         gender: 'Male',
-        personalEmail: 'staff@acaindia.org',
-        phone: '9876543210',
-        departmentId: 1,
-        departmentName: 'Software Engineering',
-        designationId: 1,
-        designationTitle: 'Senior Software Engineer',
+        personalEmail: emailLower,
+        phone: '9876543212',
+        departmentId: 11,
+        departmentName: 'Maintenance',
+        designationId: 11,
+        designationTitle: 'Maintenance Manager',
         locationId: 1,
         locationName: 'ACA Campus',
-        reportingManagerId: 2,
-        managerName: 'Jane Smith',
-        dateOfJoining: '2020-06-15',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2020-01-15',
         employmentType: 'Full-Time',
         status: 'Active',
       );
+    } else if (emailLower == 'finance.manager@aca.com') {
+      _currentUser = User(
+        id: 12,
+        email: emailLower,
+        employeeId: 12,
+        role: 'Manager',
+      );
+      _currentEmployee = Employee(
+        id: 12,
+        employeeCode: 'ACA-012',
+        firstName: 'Robert',
+        lastName: 'Downey',
+        dob: '1980-04-04',
+        gender: 'Male',
+        personalEmail: emailLower,
+        phone: '9876543222',
+        departmentId: 12,
+        departmentName: 'Finance',
+        designationId: 12,
+        designationTitle: 'Finance Manager',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2019-11-15',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else if (emailLower == 'cpd.manager@aca.com') {
+      _currentUser = User(
+        id: 13,
+        email: emailLower,
+        employeeId: 13,
+        role: 'Manager',
+      );
+      _currentEmployee = Employee(
+        id: 13,
+        employeeCode: 'ACA-013',
+        firstName: 'Chris',
+        lastName: 'Evans',
+        dob: '1981-06-13',
+        gender: 'Male',
+        personalEmail: emailLower,
+        phone: '9876543233',
+        departmentId: 13,
+        departmentName: 'CPD',
+        designationId: 13,
+        designationTitle: 'CPD Manager',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2021-03-01',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else if (emailLower == 'hr.manager@aca.com') {
+      _currentUser = User(
+        id: 14,
+        email: emailLower,
+        employeeId: 14,
+        role: 'Manager',
+      );
+      _currentEmployee = Employee(
+        id: 14,
+        employeeCode: 'ACA-014',
+        firstName: 'Emma',
+        lastName: 'Watson',
+        dob: '1990-04-15',
+        gender: 'Female',
+        personalEmail: emailLower,
+        phone: '9876543244',
+        departmentId: 14,
+        departmentName: 'HR',
+        designationId: 14,
+        designationTitle: 'HR Manager',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2022-01-10',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else if (emailLower == 'inventory.manager@aca.com') {
+      _currentUser = User(
+        id: 15,
+        email: emailLower,
+        employeeId: 15,
+        role: 'Manager',
+      );
+      _currentEmployee = Employee(
+        id: 15,
+        employeeCode: 'ACA-015',
+        firstName: 'Steve',
+        lastName: 'Rogers',
+        dob: '1985-07-04',
+        gender: 'Male',
+        personalEmail: emailLower,
+        phone: '9876543255',
+        departmentId: 15,
+        departmentName: 'Inventory',
+        designationId: 15,
+        designationTitle: 'Inventory Manager',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2020-05-20',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else if (emailLower == 'hob.manager@aca.com') {
+      _currentUser = User(
+        id: 16,
+        email: emailLower,
+        employeeId: 16,
+        role: 'Manager',
+      );
+      _currentEmployee = Employee(
+        id: 16,
+        employeeCode: 'ACA-016',
+        firstName: 'Bruce',
+        lastName: 'Banner',
+        dob: '1979-12-18',
+        gender: 'Male',
+        personalEmail: emailLower,
+        phone: '9876543266',
+        departmentId: 16,
+        departmentName: 'HOB',
+        designationId: 16,
+        designationTitle: 'HOB Manager',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2018-09-01',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else if (emailLower == 'it.manager@aca.com') {
+      _currentUser = User(
+        id: 17,
+        email: emailLower,
+        employeeId: 17,
+        role: 'Manager',
+      );
+      _currentEmployee = Employee(
+        id: 17,
+        employeeCode: 'ACA-017',
+        firstName: 'Tony',
+        lastName: 'Stark',
+        dob: '1975-05-29',
+        gender: 'Male',
+        personalEmail: emailLower,
+        phone: '9876543277',
+        departmentId: 17,
+        departmentName: 'IT',
+        designationId: 17,
+        designationTitle: 'IT Manager',
+        locationId: 1,
+        locationName: 'ACA Campus',
+        reportingManagerId: 3,
+        managerName: 'Admin User',
+        dateOfJoining: '2017-06-15',
+        employmentType: 'Full-Time',
+        status: 'Active',
+      );
+    } else {
+      // Fallback staff
+      _currentUser = User(
+        id: 1,
+        email: emailLower,
+        employeeId: 1,
+        role: 'Employee',
+      );
+      _currentEmployee = _mockEmployees.firstWhere((e) => e.id == 1);
     }
 
     return {
@@ -924,5 +1421,175 @@ class ApiService {
 
   Future<List<Map<String, dynamic>>> getAssets() async {
     return _assets;
+  }
+
+  Future<void> createTicket(Map<String, dynamic> data) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final newId = _tickets.isEmpty ? 1001 : (_tickets.map((t) => t['id'] as int).reduce((a, b) => a > b ? a : b) + 1);
+    final newTicket = {
+      'id': newId,
+      'subject': data['subject'] ?? 'New Ticket',
+      'category': data['category'] ?? 'General Support',
+      'sub_category': data['sub_category'] ?? 'General',
+      'raised_by': data['raised_by'] ?? 'Me',
+      'designation': data['designation'] ?? 'Employee',
+      'phone': data['phone'] ?? '',
+      'location': data['location'] ?? 'ACA Campus',
+      'created_at': DateFormat('d MMM yyyy').format(DateTime.now()),
+      'priority': data['priority'] ?? 'MEDIUM',
+      'assigned_to': data['assigned_to'], // int or null
+      'assigned_to_name': data['assigned_to_name'] ?? 'Unassigned',
+      'status': data['status'] ?? 'Open',
+      'description': data['description'] ?? '',
+      'messages': [],
+    };
+    _tickets.insert(0, newTicket);
+  }
+
+  Future<void> assignTicket(int ticketId, int? employeeId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final idx = _tickets.indexWhere((t) => t['id'] == ticketId);
+    if (idx != -1) {
+      if (employeeId == null) {
+        _tickets[idx]['assigned_to'] = null;
+        _tickets[idx]['assigned_to_name'] = 'Unassigned';
+        _tickets[idx]['status'] = 'Open';
+      } else {
+        final emp = _mockEmployees.firstWhere((e) => e.id == employeeId);
+        _tickets[idx]['assigned_to'] = employeeId;
+        _tickets[idx]['assigned_to_name'] = emp.fullName;
+        
+        // Let's check: does this employee already have an active ticket?
+        final hasActive = _tickets.any((t) => t['assigned_to'] == employeeId && t['status'] == 'In Progress');
+        if (hasActive) {
+          _tickets[idx]['status'] = 'Not Attended';
+        } else {
+          _tickets[idx]['status'] = 'Open'; // Green/Ready
+        }
+      }
+    }
+  }
+
+  Future<void> updateTicketStatus(int ticketId, String status) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final idx = _tickets.indexWhere((t) => t['id'] == ticketId);
+    if (idx != -1) {
+      final ticket = _tickets[idx];
+      final empId = ticket['assigned_to'] as int?;
+      
+      ticket['status'] = status;
+      
+      if (empId != null) {
+        if (status == 'In Progress') {
+          // If set to In Progress, all other tickets for this employee go to 'Not Attended'
+          for (var t in _tickets) {
+            if (t['id'] != ticketId && t['assigned_to'] == empId && (t['status'] == 'In Progress' || t['status'] == 'Not Attended' || t['status'] == 'Open')) {
+              t['status'] = 'Not Attended';
+            }
+          }
+        } else if (status == 'On Hold') {
+          // If the active ticket goes on hold, check if there are other active ones. If not, make everything else green ('Open')
+          final hasOtherActive = _tickets.any((t) => t['id'] != ticketId && t['assigned_to'] == empId && t['status'] == 'In Progress');
+          if (!hasOtherActive) {
+            for (var t in _tickets) {
+              if (t['id'] != ticketId && t['assigned_to'] == empId && t['status'] == 'Not Attended') {
+                t['status'] = 'Open';
+              }
+            }
+          }
+        } else if (status == 'Closed') {
+          final hasActive = _tickets.any((t) => t['id'] != ticketId && t['assigned_to'] == empId && t['status'] == 'In Progress');
+          if (!hasActive) {
+            for (var t in _tickets) {
+              if (t['id'] != ticketId && t['assigned_to'] == empId && t['status'] == 'Not Attended') {
+                t['status'] = 'Open';
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getPublicMessages(int ticketId) async {
+    final tk = _tickets.firstWhere((t) => t['id'] == ticketId, orElse: () => {});
+    if (tk.isEmpty) return [];
+    if (tk['public_messages'] == null) {
+      tk['public_messages'] = <Map<String, dynamic>>[];
+    }
+    return List<Map<String, dynamic>>.from(tk['public_messages']);
+  }
+
+  Future<List<Map<String, dynamic>>> getInternalMessages(int ticketId) async {
+    final tk = _tickets.firstWhere((t) => t['id'] == ticketId, orElse: () => {});
+    if (tk.isEmpty) return [];
+    if (tk['internal_messages'] == null) {
+      tk['internal_messages'] = <Map<String, dynamic>>[];
+    }
+    return List<Map<String, dynamic>>.from(tk['internal_messages']);
+  }
+
+  Future<void> sendPublicMessage(int ticketId, Map<String, dynamic> msg) async {
+    final idx = _tickets.indexWhere((t) => t['id'] == ticketId);
+    if (idx != -1) {
+      if (_tickets[idx]['public_messages'] == null) {
+        _tickets[idx]['public_messages'] = [];
+      }
+      (_tickets[idx]['public_messages'] as List).add({
+        'sender': msg['sender'] ?? 'User',
+        'content': msg['content'] ?? '',
+        'time': DateFormat('h:mm a').format(DateTime.now()),
+        'image': msg['image'],
+      });
+    }
+  }
+
+  Future<void> sendInternalMessage(int ticketId, Map<String, dynamic> msg) async {
+    final idx = _tickets.indexWhere((t) => t['id'] == ticketId);
+    if (idx != -1) {
+      if (_tickets[idx]['internal_messages'] == null) {
+        _tickets[idx]['internal_messages'] = [];
+      }
+      (_tickets[idx]['internal_messages'] as List).add({
+        'sender': msg['sender'] ?? 'User',
+        'content': msg['content'] ?? '',
+        'time': DateFormat('h:mm a').format(DateTime.now()),
+        'image': msg['image'],
+        'caption': msg['caption'],
+        'is_approval_request': msg['is_approval_request'] ?? false,
+        'approval_status': msg['is_approval_request'] == true ? 'Pending' : null,
+      });
+    }
+  }
+
+  Future<void> updateApprovalStatus(int ticketId, int messageIndex, String status, {String? suggestion}) async {
+    final idx = _tickets.indexWhere((t) => t['id'] == ticketId);
+    if (idx != -1) {
+      final msgs = _tickets[idx]['internal_messages'] as List?;
+      if (msgs != null && messageIndex < msgs.length) {
+        final msg = msgs[messageIndex] as Map<String, dynamic>;
+        msg['approval_status'] = status;
+        
+        // Add a reply message automatically representing the suggestion or decision
+        String replyContent = 'Approval Request: $status';
+        if (status == 'Suggestion' && suggestion != null) {
+          replyContent += '\nSuggestion details: $suggestion';
+        }
+        
+        msgs.add({
+          'sender': 'Jane Smith (Manager)',
+          'content': replyContent,
+          'time': DateFormat('h:mm a').format(DateTime.now()),
+          'is_approval_request': false,
+        });
+      }
+    }
+  }
+
+  Future<void> markTicketAsRead(int ticketId) async {
+    final idx = _tickets.indexWhere((t) => t['id'] == ticketId);
+    if (idx != -1) {
+      _tickets[idx]['is_read'] = true;
+    }
   }
 }

@@ -3,6 +3,7 @@ import '../../core/theme.dart';
 import 'attendance_tab.dart';
 import 'leave_tab.dart';
 import '../stubs/empty_state_screen.dart';
+import '../helpdesk/helpdesk_screen.dart';
 
 class MeDashboardScreen extends StatefulWidget {
   const MeDashboardScreen({super.key});
@@ -58,7 +59,7 @@ class _MeDashboardScreenState extends State<MeDashboardScreen> with SingleTicker
           LeaveTab(),
           EmptyStateScreen(moduleName: 'Me -> Performance'),
           EmptyStateScreen(moduleName: 'Me -> Expenses & Travel'),
-          EmptyStateScreen(moduleName: 'Me -> Helpdesk'),
+          HelpdeskScreen(),
           EmptyStateScreen(moduleName: 'Me -> Apps'),
         ],
       ),

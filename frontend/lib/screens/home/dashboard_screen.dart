@@ -13,6 +13,7 @@ import '../../providers/leave_provider.dart';
 import '../../providers/events_provider.dart';
 import '../../services/api_service.dart';
 import '../../services/voice_helper.dart';
+import '../../widgets/ticket_details_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -28,6 +29,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
   
   List<Map<String, dynamic>> _announcements = [];
   List<Map<String, dynamic>> _polls = [];
+  List<Map<String, dynamic>> _tickets = [];
+  bool _isLoadingTickets = false;
+
+  Future<void> _loadTickets() async {
+    if (!mounted) return;
+    setState(() => _isLoadingTickets = true);
+    final tickets = await _apiService.getTickets();
+    if (!mounted) return;
+    setState(() {
+      _tickets = tickets;
+      _isLoadingTickets = false;
+    });
+  }
   String _selectedWorkMode = 'Office';
   late Timer _timer;
   String _currentTime = '';
@@ -315,6 +329,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     ref.read(attendanceProvider.notifier).fetchLogs();
     ref.read(leaveProvider.notifier).fetchLeaveData();
     _fetchAnnouncementsAndPolls();
+    _loadTickets();
   }
 
   void _fetchAnnouncementsAndPolls() async {
@@ -328,6 +343,47 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
         });
       }
     } catch (_) {}
+  }
+
+  bool _isRaisedByDept(String sender, String dept) {
+    if (sender == 'Alex Rivera' && dept == 'Maintenance') return true;
+    if (sender == 'Robert Downey' && dept == 'Finance') return true;
+    if (sender == 'Chris Evans' && dept == 'CPD') return true;
+    if (sender == 'Emma Watson' && dept == 'HR') return true;
+    if (sender == 'Steve Rogers' && dept == 'Inventory') return true;
+    if (sender == 'Bruce Banner' && dept == 'HOB') return true;
+    if (sender == 'Tony Stark' && dept == 'IT') return true;
+    if ((sender == 'Jane Smith' || sender == 'John Doe' || sender == 'Liam Neeson' || sender == 'Sophia Loren') && dept == 'Media') return true;
+    return false;
+  }
+
+  int _getNotificationCount(String deptName, authState) {
+    if (authState.user == null) return 0;
+    final email = authState.user!.email.toLowerCase();
+
+    // If logged in as Media Manager (Jane Smith)
+    if (email == 'manager@acaindia.org' || email == 'media.manager@acaindia.org' || email == 'media.manager@aca.com') {
+      return _tickets.where((t) =>
+        t['status'] == 'Open' &&
+        t['assigned_to'] == null &&
+        t['category'] == 'Media' &&
+        t['is_read'] != true &&
+        _isRaisedByDept(t['raised_by'] ?? '', deptName)
+      ).length;
+    }
+    
+    // If logged in as Media Employee (John Doe, Liam, Sophia)
+    if (email == 'staff@acaindia.org' || email == 'john.doe@aca.com' || email == 'liam.neeson@aca.com' || email == 'sophia.loren@aca.com') {
+      final empId = authState.employee?.id ?? 1;
+      return _tickets.where((t) =>
+        t['assigned_to'] == empId &&
+        t['status'] != 'Closed' &&
+        t['is_read'] != true &&
+        _isRaisedByDept(t['raised_by'] ?? '', deptName)
+      ).length;
+    }
+
+    return 0;
   }
 
   Widget _buildDepartmentPortalsRow() {
@@ -385,8 +441,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
             itemCount: list.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: isDesktop ? 8 : 4,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
               childAspectRatio: isDesktop ? 1.25 : 1.0,
             ),
             itemBuilder: (context, index) {
@@ -394,8 +450,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
               final name = dept['name'] as String;
               final icon = dept['icon'] as IconData;
               final color = dept['color'] as Color;
+              final badgeCount = _getNotificationCount(name, authState);
 
-              return Container(
+              Widget cardWidget = Container(
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(16),
@@ -424,23 +481,62 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                   ),
                 ),
               );
+
+              if (badgeCount > 0) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    cardWidget,
+                    Positioned(
+                      top: -6,
+                      right: -6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$badgeCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return cardWidget;
             },
           )
         else
           SizedBox(
-            height: 90,
+            height: 106,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: list.length,
               itemBuilder: (context, index) {
                 final dept = list[index];
                 final name = dept['name'] as String;
                 final icon = dept['icon'] as IconData;
                 final color = dept['color'] as Color;
+                final badgeCount = _getNotificationCount(name, authState);
 
-                return Container(
-                  margin: const EdgeInsets.only(right: 12),
+                Widget cardWidget = Container(
                   width: 95,
+                  margin: const EdgeInsets.only(right: 12),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(16),
@@ -469,10 +565,216 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                     ),
                   ),
                 );
+
+                if (badgeCount > 0) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      cardWidget,
+                      Positioned(
+                        top: -6,
+                        right: 6,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '$badgeCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return cardWidget;
               },
             ),
-          ),
+          )
       ],
+    );
+  }
+
+  void _openTicketDetails(BuildContext context, int ticketId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TicketDetailsDialog(
+          ticketId: ticketId,
+          onRefresh: _loadTickets,
+        ),
+      ),
+    );
+  }
+
+  void _showAllTicketsDialog(BuildContext context, String deptName, Color color) {
+    final allDeptTickets = _tickets.where((t) =>
+      t['category'] == 'Media' &&
+      _isRaisedByDept(t['raised_by'], deptName)
+    ).toList();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 8),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('All Tickets - $deptName', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              )
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: allDeptTickets.isEmpty
+                ? const Center(child: Text('No tickets found for this department.', style: TextStyle(color: AppTheme.textMuted)))
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: allDeptTickets.length,
+                    itemBuilder: (context, idx) {
+                      final t = allDeptTickets[idx];
+                      final isClosed = t['status'] == 'Closed';
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: AppTheme.borderGrey),
+                        ),
+                        elevation: 0,
+                        child: ListTile(
+                          leading: Icon(
+                            isClosed ? Icons.check_circle_outline : Icons.pending_actions,
+                            color: isClosed ? Colors.green : Colors.orange,
+                          ),
+                          title: Text(t['subject'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                          subtitle: Text('Status: ${t['status']} | Assignee: ${t['assigned_to_name']}', style: const TextStyle(fontSize: 11)),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+                          onTap: () {
+                            Navigator.pop(context); // Close all tickets dialog
+                            _openTicketDetails(context, t['id'] as int);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRaiseTicketDialog(BuildContext context, String deptName, List<String> deptServices, Color color) {
+    String selectedService = deptServices.first;
+    final descController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text('Raise Ticket to $deptName', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: selectedService,
+                    decoration: const InputDecoration(
+                      labelText: 'Select Service Required',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: deptServices.map((String service) {
+                      return DropdownMenuItem<String>(
+                        value: service,
+                        child: Text(service, style: const TextStyle(fontSize: 13)),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setModalState(() {
+                          selectedService = val;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: descController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Description / Remarks',
+                      alignLabelWithHint: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final desc = descController.text.trim();
+                    if (desc.isEmpty) return;
+
+                    final authState = ref.read(authProvider);
+                    final senderName = authState.employee?.fullName ?? 'User';
+                    final senderDesignation = authState.employee?.designationTitle ?? 'Employee';
+
+                    await _apiService.createTicket({
+                      'subject': '$selectedService - Raised by $senderName',
+                      'category': 'Media', // Rout to Media department
+                      'sub_category': 'General',
+                      'raised_by': senderName,
+                      'designation': senderDesignation,
+                      'status': 'Open',
+                      'description': desc,
+                    });
+
+                    Navigator.pop(context); // Close dialog
+                    _loadTickets();
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Ticket created successfully for $deptName ($selectedService)'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Submit'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -505,40 +807,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final deptServices = services[deptName] ?? ['General Support Request'];
     final deptPresence = _presenceData[deptName] ?? [];
 
-    String selectedService = deptServices.first;
-    final descController = TextEditingController();
+    final authState = ref.read(authProvider);
+
+    // Filter UNREAD notifications/active tickets related to this department
+    final deptNotifications = _tickets.where((t) =>
+      t['category'] == 'Media' &&
+      t['is_read'] != true &&
+      t['status'] != 'Closed' &&
+      _isRaisedByDept(t['raised_by'], deptName)
+    ).toList();
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppTheme.borderGrey,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).viewInsets.bottom + 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppTheme.borderGrey,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Icon(icon, color: color, size: 28),
@@ -553,172 +863,129 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  // Section 1: Team Presence
-                  Text(
-                    'TEAM PRESENCE',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textMuted,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  if (deptPresence.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text('No team presence information listed.'),
-                    )
-                  else
-                    SizedBox(
-                      height: 130,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: deptPresence.length,
-                        itemBuilder: (context, index) {
-                          return _buildStaffCard(deptPresence[index], deptName);
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          _showRaiseTicketDialog(context, deptName, deptServices, color);
                         },
-                      ),
-                    ),
-                  const SizedBox(height: 24),
-                  // Section 2: Helpdesk Ticket
-                  Text(
-                    'RAISE SERVICE TICKET',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textMuted,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: selectedService,
-                    decoration: const InputDecoration(
-                      labelText: 'Select Service Required',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: deptServices.map((String service) {
-                      return DropdownMenuItem<String>(
-                        value: service,
-                        child: Text(service, style: const TextStyle(fontSize: 13.5)),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setModalState(() {
-                          selectedService = val;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: descController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Description / Remarks',
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      final desc = descController.text.trim();
-                      if (desc.isEmpty) return;
-                      
-                      setState(() {
-                        _recentTickets.insert(0, <String, String>{
-                          'dept': deptName,
-                          'service': selectedService,
-                          'desc': desc,
-                          'status': 'Pending'
-                        });
-                      });
-
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Ticket created successfully for $deptName ($selectedService)'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: color,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    child: const Text(
-                      'Submit Ticket Request',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Divider(height: 1, color: AppTheme.borderGrey),
-                  const SizedBox(height: 16),
-                  Text(
-                    'RECENT TICKETS FOR $deptName',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textMuted,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ..._recentTickets.where((t) => t['dept'] == deptName).map((t) {
-                    return Card(
-                      color: AppTheme.bgLight,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  t['service']!,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: t['status'] == 'Pending' ? Colors.amber.withOpacity(0.12) : Colors.blue.withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    t['status']!,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: t['status'] == 'Pending' ? Colors.amber[800] : Colors.blue[800],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            DateParserHelper.buildClickableText(
-                              context,
-                              ref,
-                              t['desc']!,
-                              style: const TextStyle(fontSize: 12.5, color: AppTheme.textBody),
-                            ),
-                          ],
+                        icon: const Icon(Icons.add, size: 14),
+                        label: const Text('Raise Ticket', style: TextStyle(fontSize: 10)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         ),
                       ),
-                    );
-                  }).toList(),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          _showAllTicketsDialog(context, deptName, color);
+                        },
+                        icon: const Icon(Icons.receipt_long, size: 14),
+                        label: const Text('View All', style: TextStyle(fontSize: 10)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: color,
+                          side: BorderSide(color: color),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            );
-          },
+              const SizedBox(height: 20),
+              // Section 1: Team Presence
+              Text(
+                'TEAM PRESENCE',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textMuted,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (deptPresence.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Text('No team presence information listed.', style: TextStyle(fontSize: 12)),
+                )
+              else
+                SizedBox(
+                  height: 130,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: deptPresence.length,
+                    itemBuilder: (context, index) {
+                      return _buildStaffCard(deptPresence[index], deptName);
+                    },
+                  ),
+                ),
+              
+              if (deptNotifications.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                Text(
+                  'NOTIFICATIONS / ACTIVE TICKETS',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMuted,
+                    letterSpacing: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 180),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: deptNotifications.length,
+                    itemBuilder: (context, idx) {
+                      final t = deptNotifications[idx];
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.red.shade100),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.red,
+                            radius: 16,
+                            child: Icon(
+                              Icons.notifications_active,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                          title: Text(
+                            t['subject'],
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                          ),
+                          subtitle: Text(
+                            'Status: ${t['status']} | Raised by: ${t['raised_by']}',
+                            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                          ),
+                          trailing: const Icon(Icons.chevron_right, size: 18, color: AppTheme.textMuted),
+                          onTap: () async {
+                            Navigator.pop(context); // Close bottom sheet
+                            await _apiService.markTicketAsRead(t['id'] as int);
+                            _loadTickets();
+                            _openTicketDetails(context, t['id'] as int);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ],
+          ),
         );
       },
     );

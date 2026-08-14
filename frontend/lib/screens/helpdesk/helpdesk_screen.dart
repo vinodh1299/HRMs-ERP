@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../core/responsive.dart';
 import '../../services/api_service.dart';
+import '../../providers/auth_provider.dart';
 import 'package:intl/intl.dart';
 
 class HelpdeskScreen extends ConsumerStatefulWidget {
@@ -44,10 +45,16 @@ class _HelpdeskScreenState extends ConsumerState<HelpdeskScreen> with SingleTick
 
   late List<Map<String, dynamic>> _mockTickets;
 
+  int _tabCount = 3;
+  bool _hasQueueTab = false;
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    final authState = ref.read(authProvider);
+    _hasQueueTab = authState.user?.role == 'Employee';
+    _tabCount = _hasQueueTab ? 4 : 3;
+    _tabController = TabController(length: _tabCount, vsync: this);
     
     // Set up high-fidelity mock data matching screenshots
     _mockTickets = [
@@ -190,10 +197,11 @@ class _HelpdeskScreenState extends ConsumerState<HelpdeskScreen> with SingleTick
             labelColor: AppTheme.primary,
             unselectedLabelColor: AppTheme.textMuted,
             labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-            tabs: const [
-              Tab(text: 'SUMMARY'),
-              Tab(text: 'TICKETS'),
-              Tab(text: 'REPORTS'),
+            tabs: [
+              const Tab(text: 'SUMMARY'),
+              const Tab(text: 'TICKETS'),
+              if (_hasQueueTab) const Tab(text: 'MY WORK QUEUE'),
+              const Tab(text: 'REPORTS'),
             ],
           ),
         ),
@@ -205,9 +213,215 @@ class _HelpdeskScreenState extends ConsumerState<HelpdeskScreen> with SingleTick
               children: [
                 _buildSummaryTab(isDesktop),
                 _buildTicketsTab(isDesktop),
+                if (_hasQueueTab) _buildWorkQueueTab(),
                 _buildReportsTab(),
               ],
             ),
+    );
+  }
+
+  Widget _buildWorkQueueTab() {
+    final authState = ref.watch(authProvider);
+    final currentEmp = authState.employee;
+    if (currentEmp == null) {
+      return const Center(child: Text('Employee profile not loaded.'));
+    }
+
+    final myTickets = _tickets.where((tk) => tk['assigned_to'] == currentEmp.id).toList();
+
+    if (myTickets.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.assignment_turned_in_outlined, size: 64, color: AppTheme.textMuted),
+            SizedBox(height: 16),
+            Text('You have no tickets in your queue.', style: TextStyle(color: AppTheme.textMuted)),
+          ],
+        ),
+      );
+    }
+
+    Color getStatusColor(String status) {
+      switch (status) {
+        case 'In Progress':
+          return Colors.orange;
+        case 'On Hold':
+          return Colors.blue;
+        case 'Open':
+          return Colors.green;
+        case 'Not Attended':
+          return Colors.grey;
+        case 'Closed':
+          return Colors.black54;
+        default:
+          return Colors.grey;
+      }
+    }
+
+    String getStatusLabel(String status) {
+      switch (status) {
+        case 'In Progress':
+          return 'Working On';
+        case 'Open':
+          return 'Ready / Available';
+        case 'On Hold':
+          return 'On Hold';
+        case 'Not Attended':
+          return 'Not Attended';
+        case 'Closed':
+          return 'Closed';
+        default:
+          return status;
+      }
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: myTickets.length,
+      itemBuilder: (context, index) {
+        final tk = myTickets[index];
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: AppTheme.borderGrey),
+          ),
+          elevation: 0,
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: getStatusColor(tk['status']).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        getStatusLabel(tk['status']),
+                        style: TextStyle(
+                          color: getStatusColor(tk['status']),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'TKT-${tk['id']}',
+                      style: const TextStyle(
+                        color: AppTheme.textMuted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  tk['subject'] ?? 'No Subject',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textDark,
+                  ),
+                ),
+                if (tk['description'] != null && tk['description'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    tk['description'],
+                    style: TextStyle(fontSize: 13, color: AppTheme.textMuted, height: 1.4),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 12),
+                if (tk['status'] != 'Closed')
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (tk['status'] != 'In Progress')
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            setState(() => _isLoading = true);
+                            await _apiService.updateTicketStatus(tk['id'], 'In Progress');
+                            _loadTickets();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('You are now working on this ticket.')),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.play_arrow, size: 16),
+                          label: const Text('Start Work', style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      if (tk['status'] == 'In Progress')
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            setState(() => _isLoading = true);
+                            await _apiService.updateTicketStatus(tk['id'], 'On Hold');
+                            _loadTickets();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Ticket put on hold.')),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.pause, size: 16),
+                          label: const Text('Put On Hold', style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          setState(() => _isLoading = true);
+                          await _apiService.updateTicketStatus(tk['id'], 'Closed');
+                          _loadTickets();
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Ticket successfully completed & closed.')),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.check, size: 16),
+                        label: const Text('Mark Complete', style: TextStyle(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.green,
+                          side: const BorderSide(color: Colors.green),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Icon(Icons.check_circle, color: Colors.green, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        'Completed',
+                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
