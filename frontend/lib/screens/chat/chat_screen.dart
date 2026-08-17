@@ -75,7 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
     'Gemini AI Assistant': [
       ChatMessage(
         sender: 'Gemini AI Assistant',
-        text: 'Hello! I am your Google Gemini HR Assistant. How can I help you today? (You can configure my API key using the Settings gear in the header)',
+        text: 'Hello! I am your HRMs-AI Assistant. Connected to the HRMs-AI engine. Ask me policy questions or instruct me to perform actions like raising tickets, applying for leave, or checking attendance!',
         timestamp: DateTime.now(),
         isMe: false,
       ),
