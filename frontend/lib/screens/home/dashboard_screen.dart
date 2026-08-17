@@ -2332,7 +2332,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                           if (!isUser) ...[
                             const SizedBox(height: 4),
                             InkWell(
-                              onTap: () => VoiceHelper.speak(msg['text'] as String),
+                              onTap: () => VoiceHelper.speak(msg['text'] as String, force: true),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [

@@ -389,7 +389,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 if (!msg.isMe)
                   InkWell(
-                    onTap: () => VoiceHelper.speak(msg.text),
+                    onTap: () => VoiceHelper.speak(msg.text, force: true),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Row(
