@@ -265,13 +265,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ),
                 ),
-                if (_activeTarget.name == 'Gemini AI Assistant') ...[
-                  IconButton(
-                    icon: const Icon(Icons.settings, color: AppTheme.primary),
-                    tooltip: 'Configure API Key',
-                    onPressed: () => _showApiKeyDialog(),
-                  ),
-                ],
               ],
             ),
           ),
@@ -515,71 +508,4 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void _showApiKeyDialog() async {
-    final formKey = GlobalKey<FormState>();
-    final currentKey = await GeminiService.getApiKey() ?? '';
-    final controller = TextEditingController(text: currentKey);
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Configure Gemini API Key'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Enter your Google AI Studio Gemini API Key. It will be stored securely on your local device.',
-                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: controller,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Gemini API Key',
-                    prefixIcon: Icon(Icons.vpn_key),
-                  ),
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                GeminiService.deleteApiKey();
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('API Key cleared.')),
-                );
-              },
-              child: const Text('CLEAR KEY', style: TextStyle(color: AppTheme.errorRed)),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('CANCEL'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  await GeminiService.saveApiKey(controller.text.trim());
-                  if (mounted) {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('API Key saved successfully.')),
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white),
-              child: const Text('SAVE'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
