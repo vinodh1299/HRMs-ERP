@@ -8,7 +8,12 @@ class VoiceHelperImpl {
     onEnd();
   }
 
-  static void speak(String text) {}
+  static void speak(String text, {void Function()? onStart, void Function()? onEnd}) {
+    onEnd?.call();
+  }
 
   static void stopSpeaking() {}
+
+  static bool isSpeaking() => false;
 }
+

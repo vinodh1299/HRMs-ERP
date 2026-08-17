@@ -42,10 +42,13 @@
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
   <script>
+    var _currentSpeechEndCallback = null;
+
     window.startSpeechRecognition = function(onResult, onError, onEnd) {
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        onError("Speech recognition not supported in this browser.");
+        if (onError) onError("Speech recognition not supported in this browser.");
+        if (onEnd) onEnd();
         return null;
       }
       var recognition = new SpeechRecognition();
@@ -55,41 +58,68 @@
 
       recognition.onresult = function(event) {
         var text = event.results[0][0].transcript;
-        onResult(text);
+        if (onResult) onResult(text);
       };
       recognition.onerror = function(event) {
-        onError(event.error);
+        if (onError) onError(event.error || "Speech recognition error");
       };
       recognition.onend = function() {
-        onEnd();
+        if (onEnd) onEnd();
       };
       try {
         recognition.start();
       } catch (e) {
-        onError(e.message);
+        if (onError) onError(e.message || "Failed to start speech recognition");
+        if (onEnd) onEnd();
       }
       return recognition;
     };
 
-    window.speakText = function(text) {
+    window.speakText = function(text, onStart, onEnd) {
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
-      var cleanText = text
+      var cleanText = String(text)
         .replace(/[\#\*\_\`\~]/g, '')
-        .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋/g, '')
-        .replace(/\n+/g, '. ');
+        .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋|⚠️|🚫/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
       
+      if (!cleanText) {
+        if (onEnd) onEnd();
+        return;
+      }
+
       var utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
       utterance.lang = 'en-US';
+
+      utterance.onstart = function() {
+        if (onStart) onStart();
+      };
+      utterance.onend = function() {
+        if (onEnd) onEnd();
+      };
+      utterance.onerror = function(e) {
+        if (onEnd) onEnd();
+      };
+
+      _currentSpeechEndCallback = onEnd;
       window.speechSynthesis.speak(utterance);
     };
 
     window.stopSpeaking = function() {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
+        if (_currentSpeechEndCallback) {
+          _currentSpeechEndCallback();
+          _currentSpeechEndCallback = null;
+        }
       }
+    };
+
+    window.isSpeaking = function() {
+      return ('speechSynthesis' in window) && window.speechSynthesis.speaking;
     };
   </script>
   <script src="flutter_bootstrap.js" async></script>

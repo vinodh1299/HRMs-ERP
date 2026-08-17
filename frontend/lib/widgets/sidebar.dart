@@ -5,6 +5,7 @@ import '../core/responsive.dart';
 import '../core/theme.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import 'voice_assistant_widget.dart';
 
 class NavItem {
   final String title;
@@ -272,6 +273,8 @@ class NavigationShell extends ConsumerWidget {
               ),
             ),
           ],
+          const VoiceAssistantWidget(compact: true),
+          const SizedBox(width: 10),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'toggle_theme') {

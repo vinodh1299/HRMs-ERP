@@ -4,10 +4,13 @@ import 'dart:js_interop';
 external void _jsStartSpeechRecognition(JSFunction onResult, JSFunction onError, JSFunction onEnd);
 
 @JS('speakText')
-external void _jsSpeakText(JSString text);
+external void _jsSpeakText(JSString text, JSFunction? onStart, JSFunction? onEnd);
 
 @JS('stopSpeaking')
 external void _jsStopSpeaking();
+
+@JS('isSpeaking')
+external JSBoolean _jsIsSpeaking();
 
 class VoiceHelperImpl {
   static void startRecognition({
@@ -27,10 +30,14 @@ class VoiceHelperImpl {
     }
   }
 
-  static void speak(String text) {
+  static void speak(String text, {void Function()? onStart, void Function()? onEnd}) {
     try {
-      _jsSpeakText(text.toJS);
-    } catch (_) {}
+      final jsStart = onStart != null ? (() => onStart()).toJS : null;
+      final jsEnd = onEnd != null ? (() => onEnd()).toJS : null;
+      _jsSpeakText(text.toJS, jsStart, jsEnd);
+    } catch (_) {
+      onEnd?.call();
+    }
   }
 
   static void stopSpeaking() {
@@ -38,4 +45,13 @@ class VoiceHelperImpl {
       _jsStopSpeaking();
     } catch (_) {}
   }
+
+  static bool isSpeaking() {
+    try {
+      return _jsIsSpeaking().toDart;
+    } catch (_) {
+      return false;
+    }
+  }
 }
+

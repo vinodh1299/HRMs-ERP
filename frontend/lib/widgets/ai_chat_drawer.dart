@@ -24,6 +24,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
   
   bool _isActionAgentMode = true;
   bool _isLoading = false;
+  bool _isListening = false;
 
   final List<ChatMessage> _messages = [
     ChatMessage(
@@ -38,6 +39,37 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
   void initState() {
     super.initState();
     _apiService = HrmsAiApiService(baseUrl: widget.backendUrl);
+  }
+
+  void _toggleVoiceRecording() {
+    if (_isListening) {
+      setState(() => _isListening = false);
+      return;
+    }
+
+    setState(() => _isListening = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Listening... Speak your prompt!'), duration: Duration(seconds: 2)),
+    );
+
+    VoiceHelper.startRecognition(
+      onResult: (text) {
+        if (!mounted) return;
+        setState(() {
+          _textController.text = text;
+        });
+      },
+      onError: (err) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Voice error: $err')),
+        );
+      },
+      onEnd: () {
+        if (!mounted) return;
+        setState(() => _isListening = false);
+      },
+    );
   }
 
   @override
@@ -231,13 +263,23 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
               color: Colors.grey.shade100,
               child: Row(
                 children: [
+                  IconButton(
+                    icon: Icon(
+                      _isListening ? Icons.mic_rounded : Icons.mic_none_outlined,
+                      color: _isListening ? Colors.red : Colors.blueAccent,
+                    ),
+                    tooltip: 'Voice Input',
+                    onPressed: _toggleVoiceRecording,
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _textController,
                       decoration: InputDecoration(
-                        hintText: _isActionAgentMode
-                            ? 'Enter prompt (e.g. Apply for leave)...'
-                            : 'Ask policy question...',
+                        hintText: _isListening
+                            ? 'Listening... Speak prompt...'
+                            : (_isActionAgentMode
+                                ? 'Enter prompt (or tap mic)...'
+                                : 'Ask policy question...'),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
@@ -279,6 +321,23 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
               msg.text,
               style: TextStyle(color: isUser ? Colors.white : Colors.black87, fontSize: 14),
             ),
+            if (!isUser) ...[
+              const SizedBox(height: 4),
+              InkWell(
+                onTap: () => VoiceHelper.speak(msg.text, force: true),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.volume_up_rounded, size: 14, color: Colors.blue.shade800),
+                      const SizedBox(width: 4),
+                      Text('Listen', style: TextStyle(fontSize: 11, color: Colors.blue.shade800, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
 
             // Render Sources if present
             if (msg.sources != null && msg.sources!.isNotEmpty) ...[
