@@ -7,4 +7,8 @@ class VoiceHelperImpl {
     onError("Voice Assistant not supported on this platform.");
     onEnd();
   }
+
+  static void speak(String text) {}
+
+  static void stopSpeaking() {}
 }

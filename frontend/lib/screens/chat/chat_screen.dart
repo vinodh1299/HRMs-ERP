@@ -84,6 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           );
         });
+        VoiceHelper.speak(assistantReply);
         _scrollToBottom();
       });
     } else if (!_activeTarget.isChannel) {
@@ -383,15 +384,33 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text(
-                DateParserHelper.formatTime(msg.timestamp),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: msg.isMe ? Colors.white70 : AppTheme.textMuted,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (!msg.isMe)
+                  InkWell(
+                    onTap: () => VoiceHelper.speak(msg.text),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.volume_up_rounded, size: 14, color: AppTheme.primary),
+                          SizedBox(width: 4),
+                          Text('Listen', style: TextStyle(fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
+                Text(
+                  DateParserHelper.formatTime(msg.timestamp),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: msg.isMe ? Colors.white70 : AppTheme.textMuted,
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

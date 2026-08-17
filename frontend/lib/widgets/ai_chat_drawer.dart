@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/ai_models.dart';
 import '../services/hrms_ai_service.dart';
 import '../services/chat_service.dart';
+import '../services/voice_helper.dart';
 
 /// Interactive AI Assistant Chat Drawer / Modal Sheet for Flutter apps.
 class AiChatDrawer extends StatefulWidget {
@@ -88,6 +89,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
           isUser: false,
           timestamp: DateTime.now(),
         ));
+        VoiceHelper.speak(reply);
       } else if (_isActionAgentMode) {
         final outcomes = await _apiService.sendAgentAction(text);
         for (var outcome in outcomes) {
@@ -98,6 +100,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
             timestamp: DateTime.now(),
             agentOutcome: outcome,
           ));
+          VoiceHelper.speak(outcome.message);
         }
       } else {
         final chatRes = await _apiService.askPolicyChat(text);
@@ -108,6 +111,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
           timestamp: DateTime.now(),
           sources: chatRes.sources,
         ));
+        VoiceHelper.speak(chatRes.answer);
       }
     } catch (e) {
       _messages.add(ChatMessage(

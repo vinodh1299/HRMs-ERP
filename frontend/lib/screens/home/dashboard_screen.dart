@@ -2318,13 +2318,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
                                 ),
                               ],
                       ),
-                      child: Text(
-                        msg['text'] as String,
-                        style: TextStyle(
-                          color: isUser ? Colors.white : AppTheme.textDark,
-                          fontSize: 12.5,
-                          height: 1.4,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            msg['text'] as String,
+                            style: TextStyle(
+                              color: isUser ? Colors.white : AppTheme.textDark,
+                              fontSize: 12.5,
+                              height: 1.4,
+                            ),
+                          ),
+                          if (!isUser) ...[
+                            const SizedBox(height: 4),
+                            InkWell(
+                              onTap: () => VoiceHelper.speak(msg['text'] as String),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.volume_up_rounded, size: 13, color: AppTheme.primary),
+                                  SizedBox(width: 4),
+                                  Text('Listen', style: TextStyle(fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   );
@@ -2830,6 +2849,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
             'time': DateTime.now(),
           });
         });
+        VoiceHelper.speak(text);
         _scrollToBottom();
       }
     });

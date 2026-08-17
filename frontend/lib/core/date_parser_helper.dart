@@ -215,4 +215,11 @@ class DateParserHelper {
     if (month >= 1 && month <= 12) return names[month - 1];
     return '';
   }
+
+  static String formatTime(DateTime date) {
+    final hour = date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date.hour);
+    final minute = date.minute.toString().padLeft(2, '0');
+    final period = date.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
+  }
 }
