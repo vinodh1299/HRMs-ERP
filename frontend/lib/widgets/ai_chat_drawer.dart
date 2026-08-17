@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/ai_models.dart';
 import '../services/hrms_ai_service.dart';
+import '../services/chat_service.dart';
 
 /// Interactive AI Assistant Chat Drawer / Modal Sheet for Flutter apps.
 class AiChatDrawer extends StatefulWidget {
@@ -77,7 +78,17 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
     _scrollToBottom();
 
     try {
-      if (_isActionAgentMode) {
+      final lowerText = text.toLowerCase();
+      if (lowerText.contains('send') || lowerText.contains('msg') || lowerText.contains('message') ||
+          lowerText.contains('vinodh') || lowerText.contains('john') || lowerText.contains('jane') || lowerText.contains('alice')) {
+        final reply = await ChatService.processAiPrompt(text);
+        _messages.add(ChatMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          text: reply,
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+      } else if (_isActionAgentMode) {
         final outcomes = await _apiService.sendAgentAction(text);
         for (var outcome in outcomes) {
           _messages.add(ChatMessage(

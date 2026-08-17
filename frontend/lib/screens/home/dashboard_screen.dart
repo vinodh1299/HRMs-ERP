@@ -13,6 +13,7 @@ import '../../providers/leave_provider.dart';
 import '../../providers/events_provider.dart';
 import '../../services/api_service.dart';
 import '../../services/voice_helper.dart';
+import '../../services/chat_service.dart';
 import '../../widgets/ticket_details_dialog.dart';
 import '../../widgets/ai_chat_drawer.dart';
 import 'package:go_router/go_router.dart';
@@ -2467,6 +2468,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
           });
         }
         _addAssistantReply("I am only authorized to assist with ACA HRMs-ERP application operations, such as checking staff presence, raising department tickets, or portal info. Please ask a question related to this app.");
+        return;
+      }
+
+      // Direct team/user message dispatching via ChatService
+      if (text.contains('send') || text.contains('msg') || text.contains('message') ||
+          text.contains('vinodh') || text.contains('john') || text.contains('jane') || text.contains('alice')) {
+        Future.microtask(() async {
+          final reply = await ChatService.processAiPrompt(userText);
+          if (mounted) {
+            setState(() {
+              _isAiTyping = false;
+            });
+            _addAssistantReply(reply);
+          }
+        });
         return;
       }
 
