@@ -49,6 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late ChatTarget _activeTarget;
   bool _isTyping = false;
   bool _isListening = false;
+  String? _lastGeneratedContext;
 
   final List<ChatTarget> _targets = [
     ChatTarget(name: '#general', isChannel: true),
@@ -123,14 +124,55 @@ class _ChatScreenState extends State<ChatScreen> {
       _scrollToBottom();
 
       Future.microtask(() async {
+        final lowerText = text.toLowerCase();
+        
+        // Match recipient name from active chat targets
+        String? matchedTargetName;
+        for (final target in _targets) {
+          if (target.name == 'Gemini AI Assistant') continue;
+          final targetClean = target.name.replaceAll('#', '').trim().toLowerCase();
+          if (lowerText.contains(targetClean) || lowerText.contains(target.name.toLowerCase())) {
+            matchedTargetName = target.name;
+            break;
+          }
+        }
+
         final responseText = await GeminiService.getChatResponse(text);
         if (!mounted) return;
+
+        String assistantReply = responseText;
+
+        if (matchedTargetName != null) {
+          // Determine the contextual message body to send
+          String contentToDispatch = _lastGeneratedContext ?? responseText;
+          
+          if (contentToDispatch.contains('Subject:')) {
+            contentToDispatch = contentToDispatch.replaceAll('***', '').trim();
+          }
+
+          // Automatically insert message into recipient's chat
+          _conversations.putIfAbsent(matchedTargetName, () => []);
+          _conversations[matchedTargetName]!.add(
+            ChatMessage(
+              sender: 'Me',
+              text: contentToDispatch,
+              timestamp: DateTime.now(),
+              isMe: true,
+            ),
+          );
+
+          assistantReply = '🚀 **Message Sent Successfully**!\n\nI generated the message based on your context and automatically sent it directly to **$matchedTargetName**\'s chat.\n\n**Sent Message**:\n$contentToDispatch';
+        } else {
+          // Store generated context for potential follow-up send commands
+          _lastGeneratedContext = responseText;
+        }
+
         setState(() {
           _isTyping = false;
           _conversations[_activeTarget.name]!.add(
             ChatMessage(
               sender: 'Gemini AI Assistant',
-              text: responseText,
+              text: assistantReply,
               timestamp: DateTime.now(),
               isMe: false,
             ),
