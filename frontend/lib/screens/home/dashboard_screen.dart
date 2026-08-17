@@ -14,6 +14,7 @@ import '../../providers/events_provider.dart';
 import '../../services/api_service.dart';
 import '../../services/voice_helper.dart';
 import '../../widgets/ticket_details_dialog.dart';
+import '../../widgets/ai_chat_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -1139,20 +1140,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with SingleTi
     final employee = authState.employee;
     
     return Scaffold(
+      endDrawer: const AiChatDrawer(),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(48),
         child: Container(
           color: Colors.white,
-          child: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            indicatorColor: AppTheme.primary,
-            labelColor: AppTheme.primary,
-            unselectedLabelColor: AppTheme.textMuted,
-            tabs: const [
-              Tab(text: 'Dashboard'),
-              Tab(text: 'Welcome Onboarding'),
+          child: Row(
+            children: [
+              Expanded(
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  indicatorColor: AppTheme.primary,
+                  labelColor: AppTheme.primary,
+                  unselectedLabelColor: AppTheme.textMuted,
+                  tabs: const [
+                    Tab(text: 'Dashboard'),
+                    Tab(text: 'Welcome Onboarding'),
+                  ],
+                ),
+              ),
+              Builder(
+                builder: (scaffoldContext) => Tooltip(
+                  message: 'Open HRMs-AI Assistant',
+                  child: IconButton(
+                    icon: const Icon(Icons.auto_awesome, color: AppTheme.primary),
+                    onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
             ],
           ),
         ),
