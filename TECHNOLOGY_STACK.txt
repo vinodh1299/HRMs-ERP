@@ -1,63 +1,20 @@
 ===============================================================================
-ASIAN CHRISTIAN ACADEMY OF INDIA — HRMS-ERP & HRMS-AI TECHNOLOGY STACK
+ASIAN CHRISTIAN ACADEMY OF INDIA — SIMPLE TECHNOLOGY STACK
 ===============================================================================
 
--------------------------------------------------------------------------------
-1. ENTERPRISE ERP SYSTEM STACK
--------------------------------------------------------------------------------
-* FRAMEWORK     : Flutter 3.x (Dart) + Node.js (Express.js)
-* FRONTEND      : Flutter 3.x Multi-Platform Client Application
-                  - Web, Mobile (Android & iOS), Desktop
-                  - State Management : Riverpod & Provider
-                  - Navigation       : GoRouter
-                  - Modules          : Home Dashboard, Me Module (Attendance/Leaves),
-                                       Helpdesk (8 Dept Portals), Teams Chat,
-                                       My Finances, Org Chart, Admin Panel
-* BACKEND       : Node.js & Express.js REST API Server
-                  - Architecture     : Asynchronous Microservice Routes
-                  - Endpoints        : /api/auth, /api/employees, /api/attendance,
-                                       /api/leaves, /api/finances, /api/inbox, /api/admin
-* DATABASE      : Enterprise Relational Database Engine
-                  - Dev Driver       : mysql2 / SQLite memory adapter
-                  - Prod Engine      : PostgreSQL 16
-                  - Tables           : employees, attendance_punches, leave_requests,
-                                       helpdesk_tickets, chat_messages
+1. ERP SYSTEM
+- Framework : Flutter 3.x (Frontend) + Node.js Express (Backend)
+- Frontend  : Flutter Multi-Platform App (Web, Mobile, Desktop)
+- Backend   : Node.js Express REST API
+- Database  : PostgreSQL 16 (Relational Database)
 
--------------------------------------------------------------------------------
-2. HRMS-AI ENGINE STACK (SELF-HOSTED OPEN WEIGHTS)
--------------------------------------------------------------------------------
-* AI FRAMEWORK  : Python (PyTorch & HuggingFace PEFT/LoRA) + Rust (Candle)
-                  - Fine-Tuning      : PyTorch, HuggingFace Transformers, LoRA Adapters
-                  - Tensor Core      : Rust Native Engine (backend/ai_engine_rust)
-                                       Memory-safe, sub-millisecond vector math
-                  - Serving Runtime  : vLLM (PagedAttention GPU Serving)
-                                       + llama.cpp (GGUF Quantization CPU Fallback)
-* AI FRONTEND   : Flutter AI Touchpoints & Voice-Over Interface
-                  - Chat UI          : Floating Chatbot & AI Drawer (widgets/ai_chat_drawer.dart)
-                  - Speech Input     : Web Speech API Speech-To-Text (services/voice_helper.dart)
-                  - Speech Output    : SpeechSynthesis Voice-Over Text-To-Speech (TTS)
-                  - Interactive UI   : Staged Human-In-The-Loop (HITL) Action Confirmation Cards
-* AI BACKEND    : Node.js AI Service Gateway
-                  - Gateway Routes   : /api/ai/chat, /api/ai/rag/query, /api/ai/action/confirm
-                  - Local Bridge     : localInferenceBridge.js (Self-Hosted http://localhost:11434)
-                                       Zero Third-Party Cloud API Keys (0 OpenAI, 0 Claude, 0 Gemini)
-                  - RAG Service      : ragService.js (Grounded Policy Q&A Engine)
-                  - Action Agent     : agentService.js (ReAct Autonomous Tool Calling Engine)
-* AI DATABASE   : PostgreSQL 16 + pgvector Extension
-                  - Vector Embeddings: knowledge_chunks (1536-dimensional vectors)
-                  - Indexing         : HNSW (Hierarchical Navigable Small World) Cosine Distance
-                  - Staging Table    : agent_pending_actions (HITL Staging)
-                  - Audit Log        : ai_audit_log (Prompt & Response History)
+2. AI ENGINE
+- Framework : Python (PyTorch & LoRA) + Rust (High-Speed Tensor Engine)
+- Frontend  : AI Chatbot Drawer + Hands-Free Voice-Over (Speech-To-Text / TTS)
+- Backend   : Node.js AI Service Gateway (Self-Hosted, Zero Cloud API Keys)
+- Database  : PostgreSQL 16 + pgvector (Policy Vector Storage)
 
--------------------------------------------------------------------------------
-3. RAG & LLM ARCHITECTURE SUMMARY
--------------------------------------------------------------------------------
-* LLM (Large Language Model) : Self-hosted open-weight base model (e.g. Llama 3 / Gemma 2)
-                               fine-tuned on Asian Christian Academy HR policies via LoRA.
-                               Operates 100% privately on local server network with 0 token fees.
-* RAG (Retrieval-Augmented)  : 4-step grounded policy pipeline:
-                               1. Vector Cosine Search over Postgres pgvector knowledge_chunks
-                               2. Context Augmentation (Combines Prompt + ACA Policy Paragraphs)
-                               3. LLM Answer Synthesis (Zero-hallucination output)
-                               4. Citation Output (Attaches official policy document names)
+3. RAG & LLM EXPLANATION
+- LLM (Brain) : Self-hosted AI model (Llama 3 / Gemma 2) — 100% Private, Zero Token Costs
+- RAG (Search): Fetches official ACA policy documents so the AI gives 100% accurate answers
 ===============================================================================
