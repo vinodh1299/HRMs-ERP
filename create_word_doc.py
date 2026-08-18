@@ -25,7 +25,7 @@ def create_architecture_doc(filename):
     # Title
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_title = p_title.add_run("HRMs-ERP & Proprietary Custom AI Engine\nMaster Architecture & 10-Year Strategy Blueprint")
+    run_title = p_title.add_run("Asian Christian Academy of India\nHRMs-ERP & Proprietary Custom AI Engine Blueprint")
     run_title.font.name = 'Arial'
     run_title.font.size = Pt(22)
     run_title.font.bold = True
@@ -34,7 +34,7 @@ def create_architecture_doc(filename):
     # Subtitle
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_sub = p_sub.add_run("Proprietary AI Strategy, Agent Portfolio & 10-Year Native Language Evaluation\nVersion 3.0.0 Custom AI | August 2026")
+    run_sub = p_sub.add_run("Proprietary AI Strategy, Development Frameworks, Agent Portfolio & Language Evaluation\nVersion 3.0.0 Custom AI")
     run_sub.font.name = 'Arial'
     run_sub.font.size = Pt(11)
     run_sub.font.color.rgb = MUTED
@@ -53,13 +53,12 @@ def create_architecture_doc(filename):
         h.paragraph_format.space_after = Pt(6)
         return h
 
-    # Section 1: Executive Summary & Proprietary AI Strategy
-    add_heading("1. Executive Summary & Proprietary Custom AI Strategy", level=1)
+    # Section 1: Executive Summary
+    add_heading("1. Executive Summary & Proprietary AI Vision", level=1)
     p = doc.add_paragraph()
     r = p.add_run(
-        "This master architectural blueprint defines the strategic roadmap for developing a 100% proprietary, self-hosted AI engine for HRMs-ERP. "
-        "The system operates with complete independence—eliminating third-party cloud API keys (zero OpenAI, zero Claude, zero Gemini API keys)—guaranteeing total data privacy, "
-        "zero per-token API costs, and sub-millisecond execution over a self-hosted neural model architecture."
+        "This master architectural blueprint defines the technical specification, system design, agent portfolio, and custom development stack for building a 100% proprietary, self-hosted AI Engine for Asian Christian Academy of India. "
+        "The system operates with total independence—eliminating third-party cloud API keys (zero OpenAI, zero Claude, zero Gemini API keys)—guaranteeing complete data privacy, zero per-token API costs, and sub-millisecond execution over a self-hosted neural model architecture."
     )
     r.font.name = 'Arial'
     r.font.size = Pt(10)
@@ -79,7 +78,7 @@ def create_architecture_doc(filename):
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  2. ERP APPLICATION MODULES                                                             |\n"
+        "|  2. ASIAN CHRISTIAN ACADEMY ERP APPLICATION MODULES                                     |\n"
         "|  Dashboard (Presence/Polls) | Me (Attendance/Leaves) | Helpdesk (8 Depts) | Teams Chat |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
@@ -91,19 +90,19 @@ def create_architecture_doc(filename):
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  4. ACTIVE & FUTURE AI AGENT ECOSYSTEM                                                  |\n"
+        "|  4. ACTIVE & PLANNED AI AGENT ECOSYSTEM                                                 |\n"
         "|  RAG Policy Agent | Action Agent | Payroll Agent | Attendance Audit Agent | Vision Agent |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  5. PROPRIETARY NATIVE AI ENGINE (Self-Hosted / Built from Scratch)                    |\n"
+        "|  5. PROPRIETARY NATIVE AI ENGINE (Self-Hosted Custom Stack)                            |\n"
         "|  Proprietary LLM & Tensor Engine (Zero API Keys) <-> Enterprise Relational & Vector DB  |\n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "                                        : (10-Year Expansion)                              \n"
+        "                                        : (Expansion Phase)                                \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  6. 10-YEAR FUTURE AI ROADMAP (2026 - 2036)                                             |\n"
+        "|  6. FUTURE AI TECHNOLOGY ROADMAP                                                        |\n"
         "|  Rust High-Performance Engine | Multi-Agent Swarm | SSE Streaming | GraphRAG | On-Device  |\n"
         "+-----------------------------------------------------------------------------------------+"
     )
@@ -114,8 +113,28 @@ def create_architecture_doc(filename):
     r_chart.font.bold = True
     r_chart.font.color.rgb = PRIMARY
 
-    # Section 3: AI Agent Portfolio (Created vs Planned)
-    add_heading("3. AI Agent Portfolio: Active vs. Future Roadmap", level=1)
+    # Section 3: Custom AI Development Stack & Codebase Engineering
+    add_heading("3. Custom AI Development Stack & Codebase Engineering", level=1)
+    
+    tech_stack = [
+        ("1. AI Model Fine-Tuning Framework (Python, PyTorch & LoRA)", "The neural model is fine-tuned on custom Asian Christian Academy of India HR policies, leave rules, and SOPs using PyTorch, HuggingFace Transformers, and PEFT / LoRA (Low-Rank Adaptation)."),
+        ("2. Low-Latency Local Inference Engine (vLLM & llama.cpp)", "Model execution runs on a self-hosted inference engine powered by vLLM and llama.cpp (GGUF / GGML 4-bit & 8-bit Quantization), giving sub-millisecond tensor response speeds while keeping 100% of employee data private on local servers."),
+        ("3. Custom BPE Tokenizer & Domain Lexicon", "A custom Byte-Pair Encoding (BPE) tokenizer vocabulary is trained on ACA India organizational terminology, department codes (CPD, HOB, Media, Maintenance), and employee designations."),
+        ("4. High-Performance Core Language Strategy (Rust & C++)", "For core high-throughput tensor operations and vector search indexing, the underlying engine uses Rust (Burn / Candle framework) and C++ / CUDA for memory-safe execution on GPU hardware."),
+        ("5. Backend Gateway & Microservice Codebase (Node.js / Express)", "The backend microservice (port 4001) manages RAG document retrieval (ragService.js), autonomous function calling (agentService.js), and Human-In-The-Loop safety staging (agent_pending_actions)."),
+        ("6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)", "The client app (port 4000) is built with Flutter 3.x (Dart), featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.")
+    ]
+
+    for title, desc in tech_stack:
+        p_t = doc.add_paragraph()
+        p_t.paragraph_format.space_before = Pt(3); p_t.paragraph_format.space_after = Pt(3)
+        r_title = p_t.add_run(f"• {title}: ")
+        r_title.font.name = 'Arial'; r_title.font.size = Pt(9.5); r_title.font.bold = True; r_title.font.color.rgb = PRIMARY
+        r_desc = p_t.add_run(desc)
+        r_desc.font.name = 'Arial'; r_desc.font.size = Pt(9.5); r_desc.font.color.rgb = TEXT_DARK
+
+    # Section 4: AI Agent Portfolio (Created vs Planned)
+    add_heading("4. Asian Christian Academy AI Agent Ecosystem", level=1)
     
     active_agents = [
         ("📚 RAG Policy Search Agent (ragService.js)", "Performs grounded vector & BM25 search over indexed company policy documents."),
@@ -125,7 +144,7 @@ def create_architecture_doc(filename):
         ("🛡️ HITL Safety Agent", "Evaluates risk classification (LOW/MEDIUM/HIGH) and stages high-risk actions in agent_pending_actions.")
     ]
 
-    add_heading("3.1 Active Agents Created So Far", level=2)
+    add_heading("4.1 Active Agents Created So Far", level=2)
     for title, desc in active_agents:
         p_a = doc.add_paragraph()
         r_t = p_a.add_run(f"• {title}: ")
@@ -141,7 +160,7 @@ def create_architecture_doc(filename):
         ("🔍 Hierarchical Escalation Agent", "Traverses organizational reporting trees for complex cross-department escalations.")
     ]
 
-    add_heading("3.2 New AI Agents Planned for Future Development", level=2)
+    add_heading("4.2 New AI Agents Planned for Future Development", level=2)
     for title, desc in future_agents:
         p_f = doc.add_paragraph()
         r_t = p_f.add_run(f"• {title}: ")
@@ -149,15 +168,15 @@ def create_architecture_doc(filename):
         r_d = p_f.add_run(desc)
         r_d.font.name = 'Arial'; r_d.font.size = Pt(9.5); r_d.font.color.rgb = TEXT_DARK
 
-    # Section 4: 10-Year Programming Language Evaluation
-    add_heading("4. Strategic 10-Year Programming Language Evaluation (2026–2036)", level=1)
+    # Section 5: Programming Language Evaluation
+    add_heading("5. Programming Language Evaluation for Custom AI Development", level=1)
     
     table = doc.add_table(rows=1, cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
     
     hdr_cells = table.rows[0].cells
-    hdr_titles = ["Language", "10-Year Future Suitability", "Strengths for Proprietary AI Development"]
+    hdr_titles = ["Language", "Suitability", "Strengths for Proprietary AI Development"]
     for i, title in enumerate(hdr_titles):
         hdr_cells[i].text = title
         shading = parse_xml(r'<w:shd {} w:fill="003470"/>'.format(nsdecls('w')))

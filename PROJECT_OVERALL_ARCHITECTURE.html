@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HRMs-ERP & Proprietary AI Engine — Master Architecture Blueprint</title>
+  <title>Asian Christian Academy of India — HRMs-ERP & Proprietary AI Engine Blueprint</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root {
@@ -14,9 +14,8 @@
       --card-bg: #FFFFFF;
       --text-main: #1E293B;
       --text-muted: #64748B;
-      --border: #E2E8F0;
+      --border: #CBD5E1;
       --success: #10B981;
-      --warning: #F59E0B;
     }
 
     * {
@@ -30,11 +29,11 @@
       background-color: var(--bg);
       color: var(--text-main);
       line-height: 1.6;
-      padding: 40px 20px;
+      padding: 30px;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1300px;
       margin: 0 auto;
       background: var(--card-bg);
       border-radius: 16px;
@@ -44,7 +43,7 @@
     }
 
     header {
-      border-bottom: 2px solid var(--border);
+      border-bottom: 3px solid var(--primary);
       padding-bottom: 24px;
       margin-bottom: 36px;
       display: flex;
@@ -55,17 +54,17 @@
     }
 
     .title-group h1 {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--primary);
       margin-bottom: 6px;
+      letter-spacing: -0.5px;
     }
 
     .title-group p {
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 600;
     }
 
     .badge-bar {
@@ -75,9 +74,9 @@
     }
 
     .badge {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 16px;
       border-radius: 20px;
       background: #EFF6FF;
       color: var(--primary);
@@ -94,29 +93,23 @@
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: 700;
+      font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 52, 112, 0.15);
-      transition: all 0.2s ease;
-    }
-
-    .btn-print:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 52, 112, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 52, 112, 0.2);
     }
 
     section {
-      margin-bottom: 40px;
+      margin-bottom: 44px;
     }
 
     h2 {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 800;
       color: var(--primary);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -125,42 +118,51 @@
     h2::before {
       content: '';
       display: inline-block;
-      width: 4px;
-      height: 20px;
+      width: 5px;
+      height: 24px;
       background: var(--secondary);
-      border-radius: 2px;
+      border-radius: 3px;
     }
 
-    .chart-box {
+    /* ENLARGED ARCHITECTURE CHART BOX */
+    .chart-box-large {
       background: #F1F5F9;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      overflow-x: auto;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 24px;
+      width: 100%;
+      min-height: 650px;
       display: flex;
       justify-content: center;
-      margin-bottom: 24px;
+      align-items: center;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+
+    .chart-box-large pre.mermaid {
+      width: 100%;
+      font-size: 16px !important;
     }
 
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
     }
 
     .card {
       background: #FFFFFF;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     }
 
     .card h3 {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .card ul {
@@ -168,30 +170,52 @@
     }
 
     .card li {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-main);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       position: relative;
-      padding-left: 16px;
+      padding-left: 20px;
     }
 
     .card li::before {
       content: '•';
       color: var(--secondary);
       font-weight: bold;
+      font-size: 18px;
       position: absolute;
       left: 0;
+      top: -2px;
+    }
+
+    .tech-step {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .tech-step h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .tech-step p {
+      font-size: 13.5px;
+      color: var(--text-main);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 13px;
+      margin-top: 14px;
+      font-size: 14px;
     }
 
     th, td {
-      padding: 12px 16px;
+      padding: 14px 18px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
@@ -208,12 +232,12 @@
 
     .callout {
       background: #EFF6FF;
-      border-left: 4px solid var(--secondary);
-      padding: 16px;
-      border-radius: 0 8px 8px 0;
-      font-size: 13px;
+      border-left: 5px solid var(--secondary);
+      padding: 20px;
+      border-radius: 0 10px 10px 0;
+      font-size: 14px;
       color: #1E40AF;
-      margin-top: 16px;
+      margin-top: 20px;
     }
 
     @media print {
@@ -230,6 +254,10 @@
       .btn-print {
         display: none;
       }
+      .chart-box-large {
+        min-height: 750px;
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -238,22 +266,22 @@
   <div class="container">
     <header>
       <div class="title-group">
-        <h1>HRMs-ERP & Proprietary Custom AI Engine</h1>
-        <p>10-Year Architecture Roadmap, Agent Portfolio & Native AI Language Strategy</p>
+        <h1>Asian Christian Academy of India</h1>
+        <p>HRMs-ERP & Proprietary Custom AI Engine Master Architecture Blueprint</p>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
         <button class="btn-print" onclick="window.print()">📄 Save as PDF / Print</button>
         <div class="badge-bar">
-          <span class="badge">v3.0.0 Custom AI</span>
+          <span class="badge">Enterprise Custom AI</span>
           <span class="badge green">100% On-Premise & Independent</span>
         </div>
       </div>
     </header>
 
-    <!-- SECTION 1: MASTER CHART -->
+    <!-- SECTION 1: MASTER CHART (ENLARGED) -->
     <section>
-      <h2>1. Master System Architecture Chart (Self-Hosted Custom AI)</h2>
-      <div class="chart-box">
+      <h2>1. Master System Architecture Chart</h2>
+      <div class="chart-box-large">
         <pre class="mermaid">
 flowchart TD
     %% LAYER 1: FRAMEWORKS & CLIENT
@@ -266,7 +294,7 @@ flowchart TD
     end
 
     %% LAYER 2: ERP MODULES
-    subgraph L2 ["2. 🏢 ERP Application Modules"]
+    subgraph L2 ["2. 🏢 Asian Christian Academy ERP Application Modules"]
         DashMod["Home Dashboard\n(Quick Clock-In/Out, Department Staff Presence, Polls)"]
         MeMod["Me Module\n(Attendance Logs, Leave Balances, Shift Timings, Regularization)"]
         HelpMod["Helpdesk & Department Portals\n(IT, HR, Maintenance, Finance, CPD, Inventory, HOB, Media)"]
@@ -285,7 +313,7 @@ flowchart TD
     L2 --> ChatSync
 
     %% LAYER 4: ACTIVE & FUTURE AI AGENTS
-    subgraph L4 ["4. 🤖 Active & Future AI Agent Ecosystem"]
+    subgraph L4 ["4. 🤖 Active & Planned AI Agent Ecosystem"]
         IntentRouter{"Proprietary Intent Router"}
         
         RAGAssistant["📚 RAG Policy Search Agent\n(ragService.js - Hybrid Search)"]
@@ -304,8 +332,8 @@ flowchart TD
     APIGateway --> IntentRouter
 
     %% LAYER 5: PROPRIETARY NATIVE AI ENGINE
-    subgraph L5 ["5. 🧠 Proprietary Native AI Engine (Self-Hosted / Built from Scratch)"]
-        CustomLLM["Proprietary Custom LLM & Neural Tensor Engine\n(Self-Hosted | Zero Third-Party API Keys | 100% Private)"]
+    subgraph L5 ["5. 🧠 Proprietary Native AI Engine (Self-Hosted Custom Stack)"]
+        CustomLLM["Proprietary Neural Model & Custom Tensor Engine\n(Self-Hosted | Zero Third-Party API Keys | 100% Private)"]
         EnterpriseDB[("Enterprise Relational & Vector Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
         
         L4 <--> CustomLLM
@@ -314,23 +342,61 @@ flowchart TD
 
     L4 --> L5
 
-    %% LAYER 6: 10-YEAR FUTURE TECH ROADMAP
-    subgraph L6 ["6. 🚀 10-Year Future AI Technology Roadmap (2026 - 2036)"]
+    %% LAYER 6: FUTURE EXPANSION ROADMAP
+    subgraph L6 ["6. 🚀 Future AI Technology Roadmap"]
         RustCore["🦀 Rust High-Performance Tensor Engine\n(Memory-Safe Sub-Millisecond Native Inference)"]
         SwarmOrch["👥 Autonomous Multi-Agent Swarm\n(Event-Driven Agent Collaboration via Redis)"]
-        SSEStream["⚡ Real-Time Token Streaming & WebSockets"]
+        SSEStream["⚡ Real-Time SSE Token Streaming & WebSockets"]
         GraphRAG["🔍 GraphRAG Knowledge Graphs\n(Neo4j Hierarchy & Escalation Trees)"]
         OnDeviceAI["📱 Zero-Latency WebAssembly On-Device Speech AI"]
     end
 
-    L5 -.->|Next 10-Year Expansion Phase| L6
+    L5 -.->|Advanced Expansion Phase| L6
         </pre>
       </div>
     </section>
 
-    <!-- SECTION 2: AI AGENTS CREATED & PLANNED -->
+    <!-- SECTION 2: HOW THE CUSTOM AI IS DEVELOPED -->
     <section>
-      <h2>2. AI Agent Portfolio: Active vs. Future Roadmap</h2>
+      <h2>2. Custom AI Engine Development Stack & Codebase Engineering</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+        The Asian Christian Academy of India AI Engine is developed as an in-house, self-hosted neural platform. The complete tech stack, codebase, and frameworks used to build the custom AI include:
+      </p>
+
+      <div class="tech-step">
+        <h4>1. AI Model Training & Fine-Tuning Framework (Python, PyTorch & LoRA)</h4>
+        <p>The core intelligence model is fine-tuned on custom ACA India HR policies, leave rules, and SOPs using <strong>PyTorch</strong>, <strong>HuggingFace Transformers</strong>, and <strong>PEFT / LoRA (Low-Rank Adaptation)</strong>. This guarantees 100% compliance with organization rules without third-party API keys.</p>
+      </div>
+
+      <div class="tech-step">
+        <h4>2. Low-Latency Local Inference Engine (vLLM & Ollama / llama.cpp)</h4>
+        <p>Model execution runs on a self-hosted inference engine powered by <strong>vLLM</strong> and <strong>llama.cpp (GGUF / GGML 4-bit & 8-bit Quantization)</strong>. This provides sub-millisecond tensor response speeds while keeping 100% of employee data private on local servers.</p>
+      </div>
+
+      <div class="tech-step">
+        <h4>3. Custom BPE Tokenizer & Domain Lexicon</h4>
+        <p>A custom Byte-Pair Encoding (BPE) tokenizer vocabulary is trained on ACA India organizational terminology, department names (CPD, HOB, Media, Maintenance), and employee designations to maximize prompt understanding and precision.</p>
+      </div>
+
+      <div class="tech-step">
+        <h4>4. High-Performance Core Language Strategy (Rust & C++)</h4>
+        <p>For core high-throughput tensor operations and vector search indexing, the underlying inference backend uses <strong>Rust (Burn / Candle framework)</strong> and <strong>C++ / CUDA</strong> for memory-safe, zero-cost abstraction execution on GPU hardware.</p>
+      </div>
+
+      <div class="tech-step">
+        <h4>5. Backend Gateway & Microservice Codebase (Node.js / Express)</h4>
+        <p>The backend microservice (<code>port 4001</code>) connects the AI engine to the ERP database, managing RAG document retrieval (<code>ragService.js</code>), autonomous function calling (<code>agentService.js</code>), and Human-In-The-Loop safety staging (<code>agent_pending_actions</code>).</p>
+      </div>
+
+      <div class="tech-step">
+        <h4>6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)</h4>
+        <p>The client application (<code>port 4000</code>) is built with <strong>Flutter 3.x (Dart)</strong>, featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.</p>
+      </div>
+    </section>
+
+    <!-- SECTION 3: AI AGENTS PORTFOLIO -->
+    <section>
+      <h2>3. Asian Christian Academy AI Agent Ecosystem</h2>
       <div class="grid-2">
         <div class="card">
           <h3>✅ AI Agents Created So Far</h3>
@@ -356,52 +422,48 @@ flowchart TD
       </div>
     </section>
 
-    <!-- SECTION 3: 10-YEAR PROGRAMMING LANGUAGE EVALUATION -->
+    <!-- SECTION 4: PROGRAMMING LANGUAGE EVALUATION -->
     <section>
-      <h2>3. Strategic 10-Year Programming Language Evaluation (2026–2036)</h2>
-      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
-        To build a proprietary AI engine designed to last for the next 10 years without third-party API dependencies, selecting the right core programming language is critical:
-      </p>
-
+      <h2>4. Programming Language Evaluation for Proprietary AI Development</h2>
       <table>
         <thead>
           <tr>
             <th>Language</th>
-            <th>10-Year Future Suitability</th>
+            <th>Suitability</th>
             <th>Strengths for Custom AI Development</th>
-            <th>Limitations</th>
+            <th>Target Architecture Role</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><strong>🦀 Rust (RECOMMENDED FOR CORE ENGINE)</strong></td>
-            <td>⭐⭐⭐⭐⭐ (Highest Future Proofing)</td>
-            <td>Memory safety without Garbage Collection (GC) pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WASM compilation.</td>
-            <td>Steeper learning curve for borrow checker rules.</td>
+            <td>⭐⭐⭐⭐⭐ (Highest)</td>
+            <td>Memory safety without Garbage Collection pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WASM compilation.</td>
+            <td><strong>High-Throughput Native Inference Engine & Tensor Math</strong></td>
           </tr>
           <tr>
             <td><strong>🐍 Python</strong></td>
-            <td>⭐⭐⭐⭐ (Ideal for R&D / Fine-Tuning)</td>
+            <td>⭐⭐⭐⭐ (R&D / Fine-Tuning)</td>
             <td>Unrivaled ecosystem (PyTorch, JAX, HuggingFace, vLLM). Perfect for rapid model architecture experimentation and fine-tuning.</td>
-            <td>Higher runtime memory footprint, GIL overhead, slower execution latency without C++ bindings.</td>
+            <td><strong>Dataset Preparation, Fine-Tuning (LoRA) & Training</strong></td>
           </tr>
           <tr>
             <td><strong>⚡ C++ / CUDA</strong></td>
             <td>⭐⭐⭐⭐ (Low-Level GPU Kernels)</td>
             <td>Foundation of GGML, llama.cpp, and TensorRT. Maximum low-level GPU hardware control.</td>
-            <td>Manual memory management risks, complex cross-platform maintenance.</td>
+            <td><strong>Low-Level CUDA GPU Kernel Optimization</strong></td>
           </tr>
           <tr>
             <td><strong>🔥 Mojo / Julia</strong></td>
-            <td>⭐⭐⭐ (Emerging Contenders)</td>
+            <td>⭐⭐⭐ (Emerging)</td>
             <td>Mojo compiles Python syntax to native C-speed code. High-performance matrix math capabilities.</td>
-            <td>Ecosystem still maturing compared to Rust/Python.</td>
+            <td><strong>Secondary Research Exploration</strong></td>
           </tr>
         </tbody>
       </table>
 
       <div class="callout">
-        <strong>Strategic 10-Year Architecture Recommendation:</strong> A <strong>Hybrid Microservice Architecture</strong>:
+        <strong>Asian Christian Academy AI Architecture Strategy:</strong> A <strong>Hybrid Microservice Stack</strong>:
         <br>• <strong>Rust (or C++/CUDA)</strong>: Core high-throughput, low-latency Custom AI Inference Engine & Tensor Operations.
         <br>• <strong>Python</strong>: Model Training, Dataset Preparation & Fine-Tuning (LoRA).
         <br>• <strong>Node.js / Express</strong>: API Gateway & Application Routing (Port 4001).
