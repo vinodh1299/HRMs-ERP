@@ -72,7 +72,7 @@ def create_architecture_doc(filename):
     
     chart_text = (
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  1. FRAMEWORKS & UI ENGINE (Port 4000)                                                  |\n"
+        "|  1. FRAMEWORKS & UI ENGINE                                                              |\n"
         "|  Flutter 3.x (Dart) | Riverpod & GoRouter | Web Speech STT + SpeechSynthesis TTS        |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
@@ -85,7 +85,7 @@ def create_architecture_doc(filename):
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
         "|  3. API GATEWAYS & BRIDGES                                                              |\n"
-        "|  Central ChatService Engine (ValueNotifier Event Bus) -> Express API (Port 4001)        |\n"
+        "|  Central ChatService Engine (ValueNotifier Event Bus) -> Express API Gateway            |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
@@ -121,8 +121,8 @@ def create_architecture_doc(filename):
         ("2. Low-Latency Local Inference Engine (vLLM & llama.cpp)", "Model execution runs on a self-hosted inference engine powered by vLLM and llama.cpp (GGUF / GGML 4-bit & 8-bit Quantization), giving sub-millisecond tensor response speeds while keeping 100% of employee data private on local servers."),
         ("3. Custom BPE Tokenizer & Domain Lexicon", "A custom Byte-Pair Encoding (BPE) tokenizer vocabulary is trained on ACA India organizational terminology, department codes (CPD, HOB, Media, Maintenance), and employee designations."),
         ("4. High-Performance Core Language Strategy (Rust & C++)", "For core high-throughput tensor operations and vector search indexing, the underlying engine uses Rust (Burn / Candle framework) and C++ / CUDA for memory-safe execution on GPU hardware."),
-        ("5. Backend Gateway & Microservice Codebase (Node.js / Express)", "The backend microservice (port 4001) manages RAG document retrieval (ragService.js), autonomous function calling (agentService.js), and Human-In-The-Loop safety staging (agent_pending_actions)."),
-        ("6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)", "The client app (port 4000) is built with Flutter 3.x (Dart), featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.")
+        ("5. Backend Gateway & Microservice Codebase (Node.js / Express)", "The backend microservice manages RAG document retrieval (ragService.js), autonomous function calling (agentService.js), and Human-In-The-Loop safety staging (agent_pending_actions)."),
+        ("6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)", "The client app is built with Flutter 3.x (Dart), featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.")
     ]
 
     for title, desc in tech_stack:

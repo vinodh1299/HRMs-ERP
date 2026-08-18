@@ -6,6 +6,11 @@
   <title>Asian Christian Academy of India — HRMs-ERP & Proprietary AI Engine Blueprint</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+
     :root {
       --primary: #003470;
       --secondary: #00A3E0;
@@ -14,7 +19,7 @@
       --card-bg: #FFFFFF;
       --text-main: #1E293B;
       --text-muted: #64748B;
-      --border: #CBD5E1;
+      --border: #E2E8F0;
       --success: #10B981;
     }
 
@@ -33,19 +38,19 @@
     }
 
     .container {
-      max-width: 1300px;
+      max-width: 1100px;
       margin: 0 auto;
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border);
-      padding: 48px;
+      padding: 40px;
     }
 
     header {
       border-bottom: 3px solid var(--primary);
-      padding-bottom: 24px;
-      margin-bottom: 36px;
+      padding-bottom: 20px;
+      margin-bottom: 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -54,16 +59,16 @@
     }
 
     .title-group h1 {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
       color: var(--primary);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       letter-spacing: -0.5px;
     }
 
     .title-group p {
       color: var(--text-muted);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
     }
 
@@ -74,9 +79,9 @@
     }
 
     .badge {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 6px 16px;
+      padding: 5px 14px;
       border-radius: 20px;
       background: #EFF6FF;
       color: var(--primary);
@@ -93,23 +98,23 @@
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0, 52, 112, 0.2);
     }
 
     section {
-      margin-bottom: 44px;
+      margin-bottom: 36px;
     }
 
     h2 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: var(--primary);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -118,51 +123,42 @@
     h2::before {
       content: '';
       display: inline-block;
-      width: 5px;
-      height: 24px;
+      width: 4px;
+      height: 22px;
       background: var(--secondary);
-      border-radius: 3px;
+      border-radius: 2px;
     }
 
-    /* ENLARGED ARCHITECTURE CHART BOX */
-    .chart-box-large {
+    .chart-box {
       background: #F1F5F9;
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      padding: 36px 24px;
-      width: 100%;
-      min-height: 650px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
       display: flex;
       justify-content: center;
-      align-items: center;
-      margin-bottom: 28px;
-      overflow-x: auto;
-    }
-
-    .chart-box-large pre.mermaid {
-      width: 100%;
-      font-size: 16px !important;
+      margin-bottom: 24px;
     }
 
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
     }
 
     .card {
       background: #FFFFFF;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     .card h3 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .card ul {
@@ -170,18 +166,18 @@
     }
 
     .card li {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-main);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       position: relative;
-      padding-left: 20px;
+      padding-left: 18px;
     }
 
     .card li::before {
       content: '•';
       color: var(--secondary);
       font-weight: bold;
-      font-size: 18px;
+      font-size: 16px;
       position: absolute;
       left: 0;
       top: -2px;
@@ -190,32 +186,32 @@
     .tech-step {
       background: #F8FAFC;
       border: 1px solid #CBD5E1;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
     }
 
     .tech-step h4 {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .tech-step p {
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--text-main);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 14px;
-      font-size: 14px;
+      margin-top: 12px;
+      font-size: 13px;
     }
 
     th, td {
-      padding: 14px 18px;
+      padding: 12px 16px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
@@ -232,12 +228,12 @@
 
     .callout {
       background: #EFF6FF;
-      border-left: 5px solid var(--secondary);
-      padding: 20px;
-      border-radius: 0 10px 10px 0;
-      font-size: 14px;
+      border-left: 4px solid var(--secondary);
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
       color: #1E40AF;
-      margin-top: 20px;
+      margin-top: 16px;
     }
 
     @media print {
@@ -253,10 +249,6 @@
       }
       .btn-print {
         display: none;
-      }
-      .chart-box-large {
-        min-height: 750px;
-        padding: 20px;
       }
     }
   </style>
@@ -278,14 +270,14 @@
       </div>
     </header>
 
-    <!-- SECTION 1: MASTER CHART (ENLARGED) -->
+    <!-- SECTION 1: MASTER CHART -->
     <section>
       <h2>1. Master System Architecture Chart</h2>
-      <div class="chart-box-large">
+      <div class="chart-box">
         <pre class="mermaid">
 flowchart TD
     %% LAYER 1: FRAMEWORKS & CLIENT
-    subgraph L1 ["1. 🛠️ Frameworks & Core UI Engine (Port 4000)"]
+    subgraph L1 ["1. 🛠️ Frameworks & Core UI Engine"]
         Flutter["Flutter 3.x Framework (Dart)"]
         StateMgmt["Riverpod State Management & GoRouter Navigation"]
         VoiceTech["Web Speech API (Speech-To-Text) + SpeechSynthesis (Voice-Over TTS)"]
@@ -306,13 +298,13 @@ flowchart TD
     %% LAYER 3: API GATEWAY & BRIDGES
     subgraph L3 ["3. 🌐 API Gateways & Communication Bridges"]
         ChatSync["Central ChatService Engine\n(ValueNotifier Live Cross-Window Event Bus)"]
-        APIGateway["HRMs-AI Service API Gateway\n(Node.js Express @ http://localhost:4001/api/ai)"]
+        APIGateway["HRMs-AI Service API Gateway\n(Node.js Express AI Service)"]
         ChatSync -->|HTTP REST JSON| APIGateway
     end
 
     L2 --> ChatSync
 
-    %% LAYER 4: ACTIVE & FUTURE AI AGENTS
+    %% LAYER 4: ACTIVE & PLANNED AI AGENTS
     subgraph L4 ["4. 🤖 Active & Planned AI Agent Ecosystem"]
         IntentRouter{"Proprietary Intent Router"}
         
@@ -359,7 +351,7 @@ flowchart TD
     <!-- SECTION 2: HOW THE CUSTOM AI IS DEVELOPED -->
     <section>
       <h2>2. Custom AI Engine Development Stack & Codebase Engineering</h2>
-      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+      <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
         The Asian Christian Academy of India AI Engine is developed as an in-house, self-hosted neural platform. The complete tech stack, codebase, and frameworks used to build the custom AI include:
       </p>
 
@@ -385,12 +377,12 @@ flowchart TD
 
       <div class="tech-step">
         <h4>5. Backend Gateway & Microservice Codebase (Node.js / Express)</h4>
-        <p>The backend microservice (<code>port 4001</code>) connects the AI engine to the ERP database, managing RAG document retrieval (<code>ragService.js</code>), autonomous function calling (<code>agentService.js</code>), and Human-In-The-Loop safety staging (<code>agent_pending_actions</code>).</p>
+        <p>The backend microservice connects the AI engine to the ERP database, managing RAG document retrieval (<code>ragService.js</code>), autonomous function calling (<code>agentService.js</code>), and Human-In-The-Loop safety staging (<code>agent_pending_actions</code>).</p>
       </div>
 
       <div class="tech-step">
         <h4>6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)</h4>
-        <p>The client application (<code>port 4000</code>) is built with <strong>Flutter 3.x (Dart)</strong>, featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.</p>
+        <p>The client application is built with <strong>Flutter 3.x (Dart)</strong>, featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.</p>
       </div>
     </section>
 
@@ -466,8 +458,8 @@ flowchart TD
         <strong>Asian Christian Academy AI Architecture Strategy:</strong> A <strong>Hybrid Microservice Stack</strong>:
         <br>• <strong>Rust (or C++/CUDA)</strong>: Core high-throughput, low-latency Custom AI Inference Engine & Tensor Operations.
         <br>• <strong>Python</strong>: Model Training, Dataset Preparation & Fine-Tuning (LoRA).
-        <br>• <strong>Node.js / Express</strong>: API Gateway & Application Routing (Port 4001).
-        <br>• <strong>Dart (Flutter)</strong>: Cross-Platform Client UI for Web, Mobile & Desktop (Port 4000).
+        <br>• <strong>Node.js / Express</strong>: API Gateway & Application Routing.
+        <br>• <strong>Dart (Flutter)</strong>: Cross-Platform Client UI for Web, Mobile & Desktop.
       </div>
     </section>
 

@@ -18,7 +18,7 @@ The vision transitions the system from third-party API dependencies (zero OpenAI
 ```mermaid
 flowchart TD
     %% LAYER 1: FRAMEWORKS & CLIENT
-    subgraph L1 ["1. 🛠️ Frameworks & Core UI Engine (Port 4000)"]
+    subgraph L1 ["1. 🛠️ Frameworks & Core UI Engine"]
         Flutter["Flutter 3.x Framework (Dart)"]
         StateMgmt["Riverpod State Management & GoRouter Navigation"]
         VoiceTech["Web Speech API (Speech-To-Text) + SpeechSynthesis (Voice-Over TTS)"]
@@ -39,7 +39,7 @@ flowchart TD
     %% LAYER 3: API GATEWAY & BRIDGES
     subgraph L3 ["3. 🌐 API Gateways & Communication Bridges"]
         ChatSync["Central ChatService Engine\n(ValueNotifier Live Cross-Window Event Bus)"]
-        APIGateway["HRMs-AI Service API Gateway\n(Node.js Express @ http://localhost:4001/api/ai)"]
+        APIGateway["HRMs-AI Service API Gateway\n(Node.js Express AI Service)"]
         ChatSync -->|HTTP REST JSON| APIGateway
     end
 
@@ -102,9 +102,9 @@ The Asian Christian Academy of India AI Engine is developed as an in-house, self
 4. **High-Performance Core Language Strategy (Rust & C++)**:
    * For core high-throughput tensor operations and vector search indexing, the underlying inference backend uses **Rust (Burn / Candle framework)** and **C++ / CUDA** for memory-safe execution on GPU hardware.
 5. **Backend Gateway & Microservice Codebase (Node.js / Express)**:
-   * The backend microservice (`port 4001`) connects the AI engine to the ERP database, managing RAG document retrieval (`ragService.js`), autonomous function calling (`agentService.js`), and Human-In-The-Loop safety staging (`agent_pending_actions`).
+   * The backend microservice connects the AI engine to the ERP database, managing RAG document retrieval (`ragService.js`), autonomous function calling (`agentService.js`), and Human-In-The-Loop safety staging (`agent_pending_actions`).
 6. **Multi-Platform Client & Voice Interface (Flutter & Web Speech API)**:
-   * The client application (`port 4000`) is built with **Flutter 3.x (Dart)**, featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.
+   * The client application is built with **Flutter 3.x (Dart)**, featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.
 
 ---
 
@@ -112,17 +112,17 @@ The Asian Christian Academy of India AI Engine is developed as an in-house, self
 
 ### 4.1 AI Agents Created So Far
 - **📚 RAG Policy Search Agent (`ragService.js`)**: Grounded policy Q&A over indexed HR, IT, and leave SOP documents.
-- **⚡ Autonomous Action Agent (`agentService.js`)**: Converts user prompts into backend function tool calls (`createTicket`, `applyLeave`, `sendMessageToUserOrChannel`, `queryTeamAttendance`).
+- **⚡ Autonomous Action Agent (`agentService.js`)**: Converts user prompts into backend tool calls (`createTicket`, `applyLeave`, `sendMessageToUserOrChannel`, `queryTeamAttendance`).
 - **💬 Central Synchronization Agent (`ChatService`)**: Event bus synchronizing messages across floating dashboard chatbots, slide-out drawers, and team channels.
 - **🎙️ Voice & Speech Agent (`VoiceHelper`)**: Hands-free mic speech recognition and automatic SpeechSynthesis Voice-Over audio output.
 - **🛡️ Human-In-The-Loop (HITL) Safety Agent**: Classifies action risk levels and stages high-risk operations in `agent_pending_actions` for user confirmation cards.
 
 ### 4.2 New AI Agents Planned for Future Development
-- **💰 Payroll & Tax Intelligence Agent**: Calculates monthly salary breakdowns, projects tax optimizations, and automates reimbursement approvals.
-- **⏰ Attendance & Shift Anomaly Audit Agent**: Scans daily clock-in patterns, detects shift anomalies, and proactively suggests regularization requests.
-- **📸 Multi-Modal Vision & OCR Agent**: Scans uploaded expense receipts, travel bills, medical claims, and employee ID cards into ERP tickets.
-- **🏷️ IT Diagnostic & Procurement Specialist**: Monitors hardware health, compares vendor prices, and tracks POs above ₹1 Lakh.
-- **🔍 Hierarchical Escalation Agent**: Traverses organizational reporting graphs for complex cross-department approval escalations.
+- **💰 Payroll & Tax Intelligence Agent**: Payslip breakdowns, tax optimization advice, and reimbursement processing.
+- **⏰ Attendance & Shift Anomaly Agent**: Automatically detects clock-in anomalies and suggests regularizations.
+- **📸 Multi-Modal Vision & OCR Agent**: Auto-scans expense receipts, medical bills, and onboarding IDs into ERP tickets.
+- **🏷️ IT Diagnostic & Procurement Specialist**: Monitors asset health, compares vendor pricing, and tracks POs above ₹1 Lakh.
+- **🔍 Hierarchical Escalation Agent**: Traverses organizational reporting graphs for complex cross-department escalations.
 
 ---
 
@@ -140,5 +140,5 @@ When engineering a custom AI engine built for proprietary independence without t
 ### 💡 Asian Christian Academy AI Architecture Strategy
 * **Rust (or C++/CUDA)**: Powering the core high-throughput, low-latency Custom AI Inference Engine & Tensor Math.
 * **Python**: Managing offline model training, dataset preparation, and fine-tuning (LoRA).
-* **Node.js / Express**: Managing API Gateway routing (`port 4001`).
-* **Dart (Flutter)**: Delivering the multi-platform Client UI for Web, Mobile, and Desktop (`port 4000`).
+* **Node.js / Express**: Managing API Gateway routing.
+* **Dart (Flutter)**: Delivering the multi-platform Client UI for Web, Mobile, and Desktop.
