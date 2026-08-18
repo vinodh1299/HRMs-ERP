@@ -2,8 +2,8 @@ import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml import OxmlElement, parse_xml
-from docx.oxml.ns import nsdecls, qn
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
 def create_architecture_doc(filename):
     doc = docx.Document()
@@ -25,7 +25,7 @@ def create_architecture_doc(filename):
     # Title
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_title = p_title.add_run("HRMs-ERP & HRMs-AI Engine\nMaster Architecture Blueprint")
+    run_title = p_title.add_run("HRMs-ERP & HRMs-AI Engine\nMaster Architecture & RAG Ingestion Blueprint")
     run_title.font.name = 'Arial'
     run_title.font.size = Pt(24)
     run_title.font.bold = True
@@ -34,7 +34,7 @@ def create_architecture_doc(filename):
     # Subtitle
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_sub = p_sub.add_run("Enterprise System Blueprint, Architecture Chart & Technology Roadmap\nVersion 2.5.0 Production | August 2026")
+    run_sub = p_sub.add_run("Enterprise Architecture, RAG Knowledge Feeding Pipeline & Advanced Technology Roadmap\nVersion 2.5.0 Production | August 2026")
     run_sub.font.name = 'Arial'
     run_sub.font.size = Pt(11)
     run_sub.font.color.rgb = MUTED
@@ -90,15 +90,15 @@ def create_architecture_doc(filename):
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  4. HRMs-AI ENGINE & INTENT ROUTER                                                      |\n"
+        "|  4. HRMs-AI ENGINE & RAG KNOWLEDGE INGESTION                                            |\n"
         "|  RAG Grounded Policy Chatbot (ragService)  |  Autonomous Action Agent (agentService)    |\n"
         "|  Tools: createTicket, assignTicket, applyLeave, sendMessageToUserOrChannel             |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  5. DATABASE & CLOUD LAYER                                                              |\n"
-        "|  Google Gemini (gemini-3.6-flash / embedding-001) <-> MySQL 8.0 (DB: roh @ 3306)       |\n"
+        "|  5. ENTERPRISE DATABASE & CLOUD LAYER                                                   |\n"
+        "|  Google Gemini (gemini-3.6-flash / embedding-001) <-> Enterprise Relational Database    |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        : (Next Phase)                                     \n"
         "                                        v                                                  \n"
@@ -114,8 +114,35 @@ def create_architecture_doc(filename):
     r_chart.font.bold = True
     r_chart.font.color.rgb = PRIMARY
 
-    # Section 3: Layer Specifications Table
-    add_heading("3. Core Subsystem Layer Breakdown", level=1)
+    # Section 3: Feeding Knowledge to the AI Agent (RAG Pipeline)
+    add_heading("3. Feeding Knowledge to the AI Agent (RAG Ingestion Pipeline)", level=1)
+    
+    rag_steps = [
+        ("Step 1: Document Collection & Raw Extraction", "Company knowledge is gathered from raw files including HR Leave Manuals, Employee Handbooks, IT/AV SOPs, Benefits Guidelines, and Resolved Ticket Histories."),
+        ("Step 2: Semantic Chunking & Metadata Tagging", "Long documents are broken into optimal 500-1000 character overlapping text chunks. Each chunk is tagged with structured metadata (category, department, target_role, updated_timestamp)."),
+        ("Step 3: High-Dimensional Vector Embedding", "Text chunks are passed through the Google Gemini Embedding API (gemini-embedding-001) to generate 3072-dimensional math vector representations."),
+        ("Step 4: Dual Indexing (Vector + BM25 Full-Text)", "Chunks, metadata, and 3072-dim vector embeddings are stored in the knowledge_chunks database table with both BM25 Full-Text and Cosine Similarity vector indexes."),
+        ("Step 5: Real-Time Hybrid Retrieval & Prompt Grounding", "When an employee asks a question, the query vector is generated and searched using Hybrid Search (Cosine Similarity + BM25). Top K matched contexts are injected into Gemini system prompts for zero-hallucination answers.")
+    ]
+
+    for step_title, step_desc in rag_steps:
+        p_step = doc.add_paragraph()
+        p_step.paragraph_format.space_before = Pt(4)
+        p_step.paragraph_format.space_after = Pt(4)
+        
+        r_st = p_step.add_run(f"• {step_title}: ")
+        r_st.font.name = 'Arial'
+        r_st.font.size = Pt(10)
+        r_st.font.bold = True
+        r_st.font.color.rgb = PRIMARY
+
+        r_sd = p_step.add_run(step_desc)
+        r_sd.font.name = 'Arial'
+        r_sd.font.size = Pt(10)
+        r_sd.font.color.rgb = TEXT_DARK
+
+    # Section 4: Layer Specifications Table
+    add_heading("4. Core Subsystem Layer Breakdown", level=1)
     
     table = doc.add_table(rows=1, cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -139,7 +166,7 @@ def create_architecture_doc(filename):
         ("Layer 2", "ERP Application Modules", "Dashboard (Presence, Clock-In), Me (Attendance, Leaves), Helpdesk (8 Departments), Teams Chat."),
         ("Layer 3", "API Gateways & Sync", "Central ChatService Event Bus (ValueNotifier) <-> Express API Gateway (http://localhost:4001/api/ai)."),
         ("Layer 4", "HRMs-AI Engine", "Intent Router, RAG Grounded Policy Chatbot (ragService.js), Autonomous Action Agent (agentService.js), Function Tools."),
-        ("Layer 5", "Database & AI Cloud", "Google Gemini Cloud (gemini-3.6-flash & gemini-embedding-001), MySQL 8.0 Database (roh @ 127.0.0.1:3306)."),
+        ("Layer 5", "Database & AI Cloud", "Google Gemini Cloud (gemini-3.6-flash & gemini-embedding-001), Enterprise Relational Database."),
         ("Layer 6", "Advanced Tech Roadmap", "Vision AI OCR, Multi-Agent Swarm, Real-Time SSE Token Streaming, GraphRAG Knowledge Graphs, Qdrant Vector DB, On-Device Whisper.")
     ]
 
@@ -155,8 +182,8 @@ def create_architecture_doc(filename):
                     run.font.size = Pt(9.5)
                     run.font.color.rgb = TEXT_DARK
 
-    # Section 4: Advanced Technologies Roadmap
-    add_heading("4. Advanced Technologies Roadmap", level=1)
+    # Section 5: Advanced Technologies Roadmap
+    add_heading("5. Advanced Technologies Roadmap", level=1)
     
     tech_items = [
         ("📸 Vision AI OCR Analysis", "Integrate Gemini Vision to parse expense receipts, travel invoices, medical bills, and employee ID proofs into tickets."),

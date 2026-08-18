@@ -1,4 +1,4 @@
-# HRMs-ERP & HRMs-AI Engine — Master Architecture Chart
+# HRMs-ERP & HRMs-AI Engine — Master Architecture Blueprint
 
 ---
 
@@ -34,7 +34,7 @@ flowchart TD
 
     L2 --> ChatSync
 
-    %% LAYER 4: AI AGENTS & ASSISTANTS
+    %% LAYER 4: AI AGENTS & RAG KNOWLEDGE INGESTION
     subgraph L4 ["4. 🤖 HRMs-AI Agents, Assistants & Intelligence Engine"]
         IntentRouter{"Intent Router"}
         
@@ -53,13 +53,13 @@ flowchart TD
     APIGateway --> IntentRouter
 
     %% LAYER 5: DATABASE & EXTERNAL AI CLOUD
-    subgraph L5 ["5. 💾 Database & AI Cloud Layer"]
+    subgraph L5 ["5. 💾 Enterprise Database & AI Cloud Layer"]
         GeminiAPI["Google Gemini Cloud API\n(gemini-3.6-flash Generative & gemini-embedding-001 Embeddings)"]
-        MySQLDB[("MySQL Database: roh @ 127.0.0.1:3306\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
+        EnterpriseDB[("Enterprise Relational Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
         
         RAGAssistant <--> GeminiAPI
         ActionAgent <--> GeminiAPI
-        HITLCheck <--> MySQLDB
+        HITLCheck <--> EnterpriseDB
     end
 
     L4 --> L5
@@ -79,7 +79,24 @@ flowchart TD
 
 ---
 
-## 2. Layer-by-Layer Architectural Breakdown
+## 2. Feeding Knowledge to the AI Agent (RAG Pipeline)
+
+To ensure the AI Agent answers company questions accurately without hallucinations, raw enterprise documents are processed through a 5-step Knowledge Feeding & Grounding Pipeline:
+
+1. **Document Collection & Raw Extraction**:
+   * Knowledge is gathered from raw company files including HR Leave Manuals, Employee Handbooks, IT/AV Equipment SOPs, Benefits Guides, and Resolved Support Tickets.
+2. **Semantic Chunking & Metadata Tagging**:
+   * Long policy documents are broken down into optimal 500-1000 character overlapping text chunks. Each chunk is tagged with structured metadata (`category`, `department`, `target_role`, `updated_timestamp`).
+3. **High-Dimensional Vector Embedding**:
+   * Text chunks are passed through the Google Gemini Embedding API (`gemini-embedding-001`) to convert human text into a 3072-dimensional vector math representation.
+4. **Dual Indexing (Vector + BM25 Full-Text)**:
+   * Chunks, metadata, and 3072-dim vector embeddings are stored in the `knowledge_chunks` database table with both BM25 Full-Text keywords and vector Cosine Similarity distance indexes.
+5. **Real-Time Hybrid Search & Grounded Prompt Synthesis**:
+   * When an employee asks a policy question, the query vector is generated and searched using Hybrid Search (Cosine Similarity + BM25). The top K matched contexts are injected into Gemini system prompts to generate 100% accurate, policy-grounded answers.
+
+---
+
+## 3. Core Layer Specifications Breakdown
 
 ### 🛠️ Layer 1: Frameworks & Core UI Engine
 - **Frontend Stack**: Flutter 3.x for Web & Mobile built with Dart.
@@ -111,7 +128,7 @@ flowchart TD
 
 ### 💾 Layer 5: Database & AI Cloud Layer
 - **Google Gemini Cloud**: `gemini-3.6-flash` for high-speed generative reasoning and function calling; `gemini-embedding-001` for vector embedding generation.
-- **MySQL Database (`roh` @ 127.0.0.1:3306)**: Stores structured tables (`tickets`, `leaves`, `attendance`, `employees`, `chat_messages`) and AI tables (`knowledge_chunks`, `agent_action_log`, `agent_pending_actions`).
+- **Enterprise Relational Database**: Stores structured tables (`tickets`, `leaves`, `attendance`, `employees`, `chat_messages`) and AI tables (`knowledge_chunks`, `agent_action_log`, `agent_pending_actions`).
 
 ---
 
@@ -121,7 +138,7 @@ flowchart TD
 | :--- | :--- |
 | 📸 **Vision AI OCR** | Scans uploaded employee expense receipts, travel invoices, and medical bills to automatically extract line items and auto-fill reimbursement tickets. |
 | 👥 **Multi-Agent Swarm** | Decouples monolithic AI into specialized subagents (*Payroll Agent*, *Attendance Audit Agent*, *IT Diagnostic Agent*) communicating asynchronously. |
-| ⚡ **Real-Time Token Streaming** | Uses Server-Sent Events (SSE) and WebSockets for token-by-token live typing effects and instant push alerts when messages/tickets are dispatched. |
+| ⚡ **Real-Time SSE Token Streaming** | Uses Server-Sent Events (SSE) and WebSockets for token-by-token live typing effects and instant push alerts when messages/tickets are dispatched. |
 | 🔍 **GraphRAG Knowledge Graphs** | Integrates Neo4j / Memgraph to map employee reporting hierarchies and team dependencies for complex multi-hop escalation queries. |
 | 💾 **Dedicated Vector Database** | Migrates vector storage to Qdrant or `pgvector` with HNSW indexing for sub-millisecond similarity search across millions of document chunks. |
 | 📱 **On-Device Voice AI** | Runs quantized Whisper models via WebAssembly inside the browser for zero-latency, offline voice recognition without cloud network lag. |
