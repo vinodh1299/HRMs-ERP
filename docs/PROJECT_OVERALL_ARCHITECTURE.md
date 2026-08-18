@@ -1,76 +1,127 @@
-# HRMs-ERP & HRMs-AI Engine — Simplified System Overview
+# HRMs-ERP & HRMs-AI Engine — Master Architecture Chart
 
 ---
 
-## 1. Project Overview
-
-The **HRMs-ERP & HRMs-AI System** is an enterprise HR portal combined with an intelligent AI assistant. It allows employees to manage attendance, submit leave applications, raise service tickets, and chat with team members—either manually through the Web UI or completely hands-free using **voice prompts and automated AI actions**.
-
----
-
-## 2. Simple System Architecture Diagram
+## 1. Master System Architecture Chart
 
 ```mermaid
-flowchart LR
-    %% Main Architecture Layers
-    User([👤 User / Employee]) -->|Voice or Text| Frontend["📱 Frontend App\n(Flutter Web - Port 4000)"]
-    
-    Frontend -->|API Request| Backend["⚙️ HRMs-AI Server\n(Node.js / Express - Port 4001)"]
-    
-    subgraph AI_Engine ["🧠 HRMs-AI Engine"]
-        Backend --> Router{"Intent Router"}
-        Router -->|Policy Question| RAG["RAG Search\n(Policy Documents)"]
-        Router -->|App Action| Agent["Action Agent\n(Tickets, Leaves, Messages)"]
+flowchart TD
+    %% LAYER 1: FRAMEWORKS & CLIENT
+    subgraph L1 ["1. 🛠️ Frameworks & Core UI Engine (Port 4000)"]
+        Flutter["Flutter 3.x Framework (Dart)"]
+        StateMgmt["Riverpod State Management & GoRouter Navigation"]
+        VoiceTech["Web Speech API (Speech-To-Text) + SpeechSynthesis (Voice-Over TTS)"]
+        Flutter --> StateMgmt
+        Flutter --> VoiceTech
+    end
+
+    %% LAYER 2: ERP MODULES
+    subgraph L2 ["2. 🏢 ERP Application Modules"]
+        DashMod["Home Dashboard\n(Quick Clock-In/Out, Department Staff Presence, Polls)"]
+        MeMod["Me Module\n(Attendance Logs, Leave Balances, Shift Timings, Regularization)"]
+        HelpMod["Helpdesk & Department Portals\n(IT, HR, Maintenance, Finance, CPD, Inventory, HOB, Media)"]
+        ChatMod["My Teams Chat Module\n(#general, #maintenance-updates, Vinodh, John Doe, DMs)"]
     end
     
-    subgraph Data_Cloud ["💾 Database & AI Services"]
-        RAG <--> GeminiAPI["Google Gemini AI"]
-        Agent <--> MySQL[("MySQL Database\n(DB: roh @ 3306)")]
+    L1 --> L2
+
+    %% LAYER 3: API GATEWAY & COMMUNICATION BRIDGES
+    subgraph L3 ["3. 🌐 API Gateways & Communication Bridges"]
+        ChatSync["Central ChatService Engine\n(ValueNotifier Live Cross-Window Event Bus)"]
+        APIGateway["HRMs-AI Service API Gateway\n(Node.js Express @ http://localhost:4001/api/ai)"]
+        ChatSync -->|HTTP REST JSON| APIGateway
     end
-    
-    Backend -->|Response & Sync| Frontend
-    Frontend -->|Voice-Over Audio| Speaker([🔊 Voice Output])
+
+    L2 --> ChatSync
+
+    %% LAYER 4: AI AGENTS & ASSISTANTS
+    subgraph L4 ["4. 🤖 HRMs-AI Agents, Assistants & Intelligence Engine"]
+        IntentRouter{"Intent Router"}
+        
+        RAGAssistant["📚 RAG Grounded Policy Chatbot\n(ragService.js - Document Hybrid Search)"]
+        ActionAgent["⚡ Autonomous Action Agent\n(agentService.js - ReAct Function Calling)"]
+        
+        ToolSet["Function Tools:\n• createTicket\n• assignTicket\n• applyLeave\n• sendMessageToUserOrChannel\n• queryTeamAttendance"]
+        HITLCheck{"HITL Risk Classification\n(LOW, MEDIUM, HIGH Risk)"}
+        
+        IntentRouter -->|Policy Question| RAGAssistant
+        IntentRouter -->|App Action Command| ActionAgent
+        ActionAgent --> ToolSet
+        ToolSet --> HITLCheck
+    end
+
+    APIGateway --> IntentRouter
+
+    %% LAYER 5: DATABASE & EXTERNAL AI CLOUD
+    subgraph L5 ["5. 💾 Database & AI Cloud Layer"]
+        GeminiAPI["Google Gemini Cloud API\n(gemini-3.6-flash Generative & gemini-embedding-001 Embeddings)"]
+        MySQLDB[("MySQL Database: roh @ 127.0.0.1:3306\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
+        
+        RAGAssistant <--> GeminiAPI
+        ActionAgent <--> GeminiAPI
+        HITLCheck <--> MySQLDB
+    end
+
+    L4 --> L5
+
+    %% LAYER 6: NEW ADVANCED TECHNOLOGIES ROADMAP
+    subgraph L6 ["6. 🚀 New & Advanced Technologies Roadmap (Future Implementations)"]
+        VisionAI["📸 Vision AI OCR\n(Expense Receipts, Medical Bills & Document Parsing)"]
+        SwarmAI["👥 Multi-Agent Swarm Architecture\n(Specialized Payroll, Attendance & IT Subagents)"]
+        SSEStream["⚡ Real-Time SSE Token Streaming\n& WebSockets Push Notifications"]
+        GraphRAG["🔍 GraphRAG Knowledge Graphs\n(Neo4j Reporting Hierarchy & Escalation Trees)"]
+        VectorDB["💾 Dedicated Vector Database\n(Qdrant / pgvector with HNSW Indexing)"]
+        OnDeviceAI["📱 Zero-Latency On-Device Voice AI\n(WebAssembly Whisper Speech Processing)"]
+    end
+
+    L5 -.->|Next Upgrade Phase| L6
 ```
 
 ---
 
-## 3. What Has Been Built So Far
+## 2. Layer-by-Layer Architectural Breakdown
 
-### 💻 ERP Application Modules (Port 4000)
-- **Home Dashboard**: Quick clock-in/out banner, live department staff presence, announcements, and polls.
-- **Me Tab**: Monthly attendance logs, shift details, leave balances, and leave regularization.
-- **Helpdesk & Department Portals**: Service ticket logging for IT, HR, Maintenance, Finance, CPD, Inventory, HOB, and Media.
-- **My Teams Chat**: Real-time team channels (`#general`, `#maintenance-updates`) and direct messages.
-
-### 🤖 Intelligent HRMs-AI Backend (Port 4001)
-- **Policy Chatbot (RAG)**: Answers policy, leave, and SOP questions using grounded document search.
-- **Prompt Action Agent**: Performs real app operations via prompts (raising tickets, applying for leave, checking attendance).
-- **Direct Message Dispatching**: Generates contextual messages and automatically posts them into team member chats (`Vinodh`, `John Doe`, etc.).
-- **Human-In-The-Loop (HITL) Safety**: High-risk actions require interactive UI confirmation before executing.
-
-### 🎙️ Hands-Free Voice & Voice-Over System
-- **Speech-To-Text (Mic Button)**: Speak prompts directly into the app without typing.
-- **Automatic Voice-Over**: Reads AI responses out loud in clean, natural speech.
-- **Listen Buttons**: Tap the **Listen** speaker icon on any message card to replay audio.
+### 🛠️ Layer 1: Frameworks & Core UI Engine
+- **Frontend Stack**: Flutter 3.x for Web & Mobile built with Dart.
+- **State Management**: Riverpod providers combined with custom `ValueNotifier` event buses.
+- **Voice Engine**: HTML5 Web Speech API (`startSpeechRecognition`) for Speech-to-Text input, paired with Web SpeechSynthesis API (`window.speakText`) for automatic Voice-Over audio responses.
 
 ---
 
-## 4. How the AI Engine Works (In 3 Simple Steps)
-
-```
-[ Step 1: Input ]       --> User speaks or types a command into the app.
-[ Step 2: AI Processing ] --> HRMs-AI decides whether to answer a question (RAG) 
-                            or perform an action (Function Tool).
-[ Step 3: Execution ]    --> AI updates the database, dispatches chat messages, 
-                            and speaks the result aloud.
-```
+### 🏢 Layer 2: ERP Application Modules
+- **Home Dashboard**: Quick clock-in/out, live department staff presence modal, announcements, and polls.
+- **Me Module**: Attendance logging, work modes (Office, Home, Field), leave regularization, and leave balances (Casual, Sick, Earned).
+- **Helpdesk & Department Portals**: Service ticket management across IT, HR, Maintenance, Finance, CPD, Inventory, HOB, and Media.
+- **My Teams Chat**: Multi-channel communication (`#general`, `#maintenance-updates`, `#finance-reimbursements`, `Gemini AI Assistant`, DMs).
 
 ---
 
-## 5. Future Technology Upgrades (Top 5 Roadmap Items)
+### 🌐 Layer 3: API Gateways & Communication Bridges
+- **Frontend Sync Gateway**: `ChatService` routes prompts from floating chatbot widgets, AI drawers, and chat screens, synchronizing target conversations live.
+- **Backend API Gateway**: Node.js/Express service at `http://localhost:4001/api/ai` exposing `/chat`, `/agent`, `/confirm`, and `/decline` endpoints.
 
-1. 📸 **Receipt & Invoice OCR (Vision AI)**: Scan employee expense receipts and medical bills to automatically pre-fill reimbursement tickets.
-2. 👥 **Multi-Agent Specialist Swarm**: Dedicated AI agents for Payroll, Attendance Anomalies, and IT Troubleshooting working together.
-3. ⚡ **Real-Time Token Streaming**: Stream AI answers letter-by-letter with live typing effects and instant push notifications.
-4. 🔍 **Organizational Knowledge Graph**: Graph-based search mapping employee reporting hierarchies and team dependencies.
-5. 📱 **Offline On-Device Voice AI**: Fast on-device speech processing using WebAssembly Whisper for zero-latency speech.
+---
+
+### 🤖 Layer 4: HRMs-AI Agents, Assistants & Intelligence Engine
+- **RAG Grounded Policy Chatbot (`ragService.js`)**: Hybrid BM25 FullText + Cosine Similarity search over 3072-dimensional vector embeddings, delivering 100% grounded policy answers without hallucinations.
+- **Autonomous Action Agent (`agentService.js` & `toolRegistry.js`)**: Converts natural language prompts into function tool calls (`createTicket`, `assignTicket`, `applyLeave`, `sendMessageToUserOrChannel`, `queryTeamAttendance`).
+- **Human-In-The-Loop (HITL) Security**: High-risk actions are staged in `agent_pending_actions` and require explicit user approval cards (`CONFIRM` / `DECLINE`).
+
+---
+
+### 💾 Layer 5: Database & AI Cloud Layer
+- **Google Gemini Cloud**: `gemini-3.6-flash` for high-speed generative reasoning and function calling; `gemini-embedding-001` for vector embedding generation.
+- **MySQL Database (`roh` @ 127.0.0.1:3306)**: Stores structured tables (`tickets`, `leaves`, `attendance`, `employees`, `chat_messages`) and AI tables (`knowledge_chunks`, `agent_action_log`, `agent_pending_actions`).
+
+---
+
+### 🚀 Layer 6: New & Advanced Technologies Roadmap
+
+| Technology | Purpose & Business Value |
+| :--- | :--- |
+| 📸 **Vision AI OCR** | Scans uploaded employee expense receipts, travel invoices, and medical bills to automatically extract line items and auto-fill reimbursement tickets. |
+| 👥 **Multi-Agent Swarm** | Decouples monolithic AI into specialized subagents (*Payroll Agent*, *Attendance Audit Agent*, *IT Diagnostic Agent*) communicating asynchronously. |
+| ⚡ **Real-Time Token Streaming** | Uses Server-Sent Events (SSE) and WebSockets for token-by-token live typing effects and instant push alerts when messages/tickets are dispatched. |
+| 🔍 **GraphRAG Knowledge Graphs** | Integrates Neo4j / Memgraph to map employee reporting hierarchies and team dependencies for complex multi-hop escalation queries. |
+| 💾 **Dedicated Vector Database** | Migrates vector storage to Qdrant or `pgvector` with HNSW indexing for sub-millisecond similarity search across millions of document chunks. |
+| 📱 **On-Device Voice AI** | Runs quantized Whisper models via WebAssembly inside the browser for zero-latency, offline voice recognition without cloud network lag. |
