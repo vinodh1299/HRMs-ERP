@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asian Christian Academy of India — HRMs-ERP & Proprietary AI Engine Blueprint</title>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <title>Asian Christian Academy of India — HRMS-ERP &amp; Self-Hosted AI Engine Blueprint</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
   <style>
     @page {
       size: A4 portrait;
@@ -34,7 +34,7 @@
       background-color: var(--bg);
       color: var(--text-main);
       line-height: 1.6;
-      padding: 30px;
+      padding: 24px;
     }
 
     .container {
@@ -44,13 +44,13 @@
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border);
-      padding: 40px;
+      padding: 36px;
     }
 
     header {
       border-bottom: 3px solid var(--primary);
-      padding-bottom: 20px;
-      margin-bottom: 32px;
+      padding-bottom: 18px;
+      margin-bottom: 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -59,7 +59,7 @@
     }
 
     .title-group h1 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       color: var(--primary);
       margin-bottom: 4px;
@@ -68,8 +68,15 @@
 
     .title-group p {
       color: var(--text-muted);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
+    }
+
+    .meta-stamp {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 4px;
     }
 
     .badge-bar {
@@ -107,14 +114,16 @@
     }
 
     section {
-      margin-bottom: 36px;
+      margin-bottom: 32px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     h2 {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       color: var(--primary);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -124,7 +133,7 @@
       content: '';
       display: inline-block;
       width: 4px;
-      height: 22px;
+      height: 20px;
       background: var(--secondary);
       border-radius: 2px;
     }
@@ -133,16 +142,17 @@
       background: #F8FAFC;
       border: 1.5px solid var(--border);
       border-radius: 14px;
-      padding: 24px;
+      padding: 20px;
       margin-bottom: 24px;
       width: 100%;
       overflow-x: auto;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .chart-box svg {
       width: 100% !important;
       height: auto !important;
-      min-height: 700px !important;
       max-width: none !important;
       display: block;
       margin: 0 auto;
@@ -160,6 +170,8 @@
       border-radius: 12px;
       padding: 20px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .card h3 {
@@ -197,6 +209,8 @@
       border-radius: 10px;
       padding: 16px 20px;
       margin-bottom: 14px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .tech-step h4 {
@@ -216,6 +230,8 @@
       border-collapse: collapse;
       margin-top: 12px;
       font-size: 13px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     th, td {
@@ -230,10 +246,6 @@
       font-weight: 700;
     }
 
-    tr:hover {
-      background-color: #F1F5F9;
-    }
-
     .callout {
       background: #EFF6FF;
       border-left: 4px solid var(--secondary);
@@ -242,6 +254,8 @@
       font-size: 13px;
       color: #1E40AF;
       margin-top: 16px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     @media print {
@@ -258,8 +272,9 @@
       .btn-print {
         display: none;
       }
-      .chart-box svg {
-        min-height: 800px !important;
+      section, .card, .tech-step, table, .chart-box {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
     }
   </style>
@@ -270,130 +285,139 @@
     <header>
       <div class="title-group">
         <h1>Asian Christian Academy of India</h1>
-        <p>HRMs-ERP & Proprietary Custom AI Engine Master Architecture Blueprint</p>
+        <p>HRMS-ERP &amp; Self-Hosted AI Engine Master Architecture Blueprint</p>
+        <div class="meta-stamp">Version 1.0.0 &middot; Document Review: August 2026 &middot; Status: Enterprise Blueprint</div>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-        <button class="btn-print" onclick="window.print()">📄 Save as PDF / Print</button>
+        <button class="btn-print" onclick="window.print()">Save as PDF / Print</button>
         <div class="badge-bar">
-          <span class="badge">Global Online Private AI</span>
-          <span class="badge green">Zero Third-Party API Keys</span>
+          <span class="badge">Self-Hosted Open Weights</span>
+          <span class="badge green">Zero Cloud API Dependencies</span>
         </div>
       </div>
     </header>
 
     <!-- SECTION 1: MASTER CHART -->
     <section>
-      <h2>1. Master System Architecture Chart (Global Online Access)</h2>
+      <h2>1. Master System Architecture Chart</h2>
       <div class="chart-box">
         <pre class="mermaid">
 flowchart TD
-    %% LAYER 1: GLOBAL CLIENT ACCESS
-    subgraph L1 ["1. 📱 Global Client UI Engine (Access From Anywhere)"]
-        FlutterApp["Flutter 3.x Multi-Platform App\n(Web, iOS, Android, Desktop)"]
-        StateMgmt["Riverpod State Management & GoRouter"]
-        VoiceTech["Web Speech STT + SpeechSynthesis Voice-Over TTS"]
+    subgraph L1 ["1. Global Client UI Engine"]
+        FlutterApp["Flutter 3.x Multi-Platform App<br/>(Web, iOS, Android, Desktop)"]
+        StateMgmt["Riverpod State Management &amp; GoRouter"]
+        VoiceTech["Self-hosted STT (whisper.cpp)<br/>+ platform TTS voice-over"]
         FlutterApp --> StateMgmt
         FlutterApp --> VoiceTech
     end
 
-    %% LAYER 2: ERP MODULES
-    subgraph L2 ["2. 🏢 Asian Christian Academy ERP Application Modules"]
-        DashMod["Home Dashboard\n(Clock-In/Out & Presence)"]
-        MeMod["Me Module\n(Attendance & Leave Logs)"]
-        HelpMod["Helpdesk Portals\n(IT, HR, Maint, Finance, CPD, HOB)"]
-        ChatMod["Teams Chat Module\n(#general, #maintenance, DMs)"]
-    end
-    
-    L1 --> L2
-
-    %% LAYER 3: ONLINE API GATEWAY
-    subgraph L3 ["3. 🌐 Global Secure API Gateway & Bridges"]
-        ChatSync["Central ChatService Event Bus\n(ValueNotifier Cross-Window Sync)"]
-        APIGateway["HRMs-AI Global Online API Gateway\n(Express Gateway with SSL & JWT Auth)"]
-        ChatSync -->|Secure HTTPS / REST| APIGateway
+    subgraph L2 ["2. ACA India HRMS-ERP Modules"]
+        DashMod["Home Dashboard<br/>(Clock-In/Out &amp; Presence)"]
+        MeMod["Me Module<br/>(Attendance &amp; Leave Logs)"]
+        HelpMod["Helpdesk Portals<br/>(IT, HR, Maint, Finance, CPD, HOB)"]
+        ChatMod["Teams Chat Module<br/>(#general, #maintenance, DMs)"]
     end
 
-    L2 --> ChatSync
+    subgraph L3 ["3. Edge &amp; API Gateway"]
+        Edge["nginx / Cloudflare<br/>TLS 1.3 termination, WAF, rate limit"]
+        ChatSync["ChatService Event Bus<br/>(ValueNotifier cross-window sync)"]
+        APIGateway["Node.js / Express API<br/>(JWT auth + RBAC policy check)"]
+        Edge --> APIGateway
+        ChatSync -->|HTTPS / REST| Edge
+    end
 
-    %% LAYER 4: ACTIVE & PLANNED AI AGENTS
-    subgraph L4 ["4. 🤖 Active & Planned AI Agent Ecosystem"]
-        IntentRouter{"Proprietary Intent Router"}
-        
-        RAGAssistant["📚 RAG Policy Search Agent"]
-        ActionAgent["⚡ Autonomous Action Agent"]
-        PayrollAgent["💰 Payroll & Tax Intelligence"]
-        AuditAgent["⏰ Attendance & Shift Audit"]
-        VisionAgent["📸 Vision OCR Expense Agent"]
-        
+    subgraph L4 ["4. AI Agent Ecosystem"]
+        IntentRouter{"Intent Router"}
+        RAGAssistant["RAG Policy Search Agent"]
+        ActionAgent["Autonomous Action Agent"]
+        PayrollAgent["Payroll &amp; Tax Intelligence"]
+        AuditAgent["Attendance &amp; Shift Audit"]
+        VisionAgent["Vision OCR Expense Agent"]
         IntentRouter --> RAGAssistant
         IntentRouter --> ActionAgent
-        IntentRouter --> PayrollAgent
-        IntentRouter --> AuditAgent
-        IntentRouter --> VisionAgent
+        IntentRouter -.-Node1["Planned"]-.- PayrollAgent
+        IntentRouter -.-Node2["Planned"]-.- AuditAgent
+        IntentRouter -.-Node3["Planned"]-.- VisionAgent
     end
 
+    subgraph L5 ["5. Self-Hosted Inference &amp; Data"]
+        CustomLLM["Privately fine-tuned open-weight LLM<br/>(LoRA adapters, served on vLLM, single region)"]
+        EnterpriseDB[("Postgres 16 + pgvector<br/>knowledge_chunks, tickets, leaves,<br/>agent_pending_actions, audit_log")]
+    end
+
+    subgraph LSEC ["Cross-cutting: Security &amp; Operations"]
+        IdP["SSO / Identity Provider"]
+        Queue["Job Queue (BullMQ + Redis)"]
+        Obs["Metrics, Tracing, Audit Log"]
+        Backup["Encrypted Backups (RPO 24h / RTO 4h)"]
+    end
+
+    subgraph L6 ["6. Future Roadmap"]
+        RustCore["Rust tensor engine (Candle)"]
+        SwarmOrch["Multi-agent swarm collaboration"]
+        SSEStream["Real-time SSE token streaming"]
+        GraphRAG["GraphRAG knowledge graphs"]
+        OnDeviceAI["WebAssembly on-device speech"]
+    end
+
+    DashMod --> ChatSync
+    MeMod --> ChatSync
+    HelpMod --> ChatSync
+    ChatMod --> ChatSync
+    L1 --> L2
     APIGateway --> IntentRouter
+    L4 <--> CustomLLM
+    CustomLLM <--> EnterpriseDB
+    ActionAgent -->|HITL staging| EnterpriseDB
+    APIGateway --- IdP
+    L4 --- Queue
+    L5 --- Obs
+    EnterpriseDB --- Backup
 
-    %% LAYER 5: PROPRIETARY NATIVE AI ENGINE
-    subgraph L5 ["5. 🧠 Proprietary Native AI Engine (Online Private Server)"]
-        CustomLLM["Proprietary Custom Neural LLM & Tensor Engine\n(Private Cloud Hosted | Zero Third-Party API Keys | 100% Encrypted)"]
-        EnterpriseDB[("Enterprise Relational & Vector Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions)")]
-        
-        L4 <--> CustomLLM
-        CustomLLM <--> EnterpriseDB
-    end
-
-    L4 --> L5
-
-    %% LAYER 6: FUTURE EXPANSION ROADMAP
-    subgraph L6 ["6. 🚀 Future AI Technology Roadmap"]
-        RustCore["🦀 Rust High-Performance Tensor Engine"]
-        SwarmOrch["👥 Multi-Agent Swarm Collaboration"]
-        SSEStream["⚡ Real-Time SSE Token Streaming"]
-        GraphRAG["🔍 GraphRAG Knowledge Graphs"]
-        OnDeviceAI["📱 WebAssembly On-Device Speech AI"]
-    end
-
-    L5 -.->|Advanced Expansion| L6
+    RustCore -.- CustomLLM
+    GraphRAG -.- EnterpriseDB
+    SSEStream -.- APIGateway
+    OnDeviceAI -.- VoiceTech
+    SwarmOrch -.- IntentRouter
         </pre>
       </div>
     </section>
 
     <!-- SECTION 2: HOW THE CUSTOM AI IS DEVELOPED -->
     <section>
-      <h2>2. Custom AI Engine Development Stack & Codebase Engineering</h2>
+      <h2>2. Custom AI Engine Development Stack &amp; Infrastructure Engineering</h2>
       <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-        The Asian Christian Academy of India AI Engine is developed as a self-hosted, globally accessible online neural platform. The complete tech stack, codebase, and frameworks used to build the custom AI include:
+        The Asian Christian Academy of India AI Engine is developed as an in-house, self-hosted neural platform running privately fine-tuned open-weight models. The tech stack, codebase, and infrastructure components include:
       </p>
 
       <div class="tech-step">
-        <h4>1. AI Model Training & Fine-Tuning Framework (Python, PyTorch & LoRA)</h4>
-        <p>The core intelligence model is fine-tuned on custom ACA India HR policies, leave rules, and SOPs using <strong>PyTorch</strong>, <strong>HuggingFace Transformers</strong>, and <strong>PEFT / LoRA (Low-Rank Adaptation)</strong>. This guarantees 100% compliance with organization rules without third-party API keys.</p>
+        <h4>1. Model Fine-Tuning Framework (Python, PyTorch &amp; LoRA)</h4>
+        <p>The core intelligence engine uses open-weight base models (e.g. Llama 3 / Gemma 2) fine-tuned on Asian Christian Academy of India HR policies, leave rules, and SOP documents using <strong>PyTorch</strong>, <strong>HuggingFace Transformers</strong>, and <strong>PEFT / LoRA (Low-Rank Adaptation)</strong>.</p>
       </div>
 
       <div class="tech-step">
-        <h4>2. Low-Latency Local Inference Engine (vLLM & Ollama / llama.cpp)</h4>
-        <p>Model execution runs on a self-hosted online private cloud engine powered by <strong>vLLM</strong> and <strong>llama.cpp (GGUF / GGML 4-bit & 8-bit Quantization)</strong>. This provides sub-millisecond tensor response speeds while keeping 100% of employee data private and secure.</p>
+        <h4>2. Dual-Tier Self-Hosted Inference Runtime (vLLM &amp; llama.cpp)</h4>
+        <p>Model serving is structured in two operational tiers: <strong>vLLM (PagedAttention)</strong> provides primary GPU serving for high concurrent campus traffic (achieving 30–150 ms time-to-first-token), with <strong>llama.cpp (GGUF Quantization)</strong> acting as a low-power CPU fallback server.</p>
       </div>
 
       <div class="tech-step">
-        <h4>3. Global Online Access & Security (HTTPS, SSL & JWT Auth)</h4>
-        <p>The AI Engine is hosted on Asian Christian Academy of India's secure online domain infrastructure. Staff can access the AI from anywhere in the world (mobile, home, or remote campus) over encrypted <strong>TLS 1.3 HTTPS</strong> connections authenticated by <strong>JWT user tokens</strong>.</p>
+        <h4>3. Private Self-Hosted STT &amp; Native Platform TTS</h4>
+        <p>To preserve complete data privacy, client voice input uses self-hosted <strong>whisper.cpp / faster-whisper</strong> speech-to-text models hosted on the local gateway, paired with native platform SpeechSynthesis voice-over engines on client devices.</p>
       </div>
 
       <div class="tech-step">
-        <h4>4. High-Performance Core Language Strategy (Rust & C++)</h4>
-        <p>For core high-throughput tensor operations and vector search indexing, the underlying inference backend uses <strong>Rust (Burn / Candle framework)</strong> and <strong>C++ / CUDA</strong> for memory-safe, zero-cost abstraction execution on GPU hardware.</p>
+        <h4>4. Edge Security &amp; TLS Termination (nginx &amp; Express API Gateway)</h4>
+        <p>All traffic from mobile, web, and campus devices is encrypted in transit using <strong>TLS 1.3 HTTPS</strong> terminated at an <strong>nginx / Cloudflare edge node</strong> (with WAF and rate limiting) before routing to the <strong>Node.js / Express API service</strong> with <strong>JWT user authentication</strong> and <strong>RBAC policy enforcement</strong>.</p>
       </div>
 
       <div class="tech-step">
-        <h4>5. Backend Gateway & Microservice Codebase (Node.js / Express)</h4>
-        <p>The backend microservice connects the AI engine to the ERP database, managing RAG document retrieval (<code>ragService.js</code>), autonomous function calling (<code>agentService.js</code>), and Human-In-The-Loop safety staging (<code>agent_pending_actions</code>).</p>
+        <h4>5. Unified Relational &amp; Vector Storage (Postgres 16 + pgvector)</h4>
+        <p>Relational ERP tables (employees, leaves, tickets, audit logs) and 1536-dimensional RAG document embeddings (<code>knowledge_chunks</code>) are stored in a unified <strong>Postgres 16 + pgvector</strong> database, guaranteeing transactional consistency and simplified single-node backup routines (RPO 24h / RTO 4h).</p>
       </div>
 
       <div class="tech-step">
-        <h4>6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)</h4>
-        <p>The client application is built with <strong>Flutter 3.x (Dart)</strong>, featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.</p>
+        <h4>6. Cross-Cutting Operations (BullMQ, Redis &amp; Security Services)</h4>
+        <p>Long-running background tasks are managed via a <strong>BullMQ + Redis</strong> job queue. System health is monitored through open metrics and structured logging, backed by automated nightly AES-256 encrypted backups.</p>
       </div>
     </section>
 
@@ -402,23 +426,23 @@ flowchart TD
       <h2>3. Asian Christian Academy AI Agent Ecosystem</h2>
       <div class="grid-2">
         <div class="card">
-          <h3>✅ AI Agents Created So Far</h3>
+          <h3>Active Core Agents &amp; Services</h3>
           <ul>
-            <li><strong>RAG Policy Search Agent (<code>ragService</code>)</strong>: Grounded policy Q&A over indexed HR, IT, and leave SOP documents.</li>
-            <li><strong>Autonomous Action Agent (<code>agentService</code>)</strong>: Converts prompts into backend tool calls (<code>createTicket</code>, <code>applyLeave</code>, <code>sendMessageToUserOrChannel</code>, <code>queryTeamAttendance</code>).</li>
-            <li><strong>Central Synchronization Agent (<code>ChatService</code>)</strong>: Event bus synchronizing messages across floating chatbots, AI drawers, and team chats.</li>
-            <li><strong>Voice & Speech Agent (<code>VoiceHelper</code>)</strong>: Hands-free mic speech recognition and automatic Voice-Over audio output.</li>
-            <li><strong>HITL Safety Classifier</strong>: Evaluates risk levels and stages high-risk operations in <code>agent_pending_actions</code>.</li>
+            <li><strong>RAG Policy Search Agent (<code>ragService.js</code>)</strong>: Grounded policy Q&amp;A over indexed HR, IT, and leave SOP documents.</li>
+            <li><strong>Autonomous Action Agent (<code>agentService.js</code>)</strong>: Converts prompts into backend tool calls (<code>createTicket</code>, <code>applyLeave</code>, <code>sendMessageToUserOrChannel</code>).</li>
+            <li><strong>Central Event Bus (<code>ChatService</code>)</strong>: Cross-window synchronization service broadcasting live chat updates.</li>
+            <li><strong>Voice I/O Interface (<code>VoiceHelper</code>)</strong>: Client-side voice interaction wrapper managing mic audio and TTS playback.</li>
+            <li><strong>HITL Safety Manager</strong>: Staging service placing high-risk database mutations in <code>agent_pending_actions</code> for confirmation.</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>🚀 New AI Agents Planned for Development</h3>
+          <h3>Planned Expansion Agents</h3>
           <ul>
-            <li><strong>Payroll & Tax Intelligence Agent</strong>: Payslip breakdowns, tax optimization advice, and reimbursement processing.</li>
-            <li><strong>Attendance & Shift Anomaly Agent</strong>: Automatically detects clock-in anomalies and suggests regularizations.</li>
-            <li><strong>Multi-Modal Vision & OCR Agent</strong>: Auto-scans expense receipts, medical bills, and onboarding IDs into ERP tickets.</li>
-            <li><strong>IT Diagnostic & Procurement Specialist</strong>: Monitors asset health, compares vendor pricing, and tracks POs above ₹1 Lakh.</li>
+            <li><strong>Payroll &amp; Tax Intelligence Agent</strong>: Payslip breakdowns, tax optimization advice, and reimbursement processing.</li>
+            <li><strong>Attendance &amp; Shift Anomaly Agent</strong>: Automatically detects clock-in anomalies and suggests regularizations.</li>
+            <li><strong>Multi-Modal Vision &amp; OCR Agent</strong>: Auto-scans expense receipts, medical bills, and onboarding IDs into ERP tickets.</li>
+            <li><strong>IT Diagnostic &amp; Asset Specialist</strong>: Monitors asset health, compares vendor pricing, and tracks PO approvals above ₹1 Lakh.</li>
             <li><strong>Hierarchical Escalation Agent</strong>: Traverses organizational reporting graphs for complex cross-department escalations.</li>
           </ul>
         </div>
@@ -427,50 +451,50 @@ flowchart TD
 
     <!-- SECTION 4: PROGRAMMING LANGUAGE EVALUATION -->
     <section>
-      <h2>4. Programming Language Evaluation for Proprietary AI Development</h2>
-      <table>
+      <h2>4. Programming Language Evaluation for Self-Hosted AI Infrastructure</h2>
+      <table aria-label="Programming Language Evaluation for AI Development">
         <thead>
           <tr>
-            <th>Language</th>
-            <th>Suitability</th>
-            <th>Strengths for Custom AI Development</th>
-            <th>Target Architecture Role</th>
+            <th scope="col">Language</th>
+            <th scope="col">Evaluation &amp; Suitability</th>
+            <th scope="col">Strengths for Self-Hosted AI</th>
+            <th scope="col">Target Architecture Role</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>🦀 Rust (RECOMMENDED FOR CORE ENGINE)</strong></td>
-            <td>⭐⭐⭐⭐⭐ (Highest)</td>
-            <td>Memory safety without Garbage Collection pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WASM compilation.</td>
-            <td><strong>High-Throughput Native Inference Engine & Tensor Math</strong></td>
+            <td><strong>Rust</strong></td>
+            <td>5/5 &mdash; Recommended for Future Core Engine</td>
+            <td>Memory safety without Garbage Collection pauses, zero-cost abstractions, native C/CUDA interop, high-speed tensor libraries (Candle / Burn), WASM compilation.</td>
+            <td><strong>Evaluated for Future High-Throughput Native Inference Core</strong></td>
           </tr>
           <tr>
-            <td><strong>🐍 Python</strong></td>
-            <td>⭐⭐⭐⭐ (R&D / Fine-Tuning)</td>
-            <td>Unrivaled ecosystem (PyTorch, JAX, HuggingFace, vLLM). Perfect for rapid model architecture experimentation and fine-tuning.</td>
-            <td><strong>Dataset Preparation, Fine-Tuning (LoRA) & Training</strong></td>
+            <td><strong>Python</strong></td>
+            <td>4/5 &mdash; Essential for Model Fine-Tuning</td>
+            <td>Unrivaled AI ecosystem (PyTorch, JAX, HuggingFace, vLLM). Standard language for dataset preparation and LoRA adapter fine-tuning.</td>
+            <td><strong>Dataset Preparation, Fine-Tuning (LoRA) &amp; Training</strong></td>
           </tr>
           <tr>
-            <td><strong>⚡ C++ / CUDA</strong></td>
-            <td>⭐⭐⭐⭐ (Low-Level GPU Kernels)</td>
-            <td>Foundation of GGML, llama.cpp, and TensorRT. Maximum low-level GPU hardware control.</td>
-            <td><strong>Low-Level CUDA GPU Kernel Optimization</strong></td>
+            <td><strong>C++ / CUDA</strong></td>
+            <td>4/5 &mdash; Low-Level GPU Kernels</td>
+            <td>Foundation of GGUF, llama.cpp, and TensorRT. Maximum low-level GPU hardware control.</td>
+            <td><strong>Low-Level CUDA GPU Kernel Execution</strong></td>
           </tr>
           <tr>
-            <td><strong>🔥 Mojo / Julia</strong></td>
-            <td>⭐⭐⭐ (Emerging)</td>
-            <td>Mojo compiles Python syntax to native C-speed code. High-performance matrix math capabilities.</td>
-            <td><strong>Secondary Research Exploration</strong></td>
+            <td><strong>Mojo</strong></td>
+            <td>3/5 &mdash; Emerging AI Technology</td>
+            <td>Python superset compiling to native C speed with high-performance matrix math capabilities.</td>
+            <td><strong>Research Exploration</strong></td>
           </tr>
         </tbody>
       </table>
 
       <div class="callout">
         <strong>Asian Christian Academy AI Architecture Strategy:</strong> A <strong>Hybrid Microservice Stack</strong>:
-        <br>• <strong>Rust (or C++/CUDA)</strong>: Core high-throughput, low-latency Custom AI Inference Engine & Tensor Operations.
-        <br>• <strong>Python</strong>: Model Training, Dataset Preparation & Fine-Tuning (LoRA).
-        <br>• <strong>Node.js / Express</strong>: Global Online API Gateway & Application Routing.
-        <br>• <strong>Dart (Flutter)</strong>: Cross-Platform Client UI for Web, Mobile & Desktop.
+        <br>&bull; <strong>Python (PyTorch &amp; vLLM)</strong>: Model Fine-Tuning (LoRA) &amp; High-Concurrency GPU Inference Serving.
+        <br>&bull; <strong>C++ / Rust (llama.cpp / Candle)</strong>: CPU Fallback Engine &amp; Evaluated Future High-Performance Core.
+        <br>&bull; <strong>Node.js / Express behind nginx</strong>: Edge API Gateway, TLS 1.3 Termination, &amp; Application Routing.
+        <br>&bull; <strong>Dart (Flutter)</strong>: Cross-Platform Client UI for Web, Mobile &amp; Desktop.
       </div>
     </section>
 
@@ -480,6 +504,7 @@ flowchart TD
     mermaid.initialize({
       startOnLoad: true,
       theme: 'neutral',
+      htmlLabels: true,
       flowchart: {
         useMaxWidth: false,
         htmlLabels: true,

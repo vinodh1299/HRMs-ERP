@@ -25,7 +25,7 @@ def create_architecture_doc(filename):
     # Title
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_title = p_title.add_run("Asian Christian Academy of India\nHRMs-ERP & Proprietary Custom AI Engine Blueprint")
+    run_title = p_title.add_run("Asian Christian Academy of India\nHRMS-ERP & Self-Hosted AI Engine Blueprint")
     run_title.font.name = 'Arial'
     run_title.font.size = Pt(22)
     run_title.font.bold = True
@@ -34,7 +34,7 @@ def create_architecture_doc(filename):
     # Subtitle
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_sub = p_sub.add_run("Proprietary AI Strategy, Development Frameworks, Agent Portfolio & Language Evaluation\nVersion 3.0.0 Custom AI")
+    run_sub = p_sub.add_run("Self-Hosted Open-Weight Strategy, Infrastructure Engineering & Agent Portfolio\nVersion 1.0.0 · Document Review: August 2026")
     run_sub.font.name = 'Arial'
     run_sub.font.size = Pt(11)
     run_sub.font.color.rgb = MUTED
@@ -54,17 +54,17 @@ def create_architecture_doc(filename):
         return h
 
     # Section 1: Executive Summary
-    add_heading("1. Executive Summary & Proprietary AI Vision", level=1)
+    add_heading("1. Executive Summary & Self-Hosted AI Vision", level=1)
     p = doc.add_paragraph()
     r = p.add_run(
-        "This master architectural blueprint defines the technical specification, system design, agent portfolio, and custom development stack for building a 100% proprietary, self-hosted AI Engine for Asian Christian Academy of India. "
-        "The system operates with total independence—eliminating third-party cloud API keys (zero OpenAI, zero Claude, zero Gemini API keys)—guaranteeing complete data privacy, zero per-token API costs, and sub-millisecond execution over a self-hosted neural model architecture."
+        "This master architectural blueprint defines the technical specification, system design, agent portfolio, and infrastructure stack for building a 100% self-hosted, privately fine-tuned AI Engine for Asian Christian Academy of India. "
+        "The system operates with total independence—eliminating third-party cloud API dependencies (zero OpenAI, zero Claude, zero Gemini API keys)—guaranteeing complete enterprise data privacy, zero per-token API costs, and low latency (30–150 ms TTFT) over a self-hosted open-weight model runtime."
     )
     r.font.name = 'Arial'
     r.font.size = Pt(10)
 
     # Section 2: Master Architecture Chart
-    add_heading("2. Master System Architecture Chart (Self-Hosted Custom AI)", level=1)
+    add_heading("2. Master System Architecture Chart (Self-Hosted Open Weights)", level=1)
     
     chart_box = doc.add_paragraph()
     chart_box.paragraph_format.space_before = Pt(6)
@@ -72,38 +72,38 @@ def create_architecture_doc(filename):
     
     chart_text = (
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  1. FRAMEWORKS & UI ENGINE                                                              |\n"
-        "|  Flutter 3.x (Dart) | Riverpod & GoRouter | Web Speech STT + SpeechSynthesis TTS        |\n"
+        "|  1. GLOBAL CLIENT UI ENGINE                                                             |\n"
+        "|  Flutter 3.x (Dart) | Riverpod & GoRouter | Self-hosted STT + Platform TTS              |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  2. ASIAN CHRISTIAN ACADEMY ERP APPLICATION MODULES                                     |\n"
-        "|  Dashboard (Presence/Polls) | Me (Attendance/Leaves) | Helpdesk (8 Depts) | Teams Chat |\n"
+        "|  2. ACA INDIA HRMS-ERP APPLICATION MODULES                                              |\n"
+        "|  Dashboard (Presence/Polls) | Me (Attendance/Leaves) | Helpdesk (6 Depts) | Teams Chat |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  3. API GATEWAYS & BRIDGES                                                              |\n"
-        "|  Central ChatService Engine (ValueNotifier Event Bus) -> Express API Gateway            |\n"
+        "|  3. EDGE & API GATEWAY                                                                  |\n"
+        "|  nginx Edge (TLS 1.3, WAF, Rate Limit) -> Node.js Express API (JWT + RBAC Policy Check) |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  4. ACTIVE & PLANNED AI AGENT ECOSYSTEM                                                 |\n"
-        "|  RAG Policy Agent | Action Agent | Payroll Agent | Attendance Audit Agent | Vision Agent |\n"
+        "|  4. AI AGENT ECOSYSTEM                                                                  |\n"
+        "|  RAG Policy Agent | Action Agent | (Planned: Payroll | Attendance Audit | Vision OCR)    |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  5. PROPRIETARY NATIVE AI ENGINE (Self-Hosted Custom Stack)                            |\n"
-        "|  Proprietary LLM & Tensor Engine (Zero API Keys) <-> Enterprise Relational & Vector DB  |\n"
+        "|  5. SELF-HOSTED INFERENCE & DATA                                                        |\n"
+        "|  vLLM / llama.cpp Serving (LoRA Adapters) <-> Postgres 16 + pgvector (Unified DB)        |\n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "                                        : (Expansion Phase)                                \n"
+        "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  6. FUTURE AI TECHNOLOGY ROADMAP                                                        |\n"
-        "|  Rust High-Performance Engine | Multi-Agent Swarm | SSE Streaming | GraphRAG | On-Device  |\n"
+        "|  CROSS-CUTTING: SECURITY & OPERATIONS                                                   |\n"
+        "|  SSO / IdP Auth | BullMQ + Redis Job Queue | Metrics & Tracing | Encrypted Backups   |\n"
         "+-----------------------------------------------------------------------------------------+"
     )
     
@@ -114,15 +114,15 @@ def create_architecture_doc(filename):
     r_chart.font.color.rgb = PRIMARY
 
     # Section 3: Custom AI Development Stack & Codebase Engineering
-    add_heading("3. Custom AI Development Stack & Codebase Engineering", level=1)
+    add_heading("3. Custom AI Infrastructure & Engineering Stack", level=1)
     
     tech_stack = [
-        ("1. AI Model Fine-Tuning Framework (Python, PyTorch & LoRA)", "The neural model is fine-tuned on custom Asian Christian Academy of India HR policies, leave rules, and SOPs using PyTorch, HuggingFace Transformers, and PEFT / LoRA (Low-Rank Adaptation)."),
-        ("2. Low-Latency Local Inference Engine (vLLM & llama.cpp)", "Model execution runs on a self-hosted inference engine powered by vLLM and llama.cpp (GGUF / GGML 4-bit & 8-bit Quantization), giving sub-millisecond tensor response speeds while keeping 100% of employee data private on local servers."),
-        ("3. Custom BPE Tokenizer & Domain Lexicon", "A custom Byte-Pair Encoding (BPE) tokenizer vocabulary is trained on ACA India organizational terminology, department codes (CPD, HOB, Media, Maintenance), and employee designations."),
-        ("4. High-Performance Core Language Strategy (Rust & C++)", "For core high-throughput tensor operations and vector search indexing, the underlying engine uses Rust (Burn / Candle framework) and C++ / CUDA for memory-safe execution on GPU hardware."),
-        ("5. Backend Gateway & Microservice Codebase (Node.js / Express)", "The backend microservice manages RAG document retrieval (ragService.js), autonomous function calling (agentService.js), and Human-In-The-Loop safety staging (agent_pending_actions)."),
-        ("6. Multi-Platform Client & Voice Interface (Flutter & Web Speech API)", "The client app is built with Flutter 3.x (Dart), featuring hands-free Speech-To-Text mic recognition (Web Speech API) and automatic SpeechSynthesis Voice-Over output with manual replay speaker buttons.")
+        ("1. Model Fine-Tuning Framework (Python, PyTorch & LoRA)", "The core intelligence engine uses open-weight base models (e.g. Llama 3 / Gemma 2) fine-tuned on Asian Christian Academy of India HR policies, leave rules, and SOP documents using PyTorch, HuggingFace Transformers, and PEFT / LoRA (Low-Rank Adaptation)."),
+        ("2. Dual-Tier Self-Hosted Inference Runtime (vLLM & llama.cpp)", "Model serving is structured in two operational tiers: vLLM (PagedAttention) provides primary GPU serving for high concurrent campus traffic (achieving 30–150 ms time-to-first-token), with llama.cpp (GGUF Quantization) acting as a low-power CPU fallback server."),
+        ("3. Private Self-Hosted STT & Native Platform TTS", "To preserve complete data privacy, client voice input uses self-hosted whisper.cpp / faster-whisper speech-to-text models hosted on the local gateway, paired with native platform SpeechSynthesis voice-over engines on client devices."),
+        ("4. Edge Security & TLS Termination (nginx & Express API Gateway)", "All traffic from mobile, web, and campus devices is encrypted in transit using TLS 1.3 HTTPS terminated at an nginx / Cloudflare edge node (with WAF and rate limiting) before routing to the Node.js / Express API service with JWT user authentication and RBAC policy enforcement."),
+        ("5. Unified Relational & Vector Storage (Postgres 16 + pgvector)", "Relational ERP tables (employees, leaves, tickets, audit logs) and 1536-dimensional RAG document embeddings (knowledge_chunks) are stored in a unified Postgres 16 + pgvector database, guaranteeing transactional consistency and simplified single-node backup routines (RPO 24h / RTO 4h)."),
+        ("6. Cross-Cutting Operations (BullMQ, Redis & Security Services)", "Long-running background tasks are managed via a BullMQ + Redis job queue. System health is monitored through open metrics and structured logging, backed by automated nightly AES-256 encrypted backups.")
     ]
 
     for title, desc in tech_stack:
@@ -139,12 +139,12 @@ def create_architecture_doc(filename):
     active_agents = [
         ("📚 RAG Policy Search Agent (ragService.js)", "Performs grounded vector & BM25 search over indexed company policy documents."),
         ("⚡ Autonomous Action Agent (agentService.js)", "Converts user prompts into backend tool calls (createTicket, applyLeave, sendMessageToUserOrChannel)."),
-        ("💬 Central Synchronization Agent (ChatService)", "Event bus synchronizing chat messages across floating chatbots, drawers, and team channels."),
-        ("🎙️ Voice & Speech Agent (VoiceHelper)", "Hands-free mic speech recognition & automatic SpeechSynthesis Voice-Over output."),
-        ("🛡️ HITL Safety Agent", "Evaluates risk classification (LOW/MEDIUM/HIGH) and stages high-risk actions in agent_pending_actions.")
+        ("💬 Central Event Bus (ChatService)", "Cross-window synchronization service broadcasting live chat updates."),
+        ("🎙️ Voice I/O Interface (VoiceHelper)", "Client-side voice interaction wrapper managing mic audio and TTS playback."),
+        ("🛡️ HITL Safety Manager", "Staging service placing high-risk database mutations in agent_pending_actions for confirmation.")
     ]
 
-    add_heading("4.1 Active Agents Created So Far", level=2)
+    add_heading("4.1 Active Core Agents & Services", level=2)
     for title, desc in active_agents:
         p_a = doc.add_paragraph()
         r_t = p_a.add_run(f"• {title}: ")
@@ -154,13 +154,13 @@ def create_architecture_doc(filename):
 
     future_agents = [
         ("💰 Payroll & Tax Intelligence Agent", "Computes salary breakdowns, tax regime optimizations, and reimbursement claims."),
-        ("⏰ Attendance & Shift Anomaly Audit Agent", "Scans clock-in patterns and proactively suggests regularization workflows."),
+        ("⏰ Attendance & Shift Anomaly Agent", "Scans clock-in patterns and proactively suggests regularization workflows."),
         ("📸 Multi-Modal Vision & OCR Agent", "Extracts line items from expense receipts, medical bills, and onboarding ID cards."),
-        ("🏷️ IT Diagnostic & Procurement Specialist", "Tracks asset health, compares vendor pricing, and monitors PO approvals (> ₹1 Lakh)."),
+        ("🏷️ IT Diagnostic & Asset Specialist", "Tracks asset health, compares vendor pricing, and monitors PO approvals (> ₹1 Lakh)."),
         ("🔍 Hierarchical Escalation Agent", "Traverses organizational reporting trees for complex cross-department escalations.")
     ]
 
-    add_heading("4.2 New AI Agents Planned for Future Development", level=2)
+    add_heading("4.2 Planned Expansion Agents", level=2)
     for title, desc in future_agents:
         p_f = doc.add_paragraph()
         r_t = p_f.add_run(f"• {title}: ")
@@ -169,14 +169,14 @@ def create_architecture_doc(filename):
         r_d.font.name = 'Arial'; r_d.font.size = Pt(9.5); r_d.font.color.rgb = TEXT_DARK
 
     # Section 5: Programming Language Evaluation
-    add_heading("5. Programming Language Evaluation for Custom AI Development", level=1)
+    add_heading("5. Programming Language Evaluation for Self-Hosted AI Infrastructure", level=1)
     
     table = doc.add_table(rows=1, cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
     
     hdr_cells = table.rows[0].cells
-    hdr_titles = ["Language", "Suitability", "Strengths for Proprietary AI Development"]
+    hdr_titles = ["Language", "Evaluation & Suitability", "Strengths for Self-Hosted AI"]
     for i, title in enumerate(hdr_titles):
         hdr_cells[i].text = title
         shading = parse_xml(r'<w:shd {} w:fill="003470"/>'.format(nsdecls('w')))
@@ -186,10 +186,10 @@ def create_architecture_doc(filename):
                 run.font.name = 'Arial'; run.font.size = Pt(9.5); run.font.bold = True; run.font.color.rgb = RGBColor(255, 255, 255)
 
     lang_data = [
-        ("🦀 Rust (RECOMMENDED CORE)", "Highest (5/5 Stars)", "Memory safety without GC pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WebAssembly compilation."),
-        ("🐍 Python", "High (4/5 Stars - R&D)", "Unrivaled AI ecosystem (PyTorch, JAX, HuggingFace, vLLM). Essential for model fine-tuning & research."),
-        ("⚡ C++ / CUDA", "High (4/5 Stars - Low Level)", "Foundation of GGML, llama.cpp, and TensorRT. Maximum low-level GPU hardware control."),
-        ("🔥 Mojo / Julia", "Emerging (3/5 Stars)", "Mojo compiles Python syntax to native C speed. High-performance matrix math capabilities.")
+        ("Rust", "5/5 - Recommended Core", "Memory safety without GC pauses, zero-cost abstractions, native C/CUDA interop, high-speed tensor libraries (Candle / Burn), WebAssembly compilation."),
+        ("Python", "4/5 - Essential Fine-Tuning", "Unrivaled AI ecosystem (PyTorch, JAX, HuggingFace, vLLM). Standard language for dataset preparation and LoRA adapter fine-tuning."),
+        ("C++ / CUDA", "4/5 - Low-Level GPU Kernels", "Foundation of GGUF, llama.cpp, and TensorRT. Maximum low-level GPU hardware control."),
+        ("Mojo", "3/5 - Emerging AI Tech", "Python superset compiling to native C speed with high-performance matrix math capabilities.")
     ]
 
     for lang, star, desc in lang_data:
