@@ -25,16 +25,16 @@ def create_architecture_doc(filename):
     # Title
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_title = p_title.add_run("HRMs-ERP & HRMs-AI Engine\nMaster Architecture & RAG Ingestion Blueprint")
+    run_title = p_title.add_run("HRMs-ERP & Proprietary Custom AI Engine\nMaster Architecture & 10-Year Strategy Blueprint")
     run_title.font.name = 'Arial'
-    run_title.font.size = Pt(24)
+    run_title.font.size = Pt(22)
     run_title.font.bold = True
     run_title.font.color.rgb = PRIMARY
     
     # Subtitle
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_sub = p_sub.add_run("Enterprise Architecture, RAG Knowledge Feeding Pipeline & Advanced Technology Roadmap\nVersion 2.5.0 Production | August 2026")
+    run_sub = p_sub.add_run("Proprietary AI Strategy, Agent Portfolio & 10-Year Native Language Evaluation\nVersion 3.0.0 Custom AI | August 2026")
     run_sub.font.name = 'Arial'
     run_sub.font.size = Pt(11)
     run_sub.font.color.rgb = MUTED
@@ -46,29 +46,30 @@ def create_architecture_doc(filename):
         h = doc.add_paragraph()
         run = h.add_run(text)
         run.font.name = 'Arial'
-        run.font.size = Pt(16 if level==1 else 13)
+        run.font.size = Pt(15 if level==1 else 12.5)
         run.font.bold = True
         run.font.color.rgb = PRIMARY
         h.paragraph_format.space_before = Pt(14)
         h.paragraph_format.space_after = Pt(6)
         return h
 
-    # Section 1: Executive Summary
-    add_heading("1. Executive Summary", level=1)
+    # Section 1: Executive Summary & Proprietary AI Strategy
+    add_heading("1. Executive Summary & Proprietary Custom AI Strategy", level=1)
     p = doc.add_paragraph()
     r = p.add_run(
-        "The HRMs-ERP & HRMs-AI System combines a Flutter 3.x multi-platform ERP frontend with a dedicated Node.js/Express AI microservice powered by Google Gemini generative models. "
-        "The architecture delivers Policy RAG Document Search, Prompt-Driven Autonomous Action Execution (Tickets, Leaves, Messages), hands-free Speech-To-Text input, and automatic Text-To-Speech Voice-Over audio responses."
+        "This master architectural blueprint defines the strategic roadmap for developing a 100% proprietary, self-hosted AI engine for HRMs-ERP. "
+        "The system operates with complete independence—eliminating third-party cloud API keys (zero OpenAI, zero Claude, zero Gemini API keys)—guaranteeing total data privacy, "
+        "zero per-token API costs, and sub-millisecond execution over a self-hosted neural model architecture."
     )
     r.font.name = 'Arial'
-    r.font.size = Pt(10.5)
+    r.font.size = Pt(10)
 
     # Section 2: Master Architecture Chart
-    add_heading("2. Master System Architecture Chart", level=1)
+    add_heading("2. Master System Architecture Chart (Self-Hosted Custom AI)", level=1)
     
     chart_box = doc.add_paragraph()
-    chart_box.paragraph_format.space_before = Pt(8)
-    chart_box.paragraph_format.space_after = Pt(8)
+    chart_box.paragraph_format.space_before = Pt(6)
+    chart_box.paragraph_format.space_after = Pt(6)
     
     chart_text = (
         "+-----------------------------------------------------------------------------------------+\n"
@@ -90,125 +91,97 @@ def create_architecture_doc(filename):
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  4. HRMs-AI ENGINE & RAG KNOWLEDGE INGESTION                                            |\n"
-        "|  RAG Grounded Policy Chatbot (ragService)  |  Autonomous Action Agent (agentService)    |\n"
-        "|  Tools: createTicket, assignTicket, applyLeave, sendMessageToUserOrChannel             |\n"
+        "|  4. ACTIVE & FUTURE AI AGENT ECOSYSTEM                                                  |\n"
+        "|  RAG Policy Agent | Action Agent | Payroll Agent | Attendance Audit Agent | Vision Agent |\n"
         "+-----------------------------------------------------------------------------------------+\n"
         "                                        |                                                  \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  5. ENTERPRISE DATABASE & CLOUD LAYER                                                   |\n"
-        "|  Google Gemini (gemini-3.6-flash / embedding-001) <-> Enterprise Relational Database    |\n"
+        "|  5. PROPRIETARY NATIVE AI ENGINE (Self-Hosted / Built from Scratch)                    |\n"
+        "|  Proprietary LLM & Tensor Engine (Zero API Keys) <-> Enterprise Relational & Vector DB  |\n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "                                        : (Next Phase)                                     \n"
+        "                                        : (10-Year Expansion)                              \n"
         "                                        v                                                  \n"
         "+-----------------------------------------------------------------------------------------+\n"
-        "|  6. ADVANCED TECHNOLOGIES ROADMAP                                                       |\n"
-        "|  Vision AI OCR | Multi-Agent Swarm | SSE Real-time Streaming | GraphRAG | On-Device SLM   |\n"
+        "|  6. 10-YEAR FUTURE AI ROADMAP (2026 - 2036)                                             |\n"
+        "|  Rust High-Performance Engine | Multi-Agent Swarm | SSE Streaming | GraphRAG | On-Device  |\n"
         "+-----------------------------------------------------------------------------------------+"
     )
     
     r_chart = chart_box.add_run(chart_text)
     r_chart.font.name = 'Courier New'
-    r_chart.font.size = Pt(8.5)
+    r_chart.font.size = Pt(8)
     r_chart.font.bold = True
     r_chart.font.color.rgb = PRIMARY
 
-    # Section 3: Feeding Knowledge to the AI Agent (RAG Pipeline)
-    add_heading("3. Feeding Knowledge to the AI Agent (RAG Ingestion Pipeline)", level=1)
+    # Section 3: AI Agent Portfolio (Created vs Planned)
+    add_heading("3. AI Agent Portfolio: Active vs. Future Roadmap", level=1)
     
-    rag_steps = [
-        ("Step 1: Document Collection & Raw Extraction", "Company knowledge is gathered from raw files including HR Leave Manuals, Employee Handbooks, IT/AV SOPs, Benefits Guidelines, and Resolved Ticket Histories."),
-        ("Step 2: Semantic Chunking & Metadata Tagging", "Long documents are broken into optimal 500-1000 character overlapping text chunks. Each chunk is tagged with structured metadata (category, department, target_role, updated_timestamp)."),
-        ("Step 3: High-Dimensional Vector Embedding", "Text chunks are passed through the Google Gemini Embedding API (gemini-embedding-001) to generate 3072-dimensional math vector representations."),
-        ("Step 4: Dual Indexing (Vector + BM25 Full-Text)", "Chunks, metadata, and 3072-dim vector embeddings are stored in the knowledge_chunks database table with both BM25 Full-Text and Cosine Similarity vector indexes."),
-        ("Step 5: Real-Time Hybrid Retrieval & Prompt Grounding", "When an employee asks a question, the query vector is generated and searched using Hybrid Search (Cosine Similarity + BM25). Top K matched contexts are injected into Gemini system prompts for zero-hallucination answers.")
+    active_agents = [
+        ("📚 RAG Policy Search Agent (ragService.js)", "Performs grounded vector & BM25 search over indexed company policy documents."),
+        ("⚡ Autonomous Action Agent (agentService.js)", "Converts user prompts into backend tool calls (createTicket, applyLeave, sendMessageToUserOrChannel)."),
+        ("💬 Central Synchronization Agent (ChatService)", "Event bus synchronizing chat messages across floating chatbots, drawers, and team channels."),
+        ("🎙️ Voice & Speech Agent (VoiceHelper)", "Hands-free mic speech recognition & automatic SpeechSynthesis Voice-Over output."),
+        ("🛡️ HITL Safety Agent", "Evaluates risk classification (LOW/MEDIUM/HIGH) and stages high-risk actions in agent_pending_actions.")
     ]
 
-    for step_title, step_desc in rag_steps:
-        p_step = doc.add_paragraph()
-        p_step.paragraph_format.space_before = Pt(4)
-        p_step.paragraph_format.space_after = Pt(4)
-        
-        r_st = p_step.add_run(f"• {step_title}: ")
-        r_st.font.name = 'Arial'
-        r_st.font.size = Pt(10)
-        r_st.font.bold = True
-        r_st.font.color.rgb = PRIMARY
+    add_heading("3.1 Active Agents Created So Far", level=2)
+    for title, desc in active_agents:
+        p_a = doc.add_paragraph()
+        r_t = p_a.add_run(f"• {title}: ")
+        r_t.font.name = 'Arial'; r_t.font.size = Pt(9.5); r_t.font.bold = True; r_t.font.color.rgb = PRIMARY
+        r_d = p_a.add_run(desc)
+        r_d.font.name = 'Arial'; r_d.font.size = Pt(9.5); r_d.font.color.rgb = TEXT_DARK
 
-        r_sd = p_step.add_run(step_desc)
-        r_sd.font.name = 'Arial'
-        r_sd.font.size = Pt(10)
-        r_sd.font.color.rgb = TEXT_DARK
+    future_agents = [
+        ("💰 Payroll & Tax Intelligence Agent", "Computes salary breakdowns, tax regime optimizations, and reimbursement claims."),
+        ("⏰ Attendance & Shift Anomaly Audit Agent", "Scans clock-in patterns and proactively suggests regularization workflows."),
+        ("📸 Multi-Modal Vision & OCR Agent", "Extracts line items from expense receipts, medical bills, and onboarding ID cards."),
+        ("🏷️ IT Diagnostic & Procurement Specialist", "Tracks asset health, compares vendor pricing, and monitors PO approvals (> ₹1 Lakh)."),
+        ("🔍 Hierarchical Escalation Agent", "Traverses organizational reporting trees for complex cross-department escalations.")
+    ]
 
-    # Section 4: Layer Specifications Table
-    add_heading("4. Core Subsystem Layer Breakdown", level=1)
+    add_heading("3.2 New AI Agents Planned for Future Development", level=2)
+    for title, desc in future_agents:
+        p_f = doc.add_paragraph()
+        r_t = p_f.add_run(f"• {title}: ")
+        r_t.font.name = 'Arial'; r_t.font.size = Pt(9.5); r_t.font.bold = True; r_t.font.color.rgb = PRIMARY
+        r_d = p_f.add_run(desc)
+        r_d.font.name = 'Arial'; r_d.font.size = Pt(9.5); r_d.font.color.rgb = TEXT_DARK
+
+    # Section 4: 10-Year Programming Language Evaluation
+    add_heading("4. Strategic 10-Year Programming Language Evaluation (2026–2036)", level=1)
     
     table = doc.add_table(rows=1, cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
     
     hdr_cells = table.rows[0].cells
-    hdr_titles = ["Layer", "Architecture Component", "Technologies & Key Features"]
+    hdr_titles = ["Language", "10-Year Future Suitability", "Strengths for Proprietary AI Development"]
     for i, title in enumerate(hdr_titles):
         hdr_cells[i].text = title
         shading = parse_xml(r'<w:shd {} w:fill="003470"/>'.format(nsdecls('w')))
         hdr_cells[i]._tc.get_or_add_tcPr().append(shading)
         for p in hdr_cells[i].paragraphs:
             for run in p.runs:
-                run.font.name = 'Arial'
-                run.font.size = Pt(10)
-                run.font.bold = True
-                run.font.color.rgb = RGBColor(255, 255, 255)
+                run.font.name = 'Arial'; run.font.size = Pt(9.5); run.font.bold = True; run.font.color.rgb = RGBColor(255, 255, 255)
 
-    layers_data = [
-        ("Layer 1", "Frameworks & UI Engine", "Flutter 3.x (Dart), Riverpod, GoRouter, HTML5 Web Speech API (STT), Web SpeechSynthesis API (TTS)."),
-        ("Layer 2", "ERP Application Modules", "Dashboard (Presence, Clock-In), Me (Attendance, Leaves), Helpdesk (8 Departments), Teams Chat."),
-        ("Layer 3", "API Gateways & Sync", "Central ChatService Event Bus (ValueNotifier) <-> Express API Gateway (http://localhost:4001/api/ai)."),
-        ("Layer 4", "HRMs-AI Engine", "Intent Router, RAG Grounded Policy Chatbot (ragService.js), Autonomous Action Agent (agentService.js), Function Tools."),
-        ("Layer 5", "Database & AI Cloud", "Google Gemini Cloud (gemini-3.6-flash & gemini-embedding-001), Enterprise Relational Database."),
-        ("Layer 6", "Advanced Tech Roadmap", "Vision AI OCR, Multi-Agent Swarm, Real-Time SSE Token Streaming, GraphRAG Knowledge Graphs, Qdrant Vector DB, On-Device Whisper.")
+    lang_data = [
+        ("🦀 Rust (RECOMMENDED CORE)", "Highest (5/5 Stars)", "Memory safety without GC pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WebAssembly compilation."),
+        ("🐍 Python", "High (4/5 Stars - R&D)", "Unrivaled AI ecosystem (PyTorch, JAX, HuggingFace, vLLM). Essential for model fine-tuning & research."),
+        ("⚡ C++ / CUDA", "High (4/5 Stars - Low Level)", "Foundation of GGML, llama.cpp, and TensorRT. Maximum low-level GPU hardware control."),
+        ("🔥 Mojo / Julia", "Emerging (3/5 Stars)", "Mojo compiles Python syntax to native C speed. High-performance matrix math capabilities.")
     ]
 
-    for layer_id, name, desc in layers_data:
+    for lang, star, desc in lang_data:
         row_cells = table.add_row().cells
-        row_cells[0].text = layer_id
-        row_cells[1].text = name
+        row_cells[0].text = lang
+        row_cells[1].text = star
         row_cells[2].text = desc
         for cell in row_cells:
             for p in cell.paragraphs:
                 for run in p.runs:
-                    run.font.name = 'Arial'
-                    run.font.size = Pt(9.5)
-                    run.font.color.rgb = TEXT_DARK
-
-    # Section 5: Advanced Technologies Roadmap
-    add_heading("5. Advanced Technologies Roadmap", level=1)
-    
-    tech_items = [
-        ("📸 Vision AI OCR Analysis", "Integrate Gemini Vision to parse expense receipts, travel invoices, medical bills, and employee ID proofs into tickets."),
-        ("👥 Multi-Agent Swarm Architecture", "Decouple monolithic AI into specialized subagents (Payroll Agent, Attendance Audit Agent, IT Diagnostic Agent) via Redis Pub/Sub."),
-        ("⚡ Real-Time SSE Token Streaming", "Use Server-Sent Events (SSE) and WebSockets for token-by-token live typing effects and instant push alerts."),
-        ("🔍 GraphRAG & Knowledge Graphs", "Integrate Neo4j / Memgraph to map employee reporting hierarchies, asset dependencies, and escalation trees."),
-        ("💾 Dedicated Vector Database", "Migrate vector storage to Qdrant or pgvector with HNSW indexing for sub-millisecond similarity search."),
-        ("📱 Zero-Latency On-Device Voice AI", "Run quantized Whisper models via WebAssembly inside browser clients for offline voice recognition.")
-    ]
-
-    for title, desc in tech_items:
-        p_item = doc.add_paragraph()
-        p_item.paragraph_format.space_before = Pt(4)
-        p_item.paragraph_format.space_after = Pt(4)
-        
-        r_t = p_item.add_run(f"• {title}: ")
-        r_t.font.name = 'Arial'
-        r_t.font.size = Pt(10)
-        r_t.font.bold = True
-        r_t.font.color.rgb = PRIMARY
-
-        r_d = p_item.add_run(desc)
-        r_d.font.name = 'Arial'
-        r_d.font.size = Pt(10)
-        r_d.font.color.rgb = TEXT_DARK
+                    run.font.name = 'Arial'; run.font.size = Pt(9); run.font.color.rgb = TEXT_DARK
 
     doc.save(filename)
     print(f"Successfully generated Word document: {filename}")

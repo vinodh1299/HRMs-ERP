@@ -1,8 +1,22 @@
-# HRMs-ERP & HRMs-AI Engine — Master Architecture Blueprint
+# HRMs-ERP & Proprietary Custom AI Engine — Master Architecture Blueprint
+
+**Document Version**: 3.0.0 (Proprietary Custom AI & 10-Year Technology Strategy)  
+**Last Updated**: August 2026  
 
 ---
 
-## 1. Master System Architecture Chart
+## 1. Executive Summary & Proprietary AI Vision
+
+This master architectural blueprint defines the technical specification, system design, agent portfolio, and 10-year technology roadmap for developing a **100% proprietary, self-hosted AI Engine for HRMs-ERP**.
+
+The vision transitions the system from third-party API dependencies (zero OpenAI, zero Claude, zero Google API keys) to an **independent, self-hosted neural intelligence model**. This guarantees:
+1. **100% Data Privacy & Security**: Enterprise HR records, employee contracts, and attendance data never leave local private infrastructure.
+2. **Zero API Token Billing**: Unlimited usage across all enterprise employees with zero recurring per-prompt API costs.
+3. **Sub-Millisecond Inference Latency**: Optimized native tensor execution yielding instant responses for voice and chat touchpoints.
+
+---
+
+## 2. Master System Architecture Chart (Self-Hosted Custom AI)
 
 ```mermaid
 flowchart TD
@@ -25,7 +39,7 @@ flowchart TD
     
     L1 --> L2
 
-    %% LAYER 3: API GATEWAY & COMMUNICATION BRIDGES
+    %% LAYER 3: API GATEWAY & BRIDGES
     subgraph L3 ["3. 🌐 API Gateways & Communication Bridges"]
         ChatSync["Central ChatService Engine\n(ValueNotifier Live Cross-Window Event Bus)"]
         APIGateway["HRMs-AI Service API Gateway\n(Node.js Express @ http://localhost:4001/api/ai)"]
@@ -34,111 +48,81 @@ flowchart TD
 
     L2 --> ChatSync
 
-    %% LAYER 4: AI AGENTS & RAG KNOWLEDGE INGESTION
-    subgraph L4 ["4. 🤖 HRMs-AI Agents, Assistants & Intelligence Engine"]
-        IntentRouter{"Intent Router"}
+    %% LAYER 4: ACTIVE & FUTURE AI AGENTS
+    subgraph L4 ["4. 🤖 Active & Future AI Agent Ecosystem"]
+        IntentRouter{"Proprietary Intent Router"}
         
-        RAGAssistant["📚 RAG Grounded Policy Chatbot\n(ragService.js - Document Hybrid Search)"]
+        RAGAssistant["📚 RAG Policy Search Agent\n(ragService.js - Hybrid Search)"]
         ActionAgent["⚡ Autonomous Action Agent\n(agentService.js - ReAct Function Calling)"]
+        PayrollAgent["💰 Payroll & Tax Intelligence Agent\n(Salary Breakdowns & Tax Calculations)"]
+        AuditAgent["⏰ Attendance & Shift Audit Agent\n(Anomaly Detection & Auto Regularization)"]
+        VisionAgent["📸 Vision OCR Expense Agent\n(Receipts, Invoices & ID Verification)"]
         
-        ToolSet["Function Tools:\n• createTicket\n• assignTicket\n• applyLeave\n• sendMessageToUserOrChannel\n• queryTeamAttendance"]
-        HITLCheck{"HITL Risk Classification\n(LOW, MEDIUM, HIGH Risk)"}
-        
-        IntentRouter -->|Policy Question| RAGAssistant
-        IntentRouter -->|App Action Command| ActionAgent
-        ActionAgent --> ToolSet
-        ToolSet --> HITLCheck
+        IntentRouter --> RAGAssistant
+        IntentRouter --> ActionAgent
+        IntentRouter --> PayrollAgent
+        IntentRouter --> AuditAgent
+        IntentRouter --> VisionAgent
     end
 
     APIGateway --> IntentRouter
 
-    %% LAYER 5: DATABASE & EXTERNAL AI CLOUD
-    subgraph L5 ["5. 💾 Enterprise Database & AI Cloud Layer"]
-        GeminiAPI["Google Gemini Cloud API\n(gemini-3.6-flash Generative & gemini-embedding-001 Embeddings)"]
-        EnterpriseDB[("Enterprise Relational Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
+    %% LAYER 5: PROPRIETARY NATIVE AI ENGINE
+    subgraph L5 ["5. 🧠 Proprietary Native AI Engine (Self-Hosted / Built from Scratch)"]
+        CustomLLM["Proprietary Custom LLM & Neural Tensor Engine\n(Self-Hosted | Zero Third-Party API Keys | 100% Private)"]
+        EnterpriseDB[("Enterprise Relational & Vector Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
         
-        RAGAssistant <--> GeminiAPI
-        ActionAgent <--> GeminiAPI
-        HITLCheck <--> EnterpriseDB
+        L4 <--> CustomLLM
+        CustomLLM <--> EnterpriseDB
     end
 
     L4 --> L5
 
-    %% LAYER 6: NEW ADVANCED TECHNOLOGIES ROADMAP
-    subgraph L6 ["6. 🚀 New & Advanced Technologies Roadmap (Future Implementations)"]
-        VisionAI["📸 Vision AI OCR\n(Expense Receipts, Medical Bills & Document Parsing)"]
-        SwarmAI["👥 Multi-Agent Swarm Architecture\n(Specialized Payroll, Attendance & IT Subagents)"]
-        SSEStream["⚡ Real-Time SSE Token Streaming\n& WebSockets Push Notifications"]
-        GraphRAG["🔍 GraphRAG Knowledge Graphs\n(Neo4j Reporting Hierarchy & Escalation Trees)"]
-        VectorDB["💾 Dedicated Vector Database\n(Qdrant / pgvector with HNSW Indexing)"]
-        OnDeviceAI["📱 Zero-Latency On-Device Voice AI\n(WebAssembly Whisper Speech Processing)"]
+    %% LAYER 6: 10-YEAR FUTURE TECH ROADMAP
+    subgraph L6 ["6. 🚀 10-Year Future AI Technology Roadmap (2026 - 2036)"]
+        RustCore["🦀 Rust High-Performance Tensor Engine\n(Memory-Safe Sub-Millisecond Native Inference)"]
+        SwarmOrch["👥 Autonomous Multi-Agent Swarm\n(Event-Driven Agent Collaboration via Redis)"]
+        SSEStream["⚡ Real-Time Token Streaming & WebSockets"]
+        GraphRAG["🔍 GraphRAG Knowledge Graphs\n(Neo4j Hierarchy & Escalation Trees)"]
+        OnDeviceAI["📱 Zero-Latency WebAssembly On-Device Speech AI"]
     end
 
-    L5 -.->|Next Upgrade Phase| L6
+    L5 -.->|Next 10-Year Expansion Phase| L6
 ```
 
 ---
 
-## 2. Feeding Knowledge to the AI Agent (RAG Pipeline)
+## 3. AI Agent Portfolio: Active vs. Future Roadmap
 
-To ensure the AI Agent answers company questions accurately without hallucinations, raw enterprise documents are processed through a 5-step Knowledge Feeding & Grounding Pipeline:
+### 3.1 AI Agents Created So Far
+- **📚 RAG Policy Search Agent (`ragService.js`)**: Performs hybrid BM25 + vector similarity search over indexed HR policies, leave handbooks, and SOP documents.
+- **⚡ Autonomous Action Agent (`agentService.js`)**: Converts user prompts into backend function tool calls (`createTicket`, `applyLeave`, `sendMessageToUserOrChannel`, `queryTeamAttendance`).
+- **💬 Central Synchronization Agent (`ChatService`)**: Event bus synchronizing messages across floating dashboard chatbots, slide-out drawers, and team channels.
+- **🎙️ Voice & Speech Agent (`VoiceHelper`)**: Hands-free mic speech recognition and automatic SpeechSynthesis Voice-Over audio output.
+- **🛡️ Human-In-The-Loop (HITL) Safety Agent**: Classifies action risk levels and stages high-risk operations in `agent_pending_actions` for user confirmation cards.
 
-1. **Document Collection & Raw Extraction**:
-   * Knowledge is gathered from raw company files including HR Leave Manuals, Employee Handbooks, IT/AV Equipment SOPs, Benefits Guides, and Resolved Support Tickets.
-2. **Semantic Chunking & Metadata Tagging**:
-   * Long policy documents are broken down into optimal 500-1000 character overlapping text chunks. Each chunk is tagged with structured metadata (`category`, `department`, `target_role`, `updated_timestamp`).
-3. **High-Dimensional Vector Embedding**:
-   * Text chunks are passed through the Google Gemini Embedding API (`gemini-embedding-001`) to convert human text into a 3072-dimensional vector math representation.
-4. **Dual Indexing (Vector + BM25 Full-Text)**:
-   * Chunks, metadata, and 3072-dim vector embeddings are stored in the `knowledge_chunks` database table with both BM25 Full-Text keywords and vector Cosine Similarity distance indexes.
-5. **Real-Time Hybrid Search & Grounded Prompt Synthesis**:
-   * When an employee asks a policy question, the query vector is generated and searched using Hybrid Search (Cosine Similarity + BM25). The top K matched contexts are injected into Gemini system prompts to generate 100% accurate, policy-grounded answers.
-
----
-
-## 3. Core Layer Specifications Breakdown
-
-### 🛠️ Layer 1: Frameworks & Core UI Engine
-- **Frontend Stack**: Flutter 3.x for Web & Mobile built with Dart.
-- **State Management**: Riverpod providers combined with custom `ValueNotifier` event buses.
-- **Voice Engine**: HTML5 Web Speech API (`startSpeechRecognition`) for Speech-to-Text input, paired with Web SpeechSynthesis API (`window.speakText`) for automatic Voice-Over audio responses.
+### 3.2 New AI Agents Planned for Future Development
+- **💰 Payroll & Tax Intelligence Agent**: Calculates monthly salary breakdowns, projects tax optimizations, and automates reimbursement approvals.
+- **⏰ Attendance & Shift Anomaly Audit Agent**: Scans daily clock-in patterns, detects shift anomalies, and proactively suggests regularization requests.
+- **📸 Multi-Modal Vision & OCR Agent**: Scans uploaded expense receipts, travel bills, medical claims, and employee ID cards into ERP tickets.
+- **🏷️ IT Diagnostic & Asset Procurement Specialist**: Monitors hardware health, compares vendor prices, and tracks high-value purchase orders (> ₹1 Lakh).
+- **🔍 Hierarchical Escalation Agent**: Traverses organizational reporting graphs for complex cross-department approval escalations.
 
 ---
 
-### 🏢 Layer 2: ERP Application Modules
-- **Home Dashboard**: Quick clock-in/out, live department staff presence modal, announcements, and polls.
-- **Me Module**: Attendance logging, work modes (Office, Home, Field), leave regularization, and leave balances (Casual, Sick, Earned).
-- **Helpdesk & Department Portals**: Service ticket management across IT, HR, Maintenance, Finance, CPD, Inventory, HOB, and Media.
-- **My Teams Chat**: Multi-channel communication (`#general`, `#maintenance-updates`, `#finance-reimbursements`, `Gemini AI Assistant`, DMs).
+## 4. Strategic 10-Year Programming Language Evaluation (2026–2036)
 
----
+When engineering a custom AI engine built to last for the next 10 years without third-party API keys, selecting the core programming language is a critical decision:
 
-### 🌐 Layer 3: API Gateways & Communication Bridges
-- **Frontend Sync Gateway**: `ChatService` routes prompts from floating chatbot widgets, AI drawers, and chat screens, synchronizing target conversations live.
-- **Backend API Gateway**: Node.js/Express service at `http://localhost:4001/api/ai` exposing `/chat`, `/agent`, `/confirm`, and `/decline` endpoints.
+| Language | 10-Year Future Suitability | Key Strengths for Custom AI | Strategic Role |
+| :--- | :--- | :--- | :--- |
+| **🦀 Rust (RECOMMENDED FOR CORE ENGINE)** | ⭐⭐⭐⭐⭐ (Highest Future Proofing) | Memory safety without Garbage Collection (GC) pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WebAssembly compilation. | **Core High-Throughput Tensor & Inference Engine** |
+| **🐍 Python** | ⭐⭐⭐⭐ (Ideal for R&D & Fine-Tuning) | Unrivaled AI ecosystem (PyTorch, JAX, HuggingFace, vLLM). Essential for model fine-tuning & research. | **Dataset Preparation, Model Training & Fine-Tuning (LoRA)** |
+| **⚡ C++ / CUDA** | ⭐⭐⭐⭐ (Low-Level GPU Kernels) | Foundation of GGML, llama.cpp, and TensorRT. Maximum low-level GPU hardware control. | **Low-Level CUDA Kernel Optimization** |
+| **🔥 Mojo / Julia** | ⭐⭐⭐ (Emerging Contenders) | Mojo compiles Python syntax to native C speed. High-performance matrix math capabilities. | **Future Secondary Research Exploration** |
 
----
-
-### 🤖 Layer 4: HRMs-AI Agents, Assistants & Intelligence Engine
-- **RAG Grounded Policy Chatbot (`ragService.js`)**: Hybrid BM25 FullText + Cosine Similarity search over 3072-dimensional vector embeddings, delivering 100% grounded policy answers without hallucinations.
-- **Autonomous Action Agent (`agentService.js` & `toolRegistry.js`)**: Converts natural language prompts into function tool calls (`createTicket`, `assignTicket`, `applyLeave`, `sendMessageToUserOrChannel`, `queryTeamAttendance`).
-- **Human-In-The-Loop (HITL) Security**: High-risk actions are staged in `agent_pending_actions` and require explicit user approval cards (`CONFIRM` / `DECLINE`).
-
----
-
-### 💾 Layer 5: Database & AI Cloud Layer
-- **Google Gemini Cloud**: `gemini-3.6-flash` for high-speed generative reasoning and function calling; `gemini-embedding-001` for vector embedding generation.
-- **Enterprise Relational Database**: Stores structured tables (`tickets`, `leaves`, `attendance`, `employees`, `chat_messages`) and AI tables (`knowledge_chunks`, `agent_action_log`, `agent_pending_actions`).
-
----
-
-### 🚀 Layer 6: New & Advanced Technologies Roadmap
-
-| Technology | Purpose & Business Value |
-| :--- | :--- |
-| 📸 **Vision AI OCR** | Scans uploaded employee expense receipts, travel invoices, and medical bills to automatically extract line items and auto-fill reimbursement tickets. |
-| 👥 **Multi-Agent Swarm** | Decouples monolithic AI into specialized subagents (*Payroll Agent*, *Attendance Audit Agent*, *IT Diagnostic Agent*) communicating asynchronously. |
-| ⚡ **Real-Time SSE Token Streaming** | Uses Server-Sent Events (SSE) and WebSockets for token-by-token live typing effects and instant push alerts when messages/tickets are dispatched. |
-| 🔍 **GraphRAG Knowledge Graphs** | Integrates Neo4j / Memgraph to map employee reporting hierarchies and team dependencies for complex multi-hop escalation queries. |
-| 💾 **Dedicated Vector Database** | Migrates vector storage to Qdrant or `pgvector` with HNSW indexing for sub-millisecond similarity search across millions of document chunks. |
-| 📱 **On-Device Voice AI** | Runs quantized Whisper models via WebAssembly inside the browser for zero-latency, offline voice recognition without cloud network lag. |
+### 💡 10-Year Strategic Recommendation: Hybrid Microservice Architecture
+* **Rust (or C++/CUDA)**: Powering the core high-throughput, low-latency AI Inference Engine.
+* **Python**: Managing offline model training, dataset preparation, and fine-tuning (LoRA).
+* **Node.js / Express**: Managing API Gateway routing (`port 4001`).
+* **Dart (Flutter)**: Delivering the multi-platform Client UI for Web, Mobile, and Desktop (`port 4000`).

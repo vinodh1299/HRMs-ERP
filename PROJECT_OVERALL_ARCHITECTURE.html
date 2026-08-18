@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HRMs-ERP & HRMs-AI Engine — Master Architecture Blueprint</title>
+  <title>HRMs-ERP & Proprietary AI Engine — Master Architecture Blueprint</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root {
@@ -183,50 +183,6 @@
       left: 0;
     }
 
-    .rag-pipeline {
-      background: #F8FAFC;
-      border: 1px solid #CBD5E1;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 16px;
-    }
-
-    .rag-step {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .rag-step:last-child {
-      margin-bottom: 0;
-    }
-
-    .step-num {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 14px;
-    }
-
-    .step-content h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-
-    .step-content p {
-      font-size: 13px;
-      color: var(--text-main);
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -282,21 +238,21 @@
   <div class="container">
     <header>
       <div class="title-group">
-        <h1>HRMs-ERP & HRMs-AI Master Architecture Blueprint</h1>
-        <p>Enterprise System Design, Subsystem Specifications & RAG Knowledge Ingestion</p>
+        <h1>HRMs-ERP & Proprietary Custom AI Engine</h1>
+        <p>10-Year Architecture Roadmap, Agent Portfolio & Native AI Language Strategy</p>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
         <button class="btn-print" onclick="window.print()">📄 Save as PDF / Print</button>
         <div class="badge-bar">
-          <span class="badge">v2.5.0 Production</span>
-          <span class="badge green">Active Sync</span>
+          <span class="badge">v3.0.0 Custom AI</span>
+          <span class="badge green">100% On-Premise & Independent</span>
         </div>
       </div>
     </header>
 
     <!-- SECTION 1: MASTER CHART -->
     <section>
-      <h2>1. Master System Architecture Chart</h2>
+      <h2>1. Master System Architecture Chart (Self-Hosted Custom AI)</h2>
       <div class="chart-box">
         <pre class="mermaid">
 flowchart TD
@@ -319,7 +275,7 @@ flowchart TD
     
     L1 --> L2
 
-    %% LAYER 3: API GATEWAY & COMMUNICATION BRIDGES
+    %% LAYER 3: API GATEWAY & BRIDGES
     subgraph L3 ["3. 🌐 API Gateways & Communication Bridges"]
         ChatSync["Central ChatService Engine\n(ValueNotifier Live Cross-Window Event Bus)"]
         APIGateway["HRMs-AI Service API Gateway\n(Node.js Express @ http://localhost:4001/api/ai)"]
@@ -328,192 +284,131 @@ flowchart TD
 
     L2 --> ChatSync
 
-    %% LAYER 4: AI AGENTS & RAG KNOWLEDGE INGESTION
-    subgraph L4 ["4. 🤖 HRMs-AI Agents, Assistants & Intelligence Engine"]
-        IntentRouter{"Intent Router"}
+    %% LAYER 4: ACTIVE & FUTURE AI AGENTS
+    subgraph L4 ["4. 🤖 Active & Future AI Agent Ecosystem"]
+        IntentRouter{"Proprietary Intent Router"}
         
-        RAGAssistant["📚 RAG Grounded Policy Chatbot\n(ragService.js - Document Hybrid Search)"]
+        RAGAssistant["📚 RAG Policy Search Agent\n(ragService.js - Hybrid Search)"]
         ActionAgent["⚡ Autonomous Action Agent\n(agentService.js - ReAct Function Calling)"]
+        PayrollAgent["💰 Payroll & Tax Intelligence Agent\n(Salary Breakdowns & Tax Calculations)"]
+        AuditAgent["⏰ Attendance & Shift Audit Agent\n(Anomaly Detection & Auto Regularization)"]
+        VisionAgent["📸 Vision OCR Expense Agent\n(Receipts, Invoices & ID Verification)"]
         
-        ToolSet["Function Tools:\n• createTicket\n• assignTicket\n• applyLeave\n• sendMessageToUserOrChannel\n• queryTeamAttendance"]
-        HITLCheck{"HITL Risk Classification\n(LOW, MEDIUM, HIGH Risk)"}
-        
-        IntentRouter -->|Policy Question| RAGAssistant
-        IntentRouter -->|App Action Command| ActionAgent
-        ActionAgent --> ToolSet
-        ToolSet --> HITLCheck
+        IntentRouter --> RAGAssistant
+        IntentRouter --> ActionAgent
+        IntentRouter --> PayrollAgent
+        IntentRouter --> AuditAgent
+        IntentRouter --> VisionAgent
     end
 
     APIGateway --> IntentRouter
 
-    %% LAYER 5: DATABASE & EXTERNAL AI CLOUD
-    subgraph L5 ["5. 💾 Enterprise Database & AI Cloud Layer"]
-        GeminiAPI["Google Gemini Cloud API\n(gemini-3.6-flash Generative & gemini-embedding-001 Embeddings)"]
-        EnterpriseDB[("Enterprise Relational Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
+    %% LAYER 5: PROPRIETARY NATIVE AI ENGINE
+    subgraph L5 ["5. 🧠 Proprietary Native AI Engine (Self-Hosted / Built from Scratch)"]
+        CustomLLM["Proprietary Custom LLM & Neural Tensor Engine\n(Self-Hosted | Zero Third-Party API Keys | 100% Private)"]
+        EnterpriseDB[("Enterprise Relational & Vector Database\n(knowledge_chunks, tickets, leaves, agent_pending_actions, chat_messages)")]
         
-        RAGAssistant <--> GeminiAPI
-        ActionAgent <--> GeminiAPI
-        HITLCheck <--> EnterpriseDB
+        L4 <--> CustomLLM
+        CustomLLM <--> EnterpriseDB
     end
 
     L4 --> L5
 
-    %% LAYER 6: NEW ADVANCED TECHNOLOGIES ROADMAP
-    subgraph L6 ["6. 🚀 New & Advanced Technologies Roadmap (Future Implementations)"]
-        VisionAI["📸 Vision AI OCR\n(Expense Receipts, Medical Bills & Document Parsing)"]
-        SwarmAI["👥 Multi-Agent Swarm Architecture\n(Specialized Payroll, Attendance & IT Subagents)"]
-        SSEStream["⚡ Real-Time SSE Token Streaming\n& WebSockets Push Notifications"]
-        GraphRAG["🔍 GraphRAG Knowledge Graphs\n(Neo4j Reporting Hierarchy & Escalation Trees)"]
-        VectorDB["💾 Dedicated Vector Database\n(Qdrant / pgvector with HNSW Indexing)"]
-        OnDeviceAI["📱 Zero-Latency On-Device Voice AI\n(WebAssembly Whisper Speech Processing)"]
+    %% LAYER 6: 10-YEAR FUTURE TECH ROADMAP
+    subgraph L6 ["6. 🚀 10-Year Future AI Technology Roadmap (2026 - 2036)"]
+        RustCore["🦀 Rust High-Performance Tensor Engine\n(Memory-Safe Sub-Millisecond Native Inference)"]
+        SwarmOrch["👥 Autonomous Multi-Agent Swarm\n(Event-Driven Agent Collaboration via Redis)"]
+        SSEStream["⚡ Real-Time Token Streaming & WebSockets"]
+        GraphRAG["🔍 GraphRAG Knowledge Graphs\n(Neo4j Hierarchy & Escalation Trees)"]
+        OnDeviceAI["📱 Zero-Latency WebAssembly On-Device Speech AI"]
     end
 
-    L5 -.->|Next Upgrade Phase| L6
+    L5 -.->|Next 10-Year Expansion Phase| L6
         </pre>
       </div>
     </section>
 
-    <!-- SECTION 2: RAG KNOWLEDGE FEEDING PIPELINE -->
+    <!-- SECTION 2: AI AGENTS CREATED & PLANNED -->
     <section>
-      <h2>2. Feeding Knowledge to the AI Agent (RAG Pipeline)</h2>
-      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
-        To ensure the AI Agent answers company questions accurately without hallucinations, raw enterprise documents are processed through a 5-step Knowledge Feeding & Grounding Pipeline:
-      </p>
-
-      <div class="rag-pipeline">
-        <div class="rag-step">
-          <div class="step-num">1</div>
-          <div class="step-content">
-            <h4>Document Collection & Extraction</h4>
-            <p>Raw text is collected from company source files including HR Leave Manuals, Employee Handbooks, IT/AV Equipment SOPs, Benefits Guides, and Resolved Ticket Histories.</p>
-          </div>
-        </div>
-
-        <div class="rag-step">
-          <div class="step-num">2</div>
-          <div class="step-content">
-            <h4>Semantic Chunking & Metadata Tagging</h4>
-            <p>Documents are split into optimal 500-1000 character overlapping text chunks. Each chunk is tagged with structured metadata (<code>category</code>, <code>department</code>, <code>target_role</code>, <code>updated_timestamp</code>).</p>
-          </div>
-        </div>
-
-        <div class="rag-step">
-          <div class="step-num">3</div>
-          <div class="step-content">
-            <h4>High-Dimensional Vector Embedding</h4>
-            <p>Each chunk is processed through the Google Gemini Embedding API (<code>gemini-embedding-001</code>) to convert human language into a 3072-dimensional vector math representation.</p>
-          </div>
-        </div>
-
-        <div class="rag-step">
-          <div class="step-num">4</div>
-          <div class="step-content">
-            <h4>Dual Indexing (Vector & Full-Text)</h4>
-            <p>Chunks, metadata, and 3072-vector embeddings are stored in the <code>knowledge_chunks</code> table, indexing both BM25 Full-Text keywords and vector cosine similarity distance.</p>
-          </div>
-        </div>
-
-        <div class="rag-step">
-          <div class="step-num">5</div>
-          <div class="step-content">
-            <h4>Real-Time Hybrid Search & Grounded Synthesis</h4>
-            <p>When an employee asks a question, the query is embedded and matched via Hybrid Search (Cosine Similarity + BM25). The top K matched contexts are injected into Gemini system prompts to generate 100% accurate, policy-grounded answers.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: SUBSYSTEM BREAKDOWN -->
-    <section>
-      <h2>3. Core Layer Specifications</h2>
+      <h2>2. AI Agent Portfolio: Active vs. Future Roadmap</h2>
       <div class="grid-2">
         <div class="card">
-          <h3>🛠️ Layer 1: Core UI & Voice Engine</h3>
+          <h3>✅ AI Agents Created So Far</h3>
           <ul>
-            <li><strong>Frontend Stack</strong>: Flutter 3.x Web & Mobile built with Dart.</li>
-            <li><strong>State Management</strong>: Riverpod providers combined with custom <code>ValueNotifier</code> event bus.</li>
-            <li><strong>Voice System</strong>: HTML5 Web Speech API for Mic Speech-To-Text paired with Web SpeechSynthesis API for Voice-Over TTS audio output.</li>
+            <li><strong>RAG Policy Search Agent (<code>ragService</code>)</strong>: Grounded policy Q&A over indexed HR, IT, and leave SOP documents.</li>
+            <li><strong>Autonomous Action Agent (<code>agentService</code>)</strong>: Converts prompts into backend tool calls (<code>createTicket</code>, <code>applyLeave</code>, <code>sendMessageToUserOrChannel</code>, <code>queryTeamAttendance</code>).</li>
+            <li><strong>Central Synchronization Agent (<code>ChatService</code>)</strong>: Event bus synchronizing messages across floating chatbots, AI drawers, and team chats.</li>
+            <li><strong>Voice & Speech Agent (<code>VoiceHelper</code>)</strong>: Hands-free mic speech recognition and automatic Voice-Over audio output.</li>
+            <li><strong>HITL Safety Classifier</strong>: Evaluates risk levels and stages high-risk operations in <code>agent_pending_actions</code>.</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>🏢 Layer 2: ERP Application Modules</h3>
+          <h3>🚀 New AI Agents Planned for Development</h3>
           <ul>
-            <li><strong>Home Dashboard</strong>: Web clock-in/out, staff presence modal, announcements, polls.</li>
-            <li><strong>Me Section</strong>: Monthly attendance, work modes, leave balances, regularizations.</li>
-            <li><strong>Helpdesk</strong>: Service tickets across IT, HR, Maintenance, Finance, CPD, Inventory, HOB, Media.</li>
-            <li><strong>Teams Chat</strong>: Channels (<code>#general</code>, <code>#maintenance-updates</code>) and DMs.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🌐 Layer 3: API Gateways & Synchronization</h3>
-          <ul>
-            <li><strong>Central ChatSync</strong>: <code>ChatService</code> event bus routes messages from floating chatbots and AI drawers to target team chats live.</li>
-            <li><strong>Express Backend API</strong>: Service at <code>http://localhost:4001/api/ai</code> exposing <code>/chat</code>, <code>/agent</code>, <code>/confirm</code>, <code>/decline</code>.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🤖 Layer 4: HRMs-AI Engine & HITL Safety</h3>
-          <ul>
-            <li><strong>RAG Policy Chatbot</strong>: Hybrid BM25 FullText + Cosine Similarity vector search over 3072-dim embeddings.</li>
-            <li><strong>Action Agent</strong>: ReAct function tool calling (<code>createTicket</code>, <code>assignTicket</code>, <code>applyLeave</code>, <code>sendMessageToUserOrChannel</code>, <code>queryTeamAttendance</code>).</li>
-            <li><strong>HITL Risk Evaluation</strong>: Staged in <code>agent_pending_actions</code> table with interactive UI confirmation cards.</li>
+            <li><strong>Payroll & Tax Intelligence Agent</strong>: Payslip breakdowns, tax optimization advice, and reimbursement processing.</li>
+            <li><strong>Attendance & Shift Anomaly Agent</strong>: Automatically detects clock-in anomalies and suggests regularizations.</li>
+            <li><strong>Multi-Modal Vision & OCR Agent</strong>: Auto-scans expense receipts, medical bills, and onboarding IDs into ERP tickets.</li>
+            <li><strong>IT Diagnostic & Procurement Specialist</strong>: Monitors asset health, compares vendor pricing, and tracks POs above ₹1 Lakh.</li>
+            <li><strong>Hierarchical Escalation Agent</strong>: Traverses organizational reporting graphs for complex cross-department escalations.</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 4: ADVANCED TECH ROADMAP -->
+    <!-- SECTION 3: 10-YEAR PROGRAMMING LANGUAGE EVALUATION -->
     <section>
-      <h2>4. Advanced Technology Roadmap</h2>
+      <h2>3. Strategic 10-Year Programming Language Evaluation (2026–2036)</h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+        To build a proprietary AI engine designed to last for the next 10 years without third-party API dependencies, selecting the right core programming language is critical:
+      </p>
+
       <table>
         <thead>
           <tr>
-            <th>Technology</th>
-            <th>Capability</th>
-            <th>Implementation Goal</th>
+            <th>Language</th>
+            <th>10-Year Future Suitability</th>
+            <th>Strengths for Custom AI Development</th>
+            <th>Limitations</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>📸 Vision AI OCR</strong></td>
-            <td>Multimodal Vision Analysis</td>
-            <td>Auto-extract expense receipt line items, medical bills, and ID proofs into reimbursement tickets.</td>
+            <td><strong>🦀 Rust (RECOMMENDED FOR CORE ENGINE)</strong></td>
+            <td>⭐⭐⭐⭐⭐ (Highest Future Proofing)</td>
+            <td>Memory safety without Garbage Collection (GC) pauses, zero-cost abstractions, native C/CUDA interop, blazing fast tensor execution (Burn, Candle), WASM compilation.</td>
+            <td>Steeper learning curve for borrow checker rules.</td>
           </tr>
           <tr>
-            <td><strong>👥 Multi-Agent Swarm</strong></td>
-            <td>Subagent Orchestration</td>
-            <td>Decouple AI into specialized subagents (*Payroll Agent*, *Attendance Audit Agent*, *IT Agent*) via Redis Pub/Sub.</td>
+            <td><strong>🐍 Python</strong></td>
+            <td>⭐⭐⭐⭐ (Ideal for R&D / Fine-Tuning)</td>
+            <td>Unrivaled ecosystem (PyTorch, JAX, HuggingFace, vLLM). Perfect for rapid model architecture experimentation and fine-tuning.</td>
+            <td>Higher runtime memory footprint, GIL overhead, slower execution latency without C++ bindings.</td>
           </tr>
           <tr>
-            <td><strong>⚡ Real-Time SSE Streaming</strong></td>
-            <td>Token-by-Token Delivery</td>
-            <td>Stream AI answers letter-by-letter with typing indicators and WebSockets push alerts.</td>
+            <td><strong>⚡ C++ / CUDA</strong></td>
+            <td>⭐⭐⭐⭐ (Low-Level GPU Kernels)</td>
+            <td>Foundation of GGML, llama.cpp, and TensorRT. Maximum low-level GPU hardware control.</td>
+            <td>Manual memory management risks, complex cross-platform maintenance.</td>
           </tr>
           <tr>
-            <td><strong>🔍 GraphRAG Knowledge Graphs</strong></td>
-            <td>Hierarchy Graph Traversal</td>
-            <td>Integrate Neo4j to query organizational reporting structures and escalation trees.</td>
-          </tr>
-          <tr>
-            <td><strong>💾 Dedicated Vector DB</strong></td>
-            <td>HNSW Indexing</td>
-            <td>Migrate vector storage to Qdrant or <code>pgvector</code> for sub-millisecond similarity search across millions of chunks.</td>
-          </tr>
-          <tr>
-            <td><strong>📱 On-Device Voice AI</strong></td>
-            <td>Quantized SLM Execution</td>
-            <td>Embed Whisper models via WebAssembly inside browser for zero-latency offline speech recognition.</td>
+            <td><strong>🔥 Mojo / Julia</strong></td>
+            <td>⭐⭐⭐ (Emerging Contenders)</td>
+            <td>Mojo compiles Python syntax to native C-speed code. High-performance matrix math capabilities.</td>
+            <td>Ecosystem still maturing compared to Rust/Python.</td>
           </tr>
         </tbody>
       </table>
+
+      <div class="callout">
+        <strong>Strategic 10-Year Architecture Recommendation:</strong> A <strong>Hybrid Microservice Architecture</strong>:
+        <br>• <strong>Rust (or C++/CUDA)</strong>: Core high-throughput, low-latency Custom AI Inference Engine & Tensor Operations.
+        <br>• <strong>Python</strong>: Model Training, Dataset Preparation & Fine-Tuning (LoRA).
+        <br>• <strong>Node.js / Express</strong>: API Gateway & Application Routing (Port 4001).
+        <br>• <strong>Dart (Flutter)</strong>: Cross-Platform Client UI for Web, Mobile & Desktop (Port 4000).
+      </div>
     </section>
 
-    <div class="callout">
-      <strong>Note:</strong> This architecture document is synced with the production codebase. Open this HTML document directly in Chrome or Safari to view the live interactive Mermaid flowchart diagram and generate print-ready PDF reports.
-    </div>
   </div>
 
   <script>
