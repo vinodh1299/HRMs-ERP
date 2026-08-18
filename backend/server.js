@@ -17,6 +17,7 @@ import financeRouter from './routes/finances.js';
 import inboxRouter from './routes/inbox.js';
 import adminRouter from './routes/admin.js';
 import stubsRouter from './routes/stubs.js';
+import aiRouter from './routes/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,7 @@ app.use('/api/leaves', leaveRouter);
 app.use('/api/finances', financeRouter);
 app.use('/api/inbox', inboxRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/ai', aiRouter);
 
 // Mount stub/engage routes
 app.use('/api', stubsRouter);

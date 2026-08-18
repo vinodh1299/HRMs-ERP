@@ -1,0 +1,13 @@
+[package]
+name = "ai_engine_rust"
+version = "1.0.0"
+edition = "2021"
+authors = ["Asian Christian Academy of India <acamedia@aca-india.org>"]
+description = "High-Performance Rust Native Tensor & Vector Engine for HRMS-ERP"
+
+[dependencies]
+tokio = { version = "1.38", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+candle-core = { version = "0.6", optional = true }
+ndarray = "0.15"
