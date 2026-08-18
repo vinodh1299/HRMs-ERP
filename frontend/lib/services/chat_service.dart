@@ -37,7 +37,7 @@ class ChatService {
     ChatTarget(name: '#general', isChannel: true),
     ChatTarget(name: '#maintenance-updates', isChannel: true),
     ChatTarget(name: '#finance-reimbursements', isChannel: true),
-    ChatTarget(name: 'Gemini AI Assistant', isChannel: false, isOnline: true, status: 'Online'),
+    ChatTarget(name: 'HRMS-AI Assistant', isChannel: false, isOnline: true, status: 'Online'),
     ChatTarget(name: 'Vinodh', isChannel: false, isOnline: true, status: 'Online'),
     ChatTarget(name: 'John Doe', isChannel: false, isOnline: true, status: 'Online'),
     ChatTarget(name: 'Jane Smith', isChannel: false, isOnline: true, status: 'Away'),
@@ -55,10 +55,10 @@ class ChatService {
     '#finance-reimbursements': [
       TeamChatMessage(sender: 'Accounts', text: 'Please upload bills before the 25th of this month.', timestamp: DateTime.now().subtract(const Duration(days: 1)), isMe: false),
     ],
-    'Gemini AI Assistant': [
+    'HRMS-AI Assistant': [
       TeamChatMessage(
-        sender: 'Gemini AI Assistant',
-        text: 'Hello! I am your HRMs-AI Assistant. Connected to the HRMs-AI engine. Ask me policy questions or instruct me to perform actions like raising tickets, applying for leave, or sending messages to team members!',
+        sender: 'HRMS-AI Assistant',
+        text: 'Hello! I am your Asian Christian Academy HRMS-AI Assistant. Connected to the self-hosted HRMS-AI engine. Ask me policy questions or instruct me to perform actions like raising tickets, applying for leave, or sending messages to team members!',
         timestamp: DateTime.now(),
         isMe: false,
       ),
@@ -92,7 +92,7 @@ class ChatService {
     // Match target recipient in targets list (e.g. Vinodh, John Doe, Jane Smith, Alice Cooper, #general, etc.)
     String? matchedTargetName;
     for (final target in targets) {
-      if (target.name == 'Gemini AI Assistant') continue;
+      if (target.name == 'HRMS-AI Assistant' || target.name == 'Gemini AI Assistant') continue;
       final targetClean = target.name.replaceAll('#', '').trim().toLowerCase();
       if (lowerText.contains(targetClean) || lowerText.contains(target.name.toLowerCase())) {
         matchedTargetName = target.name;
