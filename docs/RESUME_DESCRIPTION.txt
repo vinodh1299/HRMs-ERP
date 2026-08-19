@@ -1,0 +1,49 @@
+===============================================================================
+RESUME DESCRIPTION — HRMS-AI ENGINE & BACKEND ARCHITECTURE
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. SKILLS & TECHNOLOGIES SECTION (Copy into your Skills block)
+-------------------------------------------------------------------------------
+* AI & MACHINE LEARNING : Self-Hosted LLMs (Llama 3 / Gemma 2), RAG (Retrieval-Augmented
+                          Generation), ReAct Autonomous AI Agents, Vector Search,
+                          Cosine Similarity, Function Calling / Tool Execution,
+                          PyTorch, LoRA Fine-Tuning, HuggingFace PEFT.
+* SYSTEMS & BACKEND     : Rust (Candle, Native Tensor Core), Node.js, Express.js,
+                          RESTful API Gateway, Async Microservices, Multi-Engine
+                          Cascading Fallback Architecture.
+* DATABASES & VECTORS   : PostgreSQL 16, pgvector Extension, HNSW Vector Indexing,
+                          Hybrid Search (Vector Cosine + BM25 Full-Text Search).
+* SECURITY & DEPLOYMENT : On-Premise AI Workstation, Zero Cloud API Key Privacy,
+                          Human-In-The-Loop (HITL) Staging, Cloudflare Zero Trust Tunnels.
+
+-------------------------------------------------------------------------------
+2. PROJECT EXPERIENCE SECTION (Copy into your Work Experience block)
+-------------------------------------------------------------------------------
+Project Title: HRMS-AI — Enterprise Self-Hosted Autonomous AI & RAG Engine
+Role         : Lead AI Systems Architect & Full-Stack Engineer
+
+Key Accomplishments:
+• Designed and implemented a 100% self-hosted, private AI engine using open-weight
+  LLMs (Llama 3 / Gemma 2) operating with zero third-party cloud API keys, eliminating
+  per-token cloud costs and preserving total organizational data privacy.
+• Engineered a high-performance native tensor core in Rust (backend/ai_engine_rust)
+  using Candle and ndarray to perform sub-millisecond vector cosine distance math,
+  tokenization, and model execution bridging.
+• Architected a Grounded RAG (Retrieval-Augmented Generation) Pipeline over PostgreSQL 16
+  + pgvector with HNSW indexing and hybrid BM25 search, delivering zero-hallucination policy
+  answers grounded in official organizational handbooks.
+• Developed an Autonomous ReAct Action Agent in Node.js Express that converts natural
+  language prompts into transactional ERP actions (applyLeave, createTicket, sendMessage)
+  with a Human-In-The-Loop (HITL) risk-staging confirmation system.
+• Implemented a 4-Tier Multi-Engine Cascading Fallback Architecture (vLLM -> Ollama
+  -> llama.cpp -> Embedded Native Engine) ensuring 100% high availability and zero downtime.
+• Integrated hands-free voice interaction utilizing Web Speech API Speech-To-Text (STT)
+  and SpeechSynthesis Text-To-Speech (TTS) voice-over into a Flutter 3.x multi-platform UI.
+
+-------------------------------------------------------------------------------
+3. ONE-LINE SUMMARY (For LinkedIn Bio or Resume Header)
+-------------------------------------------------------------------------------
+"Architected an enterprise self-hosted AI engine featuring a Rust native tensor core,
+Postgres pgvector RAG search pipeline, and autonomous ReAct action agents with zero cloud API keys."
+===============================================================================
