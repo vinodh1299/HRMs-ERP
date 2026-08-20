@@ -127,7 +127,7 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> with Single
                                         value: markEnabled,
                                         activeTrackColor: AppTheme.primary,
                                         onChanged: (val) {
-                                          MarkVoiceAssistantService.toggleMarkAssistant(context);
+                                          MarkVoiceAssistantService.setMarkAssistantEnabled(context, val);
                                           setModalState(() {});
                                         },
                                       ),
@@ -270,7 +270,7 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> with Single
                                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
                                           ),
                                           onPressed: () {
-                                            MarkVoiceAssistantService.toggleMarkAssistant(context);
+                                            MarkVoiceAssistantService.setMarkAssistantEnabled(context, !markEnabled);
                                             setModalState(() {});
                                           },
                                         ),

@@ -16,20 +16,19 @@ class MarkVoiceAssistantService {
 
   static final _hrmsAiService = HrmsAiApiService();
 
-  /// Initialize Mark Assistant on app startup
+  /// Initialize Mark Assistant on app startup - ALWAYS ON
   static void initMarkAssistant(BuildContext context) {
     globalContext = context;
-    if (markEnabledNotifier.value) {
-      _startAlwaysListening();
-    }
+    markEnabledNotifier.value = true;
+    _startAlwaysListening();
   }
 
-  /// Initialize or Toggle Mark Assistant ON/OFF
-  static void toggleMarkAssistant(BuildContext context) {
+  /// Explicitly set Mark Assistant Enabled state (ON / OFF)
+  static void setMarkAssistantEnabled(BuildContext context, bool enabled) {
     globalContext = context;
-    markEnabledNotifier.value = !markEnabledNotifier.value;
+    markEnabledNotifier.value = enabled;
 
-    if (markEnabledNotifier.value) {
+    if (enabled) {
       _startAlwaysListening();
       const greeting = "Hello! I am Mark, your voice assistant. How can I help you today?";
       lastResponseNotifier.value = greeting;
@@ -37,7 +36,7 @@ class MarkVoiceAssistantService {
       // Speak out loud in Male voice
       VoiceHelper.speak(greeting, force: true);
 
-      // Show visual notification banner
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('🎙️ Mark Voice Assistant Activated — Say your command or "Hey Mark"'),
@@ -51,6 +50,7 @@ class MarkVoiceAssistantService {
       lastResponseNotifier.value = farewell;
       VoiceHelper.speak(farewell, force: true);
 
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('🔇 Mark Voice Assistant Deactivated'),
@@ -59,6 +59,11 @@ class MarkVoiceAssistantService {
         ),
       );
     }
+  }
+
+  /// Toggle Mark Assistant state
+  static void toggleMarkAssistant(BuildContext context) {
+    setMarkAssistantEnabled(context, !markEnabledNotifier.value);
   }
 
   /// Start Continuous Always-Listening Engine
