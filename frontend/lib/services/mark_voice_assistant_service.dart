@@ -4,6 +4,19 @@ import 'voice_helper.dart';
 import 'chat_service.dart';
 import 'hrms_ai_service.dart';
 
+/// Representation of a staged Tier 2/3 Voice Action waiting for verbal confirmation
+class PendingVoiceAction {
+  final String actionTitle;
+  final String readBackText;
+  final VoidCallback onExecute;
+
+  PendingVoiceAction({
+    required this.actionTitle,
+    required this.readBackText,
+    required this.onExecute,
+  });
+}
+
 /// MarkVoiceAssistantService
 /// Always-Listening Voice Assistant ("Mark") for Asian Christian Academy HRMS Portal.
 class MarkVoiceAssistantService {
@@ -12,8 +25,9 @@ class MarkVoiceAssistantService {
   static final ValueNotifier<bool> isAwakeNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<String> lastCommandNotifier = ValueNotifier<String>('');
   static final ValueNotifier<String> lastResponseNotifier = ValueNotifier<String>('🎙️ Mark Listening... (Say "Hey Mark")');
+  static final ValueNotifier<PendingVoiceAction?> pendingActionNotifier = ValueNotifier<PendingVoiceAction?>(null);
+  
   static BuildContext? globalContext;
-
   static final _hrmsAiService = HrmsAiApiService();
 
   /// Initialize Mark Assistant on app startup - ALWAYS ON
@@ -46,6 +60,7 @@ class MarkVoiceAssistantService {
       );
     } else {
       _stopListening();
+      pendingActionNotifier.value = null;
       const farewell = "Mark Voice Assistant deactivated.";
       lastResponseNotifier.value = farewell;
       VoiceHelper.speak(farewell, force: true);
@@ -64,6 +79,29 @@ class MarkVoiceAssistantService {
   /// Toggle Mark Assistant state
   static void toggleMarkAssistant(BuildContext context) {
     setMarkAssistantEnabled(context, !markEnabledNotifier.value);
+  }
+
+  /// Confirm Pending Action manually or by voice
+  static void confirmPendingAction() {
+    final pending = pendingActionNotifier.value;
+    if (pending == null) return;
+
+    pending.onExecute();
+    pendingActionNotifier.value = null;
+
+    const resp = "Confirmed! Action executed successfully.";
+    lastResponseNotifier.value = resp;
+    VoiceHelper.speak(resp, force: true);
+    _showFeedbackSnackBar('✅ Mark: $resp');
+  }
+
+  /// Cancel Pending Action manually or by voice
+  static void cancelPendingAction() {
+    pendingActionNotifier.value = null;
+    const resp = "Action cancelled.";
+    lastResponseNotifier.value = resp;
+    VoiceHelper.speak(resp, force: true);
+    _showFeedbackSnackBar('🚫 Mark: $resp');
   }
 
   /// Start Continuous Always-Listening Engine
@@ -102,6 +140,25 @@ class MarkVoiceAssistantService {
     isAwakeNotifier.value = true;
     lastCommandNotifier.value = transcript;
 
+    // 1. Check if we are waiting for a Verbal Read-Back Confirmation ("YES" or "NO")
+    if (pendingActionNotifier.value != null) {
+      if (lower.contains('yes') || lower.contains('yeah') || lower.contains('yup') || lower.contains('confirm') || lower.contains('do it') || lower.contains('ok') || lower.contains('sure') || lower.contains('proceed')) {
+        confirmPendingAction();
+        return;
+      }
+      if (lower.contains('no') || lower.contains('cancel') || lower.contains('stop') || lower.contains('never mind') || lower.contains('dont') || lower.contains("don't") || lower.contains('abort')) {
+        cancelPendingAction();
+        return;
+      }
+
+      // If user says something else, remind them of read-back confirmation
+      final pending = pendingActionNotifier.value!;
+      final reminder = 'Confirmation required: ${pending.readBackText}';
+      lastResponseNotifier.value = reminder;
+      VoiceHelper.speak(reminder, force: true);
+      return;
+    }
+
     // Clean up wake word prefixes if present
     String command = lower;
     for (final prefix in ['hey mark', 'hello mark', 'hi mark', 'ok mark', 'mark', 'marck', 'mac']) {
@@ -128,8 +185,9 @@ class MarkVoiceAssistantService {
     final c = command.toLowerCase();
     final router = globalContext != null ? GoRouter.of(globalContext!) : null;
 
-    // 1. Navigation Actions
-    // Chat / Team / Messaging Route
+    // ==========================================
+    // Tier 1: Safe Navigation Actions (Auto-Execute)
+    // ==========================================
     if (c.contains('chat') || c.contains('message') || c.contains('messages') || c.contains('messaging') || c.contains('team') || c.contains('my team') || c.contains('members') || c.contains('conversation')) {
       const resp = "Opening your team chat section now.";
       lastResponseNotifier.value = resp;
@@ -139,7 +197,6 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Helpdesk / Support Route
     if (c.contains('helpdesk') || c.contains('help desk') || c.contains('ticket') || c.contains('tickets') || c.contains('support') || c.contains('issue')) {
       const resp = "Opening Helpdesk support portal.";
       lastResponseNotifier.value = resp;
@@ -149,8 +206,7 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Leave / Me Profile Route
-    if (c.contains('leave') || c.contains('leaves') || c.contains('holiday') || c.contains('sick leave') || c.contains('casual leave') || c.contains('vacation') || c.contains('time off') || c.contains('me') || c.contains('profile')) {
+    if (c.contains('leave balances') || c.contains('my leaves') || c.contains('holidays') || c.contains('profile overview')) {
       const resp = "Opening your leave balances and profile overview.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
@@ -159,7 +215,6 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Finance / Salary Route
     if (c.contains('finance') || c.contains('finances') || c.contains('pay') || c.contains('salary') || c.contains('payslip') || c.contains('payroll') || c.contains('expense')) {
       const resp = "Opening your finance overview.";
       lastResponseNotifier.value = resp;
@@ -169,7 +224,6 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Mail / Inbox Route
     if (c.contains('mail') || c.contains('email') || c.contains('inbox')) {
       const resp = "Opening your email inbox.";
       lastResponseNotifier.value = resp;
@@ -179,7 +233,6 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Org Directory Route
     if (c.contains('org') || c.contains('organization') || c.contains('directory') || c.contains('employees') || c.contains('structure')) {
       const resp = "Opening Organization directory.";
       lastResponseNotifier.value = resp;
@@ -189,7 +242,6 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Home Dashboard Route
     if (c.contains('dashboard') || c.contains('home') || c.contains('main')) {
       const resp = "Navigating to Home Dashboard.";
       lastResponseNotifier.value = resp;
@@ -199,7 +251,6 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // Admin Panel Route
     if (c.contains('admin') || c.contains('control panel') || c.contains('settings') || c.contains('manager')) {
       const resp = "Opening Admin Control Panel.";
       lastResponseNotifier.value = resp;
@@ -209,7 +260,32 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    // 2. Team Messaging Action: "send message to vinodh that im on the way"
+    // ==========================================
+    // Tier 2: State-Changing Actions (Verbal Read-Back Gated)
+    // ==========================================
+
+    // Action A: Apply Leave
+    if (c.contains('apply leave') || c.contains('apply for leave') || c.contains('casual leave') || c.contains('sick leave') || c.contains('time off')) {
+      String leaveType = 'Casual Leave';
+      if (c.contains('sick')) leaveType = 'Sick Leave';
+
+      final readBackText = "You want to apply for $leaveType. Say YES to confirm, or CANCEL to abort.";
+      
+      pendingActionNotifier.value = PendingVoiceAction(
+        actionTitle: 'Apply $leaveType',
+        readBackText: readBackText,
+        onExecute: () {
+          router?.go('/me');
+        },
+      );
+
+      lastResponseNotifier.value = '⚠️ Confirmation Required: $readBackText';
+      VoiceHelper.speak(readBackText, force: true);
+      _showFeedbackSnackBar('⚠️ Mark Read-Back: $readBackText');
+      return;
+    }
+
+    // Action B: Send Team Chat Message
     if (c.contains('send message') || c.contains('message to') || c.contains('tell')) {
       String target = 'Vinodh';
       String messageText = command;
@@ -226,24 +302,32 @@ class MarkVoiceAssistantService {
         messageText = command.split('that').last.trim();
       }
 
-      ChatService.addMessage(
-        target,
-        TeamChatMessage(
-          sender: 'Me',
-          text: messageText,
-          timestamp: DateTime.now(),
-          isMe: true,
-        ),
+      final readBackText = "You want to send a message to $target. Say YES to confirm, or CANCEL to abort.";
+
+      pendingActionNotifier.value = PendingVoiceAction(
+        actionTitle: 'Send message to $target',
+        readBackText: readBackText,
+        onExecute: () {
+          ChatService.addMessage(
+            target,
+            TeamChatMessage(
+              sender: 'Me',
+              text: messageText,
+              timestamp: DateTime.now(),
+              isMe: true,
+            ),
+          );
+          router?.go('/chat');
+        },
       );
 
-      final resp = "Message sent to $target.";
-      lastResponseNotifier.value = resp;
-      VoiceHelper.speak(resp, force: true);
-      _showFeedbackSnackBar('💬 Mark: $resp');
+      lastResponseNotifier.value = '⚠️ Confirmation Required: $readBackText';
+      VoiceHelper.speak(readBackText, force: true);
+      _showFeedbackSnackBar('⚠️ Mark Read-Back: $readBackText');
       return;
     }
 
-    // 3. Email Dispatch Action: "send a mail to vinodh that the meeting is postponed to tomorrow"
+    // Action C: Send Email
     if (c.contains('send mail') || c.contains('send email') || c.contains('mail to') || c.contains('email to')) {
       String target = 'Vinodh';
       String emailBody = command;
@@ -256,14 +340,23 @@ class MarkVoiceAssistantService {
         emailBody = command.split('that').last.trim();
       }
 
-      final resp = "Sending email to $target with content: $emailBody";
-      lastResponseNotifier.value = resp;
-      VoiceHelper.speak(resp, force: true);
-      _showFeedbackSnackBar('📧 Mark: Email dispatched to $target');
+      final readBackText = "You want to send an email to $target containing: $emailBody. Say YES to confirm, or CANCEL to abort.";
+
+      pendingActionNotifier.value = PendingVoiceAction(
+        actionTitle: 'Send email to $target',
+        readBackText: readBackText,
+        onExecute: () {
+          router?.go('/mail');
+        },
+      );
+
+      lastResponseNotifier.value = '⚠️ Confirmation Required: $readBackText';
+      VoiceHelper.speak(readBackText, force: true);
+      _showFeedbackSnackBar('⚠️ Mark Read-Back: $readBackText');
       return;
     }
 
-    // 4. Default: Query HRMS-AI Engine for general policy or complex intents
+    // Default: Query HRMS-AI Engine for general policy or complex intents
     try {
       final res = await _hrmsAiService.askPolicyChat(command);
       if (res.answer.isNotEmpty) {
