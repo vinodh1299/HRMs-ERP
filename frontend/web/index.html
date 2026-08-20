@@ -24,8 +24,9 @@
     var _activeRecognition = null;
     var _isContinuousListening = false;
     var _audioCtx = null;
+    var _currentAudioPlayer = null;
 
-    // Web Audio API Audio Chime Generator to guarantee audible feedback
+    // Web Audio API Audio Chime Generator
     function playAudioChime() {
       try {
         var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -37,7 +38,7 @@
         var osc = _audioCtx.createOscillator();
         var gain = _audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, _audioCtx.currentTime); // D5 note
+        osc.frequency.setValueAtTime(587.33, _audioCtx.currentTime);
         gain.gain.setValueAtTime(0.15, _audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, _audioCtx.currentTime + 0.3);
         osc.connect(gain);
@@ -69,7 +70,7 @@
       }
     };
 
-    // Speech Recognition Helper
+    // Speech Recognition Helper — ONLY processes COMPLETE FINAL transcripts
     window.startSpeechRecognition = function(onResult, onError, onEnd, continuous) {
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
@@ -91,14 +92,14 @@
       recognition.lang = 'en-US';
 
       recognition.onresult = function(event) {
-        var transcript = '';
         for (var i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
-        transcript = transcript.trim();
-        if (transcript) {
-          console.log("[SpeechRecognition Live Transcript]:", transcript);
-          if (onResult) onResult(transcript);
+          if (event.results[i].isFinal || event.results[i][0].confidence > 0.5) {
+            var transcript = event.results[i][0].transcript.trim();
+            if (transcript && transcript.length > 1) {
+              console.log("[SpeechRecognition Final Transcript]:", transcript);
+              if (onResult) onResult(transcript);
+            }
+          }
         }
       };
 
@@ -140,15 +141,8 @@
       }
     };
 
-    // High-Quality Male Voice Synthesis Routine
+    // ElevenLabs High-Clarity Voice Synthesis Routine
     window.speakText = function(text, onStart, onEnd) {
-      if (!('speechSynthesis' in window)) {
-        if (onEnd) onEnd();
-        return;
-      }
-
-      playAudioChime();
-
       var cleanText = String(text)
         .replace(/[\#\*\_\`\~]/g, '')
         .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋|⚠️|🚫|🎙️|🔊|🏠|⚙️|💬|📧|🤖/g, '')
@@ -156,6 +150,46 @@
         .trim();
       
       if (!cleanText) {
+        if (onEnd) onEnd();
+        return;
+      }
+
+      playAudioChime();
+
+      if (_currentAudioPlayer) {
+        try { _currentAudioPlayer.pause(); } catch(e){}
+        _currentAudioPlayer = null;
+      }
+
+      // 1. Try ElevenLabs API endpoint first for ultra-realistic male voice
+      fetch('http://localhost:3001/api/ai/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: cleanText })
+      })
+      .then(function(res) {
+        if (res.headers.get('content-type')?.includes('audio/mpeg')) {
+          return res.blob().then(function(blob) {
+            var url = URL.createObjectURL(blob);
+            var audio = new Audio(url);
+            _currentAudioPlayer = audio;
+            audio.onplay = function() { if (onStart) onStart(); };
+            audio.onended = function() { if (onEnd) onEnd(); };
+            audio.onerror = function() { fallbackWebSpeech(cleanText, onStart, onEnd); };
+            audio.play();
+          });
+        } else {
+          fallbackWebSpeech(cleanText, onStart, onEnd);
+        }
+      })
+      .catch(function() {
+        fallbackWebSpeech(cleanText, onStart, onEnd);
+      });
+    };
+
+    // Fallback WebSpeech Synthesis with Deep Male Tone
+    function fallbackWebSpeech(cleanText, onStart, onEnd) {
+      if (!('speechSynthesis' in window)) {
         if (onEnd) onEnd();
         return;
       }
@@ -193,20 +227,25 @@
           if (onEnd) onEnd();
         }
       }, 50);
-    };
+    }
 
     window.stopSpeaking = function() {
+      if (_currentAudioPlayer) {
+        try { _currentAudioPlayer.pause(); } catch(e){}
+        _currentAudioPlayer = null;
+      }
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        if (_currentSpeechEndCallback) {
-          _currentSpeechEndCallback();
-          _currentSpeechEndCallback = null;
-        }
+      }
+      if (_currentSpeechEndCallback) {
+        _currentSpeechEndCallback();
+        _currentSpeechEndCallback = null;
       }
     };
 
     window.isSpeaking = function() {
-      return ('speechSynthesis' in window) && window.speechSynthesis.speaking;
+      return (_currentAudioPlayer && !_currentAudioPlayer.paused) ||
+             (('speechSynthesis' in window) && window.speechSynthesis.speaking);
     };
   </script>
   <script src="flutter_bootstrap.js" async></script>

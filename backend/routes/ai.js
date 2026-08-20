@@ -11,10 +11,62 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'HRMS-AI Engine',
-    provider: 'Self-Hosted Open Weights',
-    thirdPartyApiKeys: false,
+    provider: 'ElevenLabs + Self-Hosted Open Weights',
+    elevenLabsEnabled: !!process.env.ELEVENLABS_API_KEY,
     timestamp: new Date().toISOString()
   });
+});
+
+/**
+ * ElevenLabs Text-to-Speech Endpoint
+ */
+router.post('/tts', async (req, res) => {
+  try {
+    const { text, voiceId } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required for TTS.' });
+    }
+
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    // Default ElevenLabs Deep Male Voice ID ("Adam")
+    const targetVoice = voiceId || 'pNInz6obpgDQGcFmaJgB';
+
+    if (apiKey) {
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${targetVoice}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`ElevenLabs API error: ${response.statusText}`);
+      }
+
+      const audioBuffer = await response.arrayBuffer();
+      res.set('Content-Type', 'audio/mpeg');
+      return res.send(Buffer.from(audioBuffer));
+    } else {
+      // Return TTS metadata fallback if key not configured
+      return res.json({
+        fallback: true,
+        message: 'ElevenLabs key not set. Using high-clarity Web Audio Speech engine.',
+        text
+      });
+    }
+  } catch (err) {
+    console.error('[ElevenLabs TTS Error]:', err);
+    res.status(500).json({ error: 'TTS Generation Error', details: err.message });
+  }
 });
 
 /**
