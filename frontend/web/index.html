@@ -22,6 +22,7 @@
   <script>
     var _currentSpeechEndCallback = null;
     var _activeRecognition = null;
+    var _isContinuousListening = false;
 
     // Force voice initialization on page load
     if ('speechSynthesis' in window) {
@@ -30,6 +31,21 @@
         try { window.speechSynthesis.getVoices(); } catch(e){}
       };
     }
+
+    // Explicit Microphone Permission Request Helper
+    window.requestMicrophonePermission = function() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(function(stream) {
+            console.log("[Microphone Permission Granted]");
+            // Stop tracks so mic indicator doesn't stay stuck red
+            stream.getTracks().forEach(function(track) { track.stop(); });
+          })
+          .catch(function(err) {
+            console.warn("[Microphone Permission Denied]:", err);
+          });
+      }
+    };
 
     // Speech Recognition Helper
     window.startSpeechRecognition = function(onResult, onError, onEnd, continuous) {
@@ -40,6 +56,8 @@
         return null;
       }
 
+      _isContinuousListening = !!continuous;
+
       if (_activeRecognition) {
         try { _activeRecognition.abort(); } catch(e){}
         _activeRecognition = null;
@@ -47,27 +65,48 @@
 
       var recognition = new SpeechRecognition();
       recognition.continuous = !!continuous;
-      recognition.interimResults = false;
+      recognition.interimResults = true;
       recognition.lang = 'en-US';
 
       recognition.onresult = function(event) {
-        var lastResultIndex = event.results.length - 1;
-        var text = event.results[lastResultIndex][0].transcript;
-        console.log("[SpeechRecognition Result]:", text);
-        if (onResult) onResult(text);
+        var transcript = '';
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal || event.results[i][0].confidence > 0.3) {
+            transcript += event.results[i][0].transcript;
+          }
+        }
+        transcript = transcript.trim();
+        if (transcript) {
+          console.log("[SpeechRecognition Live Transcript]:", transcript);
+          if (onResult) onResult(transcript);
+        }
       };
+
       recognition.onerror = function(event) {
         console.warn("[SpeechRecognition Error]:", event.error);
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          window.requestMicrophonePermission();
+        }
         if (onError) onError(event.error || "Speech recognition error");
       };
+
       recognition.onend = function() {
+        console.log("[SpeechRecognition Ended]");
         if (onEnd) onEnd();
+        // Auto-restart if continuous listening is requested
+        if (_isContinuousListening && _activeRecognition === recognition) {
+          setTimeout(function() {
+            try { recognition.start(); } catch(e){}
+          }, 300);
+        }
       };
 
       try {
         recognition.start();
         _activeRecognition = recognition;
+        console.log("[SpeechRecognition Started Successfully]");
       } catch (e) {
+        console.error("[SpeechRecognition Start Exception]:", e);
         if (onError) onError(e.message || "Failed to start speech recognition");
         if (onEnd) onEnd();
       }
@@ -75,6 +114,7 @@
     };
 
     window.stopSpeechRecognition = function() {
+      _isContinuousListening = false;
       if (_activeRecognition) {
         try { _activeRecognition.abort(); } catch(e){}
         _activeRecognition = null;

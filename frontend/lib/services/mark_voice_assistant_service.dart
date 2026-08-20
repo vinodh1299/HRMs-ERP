@@ -11,12 +11,12 @@ class MarkVoiceAssistantService {
   static final ValueNotifier<bool> markEnabledNotifier = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> isAwakeNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<String> lastCommandNotifier = ValueNotifier<String>('');
-  static final ValueNotifier<String> lastResponseNotifier = ValueNotifier<String>('Mark Listening... (Say "Hey Mark")');
+  static final ValueNotifier<String> lastResponseNotifier = ValueNotifier<String>('🎙️ Mark Listening... (Say "Hey Mark")');
   static BuildContext? globalContext;
 
   static final _hrmsAiService = HrmsAiApiService();
 
-  /// Initialize Mark Assistant
+  /// Initialize Mark Assistant on app startup
   static void initMarkAssistant(BuildContext context) {
     globalContext = context;
     if (markEnabledNotifier.value) {
@@ -107,7 +107,7 @@ class MarkVoiceAssistantService {
     }
 
     if (command.isEmpty || command == 'hello' || command == 'hey' || command == 'hi') {
-      const resp = "Hello! I am Mark. I can navigate screens, apply leaves, or send messages for you.";
+      const resp = "Hello! I am Mark. How can I assist you in the portal today?";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🎙️ Mark: $resp');
