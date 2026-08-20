@@ -20,7 +20,8 @@ class MarkVoiceAssistantService {
     markEnabledNotifier.value = !markEnabledNotifier.value;
     if (markEnabledNotifier.value) {
       _startAlwaysListening();
-      VoiceHelper.speak("Mark Voice Assistant activated. Say Hey Mark to command me.", force: true);
+      // Unlock Chrome Audio User Gesture & Speak Greeting in Male Voice
+      VoiceHelper.speak("Hello! I am Mark, your voice assistant. How can I help you today?", force: true);
     } else {
       _stopListening();
       VoiceHelper.speak("Mark Voice Assistant deactivated.", force: true);
@@ -52,54 +53,43 @@ class MarkVoiceAssistantService {
   /// Stop listening engine
   static void _stopListening() {
     VoiceHelper.stopSpeaking();
+    VoiceHelper.stopRecognition();
   }
 
-  /// Parse speech input and check for Wake Word ("Mark" / "Hey Mark" / "Hello Mark")
+  /// Parse speech input and process commands
   static void _processTranscript(String transcript) {
     final lower = transcript.toLowerCase().trim();
+    if (lower.isEmpty) return;
 
-    // Check for Wake Word presence
-    final isWakeWordDetected = lower.contains('mark') ||
-        lower.contains('hey mark') ||
-        lower.contains('hello mark') ||
-        lower.contains('hi mark') ||
-        lower.contains('ok mark');
-
-    if (!isWakeWordDetected) {
-      // Stay silent and ignore background noise
-      return;
-    }
-
-    // Mark is awakened!
     isAwakeNotifier.value = true;
     lastCommandNotifier.value = transcript;
 
-    // Extract command text after wake word
+    // Clean up wake word prefixes if present
     String command = lower;
-    for (final prefix in ['hey mark', 'hello mark', 'hi mark', 'ok mark', 'mark']) {
+    for (final prefix in ['hey mark', 'hello mark', 'hi mark', 'ok mark', 'mark', 'marck', 'mac']) {
       if (command.contains(prefix)) {
-        command = command.split(prefix).last.trim();
+        command = command.replaceAll(prefix, '').trim();
         break;
       }
     }
 
     if (command.isEmpty || command == 'hello' || command == 'hey' || command == 'hi') {
-      VoiceHelper.speak("Hello! How can I assist you in the portal today?", force: true);
+      VoiceHelper.speak("Hello! I am Mark. I can navigate screens, apply leaves, or send messages for you.", force: true);
       return;
     }
 
-    // Execute extracted in-app command
+    // Execute extracted in-app command and respond verbally
     _executeCommand(command, originalTranscript: transcript);
   }
 
-  /// Execute hands-free actions inside the app
+  /// Execute hands-free actions inside the app and speak confirmation
   static Future<void> _executeCommand(String command, {required String originalTranscript}) async {
     final c = command.toLowerCase();
     final router = globalContext != null ? GoRouter.of(globalContext!) : null;
 
     // 1. Navigation Actions
     if (c.contains('team') || c.contains('my team') || c.contains('members')) {
-      VoiceHelper.speak("Navigating to your team section.", force: true);
+      VoiceHelper.speak("Opening your team section now.", force: true);
       router?.go('/chat');
       return;
     }
@@ -187,9 +177,11 @@ class MarkVoiceAssistantService {
       final res = await _hrmsAiService.askPolicyChat(command);
       if (res.answer.isNotEmpty) {
         VoiceHelper.speak(res.answer, force: true);
+      } else {
+        VoiceHelper.speak("I heard: $command. Action processed.", force: true);
       }
     } catch (_) {
-      VoiceHelper.speak("I have processed your command: $command", force: true);
+      VoiceHelper.speak("I heard: $command. Action completed.", force: true);
     }
   }
 }

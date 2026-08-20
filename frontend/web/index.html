@@ -23,6 +23,14 @@
     var _currentSpeechEndCallback = null;
     var _activeRecognition = null;
 
+    // Force voice initialization on page load
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = function() {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
     // Speech Recognition Helper
     window.startSpeechRecognition = function(onResult, onError, onEnd, continuous) {
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -76,7 +84,7 @@
       var voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return null;
 
-      // Priority list for natural male voices
+      // Priority list for clear male voices
       var maleKeywords = ['male', 'daniel', 'alex', 'oliver', 'george', 'david', 'arthur', 'ryan', 'aaron', 'google uk english male', 'google us english male'];
       
       for (var i = 0; i < maleKeywords.length; i++) {
@@ -91,16 +99,11 @@
       return voices.find(function(v) { return v.lang.startsWith('en'); }) || voices[0];
     }
 
-    // Ensure voices are loaded
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = function() {
-        getBestMaleVoice();
-      };
-    }
-
     // High-Quality Male Voice Synthesis Routine
     window.speakText = function(text, onStart, onEnd) {
       if (!('speechSynthesis' in window)) return;
+      
+      // Cancel any ongoing speech
       window.speechSynthesis.cancel();
 
       var cleanText = String(text)
@@ -135,6 +138,12 @@
       };
 
       _currentSpeechEndCallback = onEnd;
+
+      // Resume speech synthesis engine in case browser paused audio queue
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+
       window.speechSynthesis.speak(utterance);
     };
 
