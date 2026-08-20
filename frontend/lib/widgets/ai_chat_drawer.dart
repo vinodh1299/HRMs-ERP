@@ -10,7 +10,7 @@ class AiChatDrawer extends StatefulWidget {
 
   const AiChatDrawer({
     super.key,
-    this.backendUrl = 'http://localhost:4001/api/ai',
+    this.backendUrl = 'http://localhost:3001/api/ai',
   });
 
   @override
@@ -121,7 +121,6 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
           isUser: false,
           timestamp: DateTime.now(),
         ));
-        VoiceHelper.speak(reply);
       } else if (_isActionAgentMode) {
         final outcomes = await _apiService.sendAgentAction(text);
         for (var outcome in outcomes) {
@@ -132,7 +131,6 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
             timestamp: DateTime.now(),
             agentOutcome: outcome,
           ));
-          VoiceHelper.speak(outcome.message);
         }
       } else {
         final chatRes = await _apiService.askPolicyChat(text);
@@ -143,7 +141,6 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
           timestamp: DateTime.now(),
           sources: chatRes.sources,
         ));
-        VoiceHelper.speak(chatRes.answer);
       }
     } catch (e) {
       _messages.add(ChatMessage(

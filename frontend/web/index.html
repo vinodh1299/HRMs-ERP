@@ -1,24 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Asian Christian Academy HRMS Portal">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -33,31 +19,31 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
   <script>
     var _currentSpeechEndCallback = null;
+    var _activeRecognition = null;
 
-    window.startSpeechRecognition = function(onResult, onError, onEnd) {
+    // Speech Recognition Helper
+    window.startSpeechRecognition = function(onResult, onError, onEnd, continuous) {
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         if (onError) onError("Speech recognition not supported in this browser.");
         if (onEnd) onEnd();
         return null;
       }
+
+      if (_activeRecognition) {
+        try { _activeRecognition.abort(); } catch(e){}
+      }
+
       var recognition = new SpeechRecognition();
-      recognition.continuous = false;
+      recognition.continuous = !!continuous;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
 
       recognition.onresult = function(event) {
-        var text = event.results[0][0].transcript;
+        var lastResultIndex = event.results.length - 1;
+        var text = event.results[lastResultIndex][0].transcript;
         if (onResult) onResult(text);
       };
       recognition.onerror = function(event) {
@@ -66,8 +52,10 @@
       recognition.onend = function() {
         if (onEnd) onEnd();
       };
+
       try {
         recognition.start();
+        _activeRecognition = recognition;
       } catch (e) {
         if (onError) onError(e.message || "Failed to start speech recognition");
         if (onEnd) onEnd();
@@ -75,12 +63,49 @@
       return recognition;
     };
 
+    window.stopSpeechRecognition = function() {
+      if (_activeRecognition) {
+        try { _activeRecognition.abort(); } catch(e){}
+        _activeRecognition = null;
+      }
+    };
+
+    // Preferred Male Voice Selection Routine for "Mark"
+    function getBestMaleVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      var voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      // Priority list for natural male voices
+      var maleKeywords = ['male', 'daniel', 'alex', 'oliver', 'george', 'david', 'arthur', 'ryan', 'aaron', 'google uk english male', 'google us english male'];
+      
+      for (var i = 0; i < maleKeywords.length; i++) {
+        var kw = maleKeywords[i];
+        var found = voices.find(function(v) {
+          return v.name.toLowerCase().includes(kw) && v.lang.startsWith('en');
+        });
+        if (found) return found;
+      }
+
+      // Secondary fallback to English voice
+      return voices.find(function(v) { return v.lang.startsWith('en'); }) || voices[0];
+    }
+
+    // Ensure voices are loaded
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = function() {
+        getBestMaleVoice();
+      };
+    }
+
+    // High-Quality Male Voice Synthesis Routine
     window.speakText = function(text, onStart, onEnd) {
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
+
       var cleanText = String(text)
         .replace(/[\#\*\_\`\~]/g, '')
-        .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋|⚠️|🚫/g, '')
+        .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋|⚠️|🚫|🎙️|🔊/g, '')
         .replace(/\s+/g, ' ')
         .trim();
       
@@ -91,8 +116,13 @@
 
       var utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.0;
-      utterance.pitch = 1.0;
+      utterance.pitch = 0.9; // Clear, deep male voice tone
       utterance.lang = 'en-US';
+
+      var maleVoice = getBestMaleVoice();
+      if (maleVoice) {
+        utterance.voice = maleVoice;
+      }
 
       utterance.onstart = function() {
         if (onStart) onStart();

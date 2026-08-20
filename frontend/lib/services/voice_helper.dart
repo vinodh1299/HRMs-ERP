@@ -3,7 +3,8 @@ import 'voice_helper_stub.dart'
     if (dart.library.js_interop) 'voice_helper_web.dart';
 
 abstract class VoiceHelper {
-  static final ValueNotifier<bool> autoSpeakNotifier = ValueNotifier<bool>(true);
+  // Turn autoSpeak off by default so chatbot text responses are NOT read automatically
+  static final ValueNotifier<bool> autoSpeakNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isSpeakingNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isListeningNotifier = ValueNotifier<bool>(false);
 
@@ -14,9 +15,11 @@ abstract class VoiceHelper {
     required void Function(String text) onResult,
     required void Function(String error) onError,
     required void Function() onEnd,
+    bool continuous = false,
   }) {
     isListeningNotifier.value = true;
     VoiceHelperImpl.startRecognition(
+      continuous: continuous,
       onResult: (text) {
         onResult(text);
       },
@@ -29,6 +32,11 @@ abstract class VoiceHelper {
         onEnd();
       },
     );
+  }
+
+  static void stopRecognition() {
+    VoiceHelperImpl.stopRecognition();
+    isListeningNotifier.value = false;
   }
 
   static void speak(String text, {bool force = false}) {
@@ -67,7 +75,7 @@ abstract class VoiceHelper {
     } else if (cleanPath.contains('/mail')) {
       return "You are on the Mail module. You have 2 unread emails regarding payroll updates and team announcements.";
     } else if (cleanPath.contains('/chat')) {
-      return "Welcome to Teams Chat. You have active discussions with HR Support, your Manager, and the Gemini AI Assistant.";
+      return "Welcome to Teams Chat. You have active discussions with HR Support, your Manager, and the Mark AI Assistant.";
     } else if (cleanPath.contains('/org')) {
       return "You are viewing the Organization Directory. You can explore company structure, team rosters, and staff contacts.";
     } else if (cleanPath.contains('/admin')) {
@@ -75,7 +83,7 @@ abstract class VoiceHelper {
     } else if (cleanPath.contains('/manager')) {
       return "Welcome to the Manager Panel. You can view direct reports, approve team leave requests, and track attendance records.";
     } else {
-      return "You are currently on the ACA HRMS Portal. Use the voice assistant or menu to navigate modules and complete actions.";
+      return "You are currently on the ACA HRMS Portal. Use Mark voice assistant or menu to navigate modules and complete actions.";
     }
   }
 
@@ -85,4 +93,3 @@ abstract class VoiceHelper {
     speak(summary, force: true);
   }
 }
-

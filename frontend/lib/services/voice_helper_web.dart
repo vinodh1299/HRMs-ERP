@@ -1,7 +1,10 @@
 import 'dart:js_interop';
 
 @JS('startSpeechRecognition')
-external void _jsStartSpeechRecognition(JSFunction onResult, JSFunction onError, JSFunction onEnd);
+external void _jsStartSpeechRecognition(JSFunction onResult, JSFunction onError, JSFunction onEnd, JSBoolean continuous);
+
+@JS('stopSpeechRecognition')
+external void _jsStopSpeechRecognition();
 
 @JS('speakText')
 external void _jsSpeakText(JSString text, JSFunction? onStart, JSFunction? onEnd);
@@ -17,17 +20,25 @@ class VoiceHelperImpl {
     required void Function(String text) onResult,
     required void Function(String error) onError,
     required void Function() onEnd,
+    bool continuous = false,
   }) {
     try {
       _jsStartSpeechRecognition(
         ((JSString text) => onResult(text.toDart)).toJS,
         ((JSString error) => onError(error.toDart)).toJS,
         (() => onEnd()).toJS,
+        continuous.toJS,
       );
     } catch (e) {
       onError("Speech recognition error: $e");
       onEnd();
     }
+  }
+
+  static void stopRecognition() {
+    try {
+      _jsStopSpeechRecognition();
+    } catch (_) {}
   }
 
   static void speak(String text, {void Function()? onStart, void Function()? onEnd}) {
@@ -54,4 +65,3 @@ class VoiceHelperImpl {
     }
   }
 }
-
