@@ -17,6 +17,29 @@ class PendingVoiceAction {
   });
 }
 
+/// ConversationalSessionMemory for Multi-Turn Voice State & Context Tracking
+class ConversationalSessionMemory {
+  static String? lastDomain; // e.g. 'leave', 'messaging', 'helpdesk', 'finance', 'policy'
+  static String? lastAction; // e.g. 'apply_leave', 'send_message', 'send_email'
+  static Map<String, String> contextParams = {};
+  static List<String> turnHistory = [];
+
+  static void recordTurn(String userQuery, String markReply, {String? domain, String? action}) {
+    if (domain != null) lastDomain = domain;
+    if (action != null) lastAction = action;
+    turnHistory.add('User: $userQuery');
+    turnHistory.add('Mark: $markReply');
+    if (turnHistory.length > 10) turnHistory.removeRange(0, 2);
+  }
+
+  static void reset() {
+    lastDomain = null;
+    lastAction = null;
+    contextParams.clear();
+    turnHistory.clear();
+  }
+}
+
 /// MarkVoiceAssistantService
 /// Always-Listening Voice Assistant ("Mark") for Asian Christian Academy HRMS Portal.
 class MarkVoiceAssistantService {
@@ -61,6 +84,7 @@ class MarkVoiceAssistantService {
     } else {
       _stopListening();
       pendingActionNotifier.value = null;
+      ConversationalSessionMemory.reset();
       const farewell = "Mark Voice Assistant deactivated.";
       lastResponseNotifier.value = farewell;
       VoiceHelper.speak(farewell, force: true);
@@ -91,6 +115,7 @@ class MarkVoiceAssistantService {
 
     const resp = "Confirmed! Action executed successfully.";
     lastResponseNotifier.value = resp;
+    ConversationalSessionMemory.recordTurn('Confirm', resp);
     VoiceHelper.speak(resp, force: true);
     _showFeedbackSnackBar('✅ Mark: $resp');
   }
@@ -100,6 +125,7 @@ class MarkVoiceAssistantService {
     pendingActionNotifier.value = null;
     const resp = "Action cancelled.";
     lastResponseNotifier.value = resp;
+    ConversationalSessionMemory.recordTurn('Cancel', resp);
     VoiceHelper.speak(resp, force: true);
     _showFeedbackSnackBar('🚫 Mark: $resp');
   }
@@ -132,7 +158,7 @@ class MarkVoiceAssistantService {
     VoiceHelper.stopRecognition();
   }
 
-  /// Parse speech input and process commands
+  /// Parse speech input and process commands with Multi-Turn Memory
   static void _processTranscript(String transcript) {
     final lower = transcript.toLowerCase().trim();
     if (lower.isEmpty) return;
@@ -140,20 +166,78 @@ class MarkVoiceAssistantService {
     isAwakeNotifier.value = true;
     lastCommandNotifier.value = transcript;
 
-    // 1. Check if we are waiting for a Verbal Read-Back Confirmation ("YES" or "NO")
+    // =========================================================
+    // 1. Check for Multi-Turn Action Modifications (Pending Confirmation)
+    // =========================================================
     if (pendingActionNotifier.value != null) {
+      final currentPending = pendingActionNotifier.value!;
+      final router = globalContext != null ? GoRouter.of(globalContext!) : null;
+
+      // Check for Confirmation ("YES")
       if (lower.contains('yes') || lower.contains('yeah') || lower.contains('yup') || lower.contains('confirm') || lower.contains('do it') || lower.contains('ok') || lower.contains('sure') || lower.contains('proceed')) {
         confirmPendingAction();
         return;
       }
+      // Check for Cancellation ("NO")
       if (lower.contains('no') || lower.contains('cancel') || lower.contains('stop') || lower.contains('never mind') || lower.contains('dont') || lower.contains("don't") || lower.contains('abort')) {
         cancelPendingAction();
         return;
       }
 
+      // Check for Multi-Turn Leave Parameter Modifications
+      if (currentPending.actionTitle.contains('Apply') && (lower.contains('sick') || lower.contains('casual') || lower.contains('make it') || lower.contains('change to'))) {
+        String newLeaveType = 'Sick Leave';
+        if (lower.contains('casual')) newLeaveType = 'Casual Leave';
+
+        final updatedReadBack = "Updated! You want to apply for $newLeaveType. Say YES to confirm, or CANCEL to abort.";
+        pendingActionNotifier.value = PendingVoiceAction(
+          actionTitle: 'Apply $newLeaveType',
+          readBackText: updatedReadBack,
+          onExecute: () {
+            router?.go('/me');
+          },
+        );
+
+        lastResponseNotifier.value = '⚠️ Updated: $updatedReadBack';
+        VoiceHelper.speak(updatedReadBack, force: true);
+        _showFeedbackSnackBar('⚠️ Mark Updated: $updatedReadBack');
+        return;
+      }
+
+      // Check for Multi-Turn Message Recipient Modifications
+      if (currentPending.actionTitle.contains('Send message') && (lower.contains('john') || lower.contains('jane') || lower.contains('vinodh') || lower.contains('instead') || lower.contains('send to'))) {
+        String newTarget = 'John Doe';
+        if (lower.contains('jane')) newTarget = 'Jane Smith';
+        if (lower.contains('vinodh')) newTarget = 'Vinodh';
+
+        final originalMsg = ConversationalSessionMemory.contextParams['messageText'] ?? 'I am on the way';
+        final updatedReadBack = "Updated recipient to $newTarget. Say YES to confirm, or CANCEL to abort.";
+        
+        pendingActionNotifier.value = PendingVoiceAction(
+          actionTitle: 'Send message to $newTarget',
+          readBackText: updatedReadBack,
+          onExecute: () {
+            ChatService.addMessage(
+              newTarget,
+              TeamChatMessage(
+                sender: 'Me',
+                text: originalMsg,
+                timestamp: DateTime.now(),
+                isMe: true,
+              ),
+            );
+            router?.go('/chat');
+          },
+        );
+
+        lastResponseNotifier.value = '⚠️ Updated: $updatedReadBack';
+        VoiceHelper.speak(updatedReadBack, force: true);
+        _showFeedbackSnackBar('⚠️ Mark Updated: $updatedReadBack');
+        return;
+      }
+
       // If user says something else, remind them of read-back confirmation
-      final pending = pendingActionNotifier.value!;
-      final reminder = 'Confirmation required: ${pending.readBackText}';
+      final reminder = 'Confirmation required: ${currentPending.readBackText}';
       lastResponseNotifier.value = reminder;
       VoiceHelper.speak(reminder, force: true);
       return;
@@ -171,6 +255,7 @@ class MarkVoiceAssistantService {
     if (command.isEmpty || command == 'hello' || command == 'hey' || command == 'hi') {
       const resp = "Hello! I am Mark. How can I assist you in the portal today?";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(transcript, resp);
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🎙️ Mark: $resp');
       return;
@@ -180,7 +265,7 @@ class MarkVoiceAssistantService {
     _executeCommand(command, originalTranscript: transcript);
   }
 
-  /// Execute hands-free actions inside the app and speak confirmation
+  /// Execute hands-free actions inside the app and speak confirmation with Session Memory
   static Future<void> _executeCommand(String command, {required String originalTranscript}) async {
     final c = command.toLowerCase();
     final router = globalContext != null ? GoRouter.of(globalContext!) : null;
@@ -191,6 +276,7 @@ class MarkVoiceAssistantService {
     if (c.contains('chat') || c.contains('message') || c.contains('messages') || c.contains('messaging') || c.contains('team') || c.contains('my team') || c.contains('members') || c.contains('conversation')) {
       const resp = "Opening your team chat section now.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'messaging', action: 'navigate_chat');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🚀 Mark: $resp');
       router?.go('/chat');
@@ -200,6 +286,7 @@ class MarkVoiceAssistantService {
     if (c.contains('helpdesk') || c.contains('help desk') || c.contains('ticket') || c.contains('tickets') || c.contains('support') || c.contains('issue')) {
       const resp = "Opening Helpdesk support portal.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'helpdesk', action: 'navigate_helpdesk');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🎫 Mark: $resp');
       router?.go('/helpdesk');
@@ -209,6 +296,7 @@ class MarkVoiceAssistantService {
     if (c.contains('leave balances') || c.contains('my leaves') || c.contains('holidays') || c.contains('profile overview')) {
       const resp = "Opening your leave balances and profile overview.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'leave', action: 'navigate_leave');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('📅 Mark: $resp');
       router?.go('/me');
@@ -218,6 +306,7 @@ class MarkVoiceAssistantService {
     if (c.contains('finance') || c.contains('finances') || c.contains('pay') || c.contains('salary') || c.contains('payslip') || c.contains('payroll') || c.contains('expense')) {
       const resp = "Opening your finance overview.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'finance', action: 'navigate_finances');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('💰 Mark: $resp');
       router?.go('/finances');
@@ -227,6 +316,7 @@ class MarkVoiceAssistantService {
     if (c.contains('mail') || c.contains('email') || c.contains('inbox')) {
       const resp = "Opening your email inbox.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'mail', action: 'navigate_mail');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('📧 Mark: $resp');
       router?.go('/mail');
@@ -236,6 +326,7 @@ class MarkVoiceAssistantService {
     if (c.contains('org') || c.contains('organization') || c.contains('directory') || c.contains('employees') || c.contains('structure')) {
       const resp = "Opening Organization directory.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'org', action: 'navigate_org');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('👥 Mark: $resp');
       router?.go('/org');
@@ -245,6 +336,7 @@ class MarkVoiceAssistantService {
     if (c.contains('dashboard') || c.contains('home') || c.contains('main')) {
       const resp = "Navigating to Home Dashboard.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'home', action: 'navigate_home');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🏠 Mark: $resp');
       router?.go('/');
@@ -254,6 +346,7 @@ class MarkVoiceAssistantService {
     if (c.contains('admin') || c.contains('control panel') || c.contains('settings') || c.contains('manager')) {
       const resp = "Opening Admin Control Panel.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'admin', action: 'navigate_admin');
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('⚙️ Mark: $resp');
       router?.go('/admin');
@@ -261,13 +354,17 @@ class MarkVoiceAssistantService {
     }
 
     // ==========================================
-    // Tier 2: State-Changing Actions (Verbal Read-Back Gated)
+    // Tier 2: State-Changing Actions (Verbal Read-Back Gated with Multi-Turn Memory)
     // ==========================================
 
     // Action A: Apply Leave
     if (c.contains('apply leave') || c.contains('apply for leave') || c.contains('casual leave') || c.contains('sick leave') || c.contains('time off')) {
       String leaveType = 'Casual Leave';
       if (c.contains('sick')) leaveType = 'Sick Leave';
+
+      ConversationalSessionMemory.contextParams['leaveType'] = leaveType;
+      ConversationalSessionMemory.lastDomain = 'leave';
+      ConversationalSessionMemory.lastAction = 'apply_leave';
 
       final readBackText = "You want to apply for $leaveType. Say YES to confirm, or CANCEL to abort.";
       
@@ -280,6 +377,7 @@ class MarkVoiceAssistantService {
       );
 
       lastResponseNotifier.value = '⚠️ Confirmation Required: $readBackText';
+      ConversationalSessionMemory.recordTurn(command, readBackText);
       VoiceHelper.speak(readBackText, force: true);
       _showFeedbackSnackBar('⚠️ Mark Read-Back: $readBackText');
       return;
@@ -302,6 +400,11 @@ class MarkVoiceAssistantService {
         messageText = command.split('that').last.trim();
       }
 
+      ConversationalSessionMemory.contextParams['target'] = target;
+      ConversationalSessionMemory.contextParams['messageText'] = messageText;
+      ConversationalSessionMemory.lastDomain = 'messaging';
+      ConversationalSessionMemory.lastAction = 'send_message';
+
       final readBackText = "You want to send a message to $target. Say YES to confirm, or CANCEL to abort.";
 
       pendingActionNotifier.value = PendingVoiceAction(
@@ -322,6 +425,7 @@ class MarkVoiceAssistantService {
       );
 
       lastResponseNotifier.value = '⚠️ Confirmation Required: $readBackText';
+      ConversationalSessionMemory.recordTurn(command, readBackText);
       VoiceHelper.speak(readBackText, force: true);
       _showFeedbackSnackBar('⚠️ Mark Read-Back: $readBackText');
       return;
@@ -340,7 +444,12 @@ class MarkVoiceAssistantService {
         emailBody = command.split('that').last.trim();
       }
 
-      final readBackText = "You want to send an email to $target containing: $emailBody. Say YES to confirm, or CANCEL to abort.";
+      ConversationalSessionMemory.contextParams['target'] = target;
+      ConversationalSessionMemory.contextParams['emailBody'] = emailBody;
+      ConversationalSessionMemory.lastDomain = 'mail';
+      ConversationalSessionMemory.lastAction = 'send_email';
+
+      final readBackText = "You want to send an email to $target. Say YES to confirm, or CANCEL to abort.";
 
       pendingActionNotifier.value = PendingVoiceAction(
         actionTitle: 'Send email to $target',
@@ -351,27 +460,38 @@ class MarkVoiceAssistantService {
       );
 
       lastResponseNotifier.value = '⚠️ Confirmation Required: $readBackText';
+      ConversationalSessionMemory.recordTurn(command, readBackText);
       VoiceHelper.speak(readBackText, force: true);
       _showFeedbackSnackBar('⚠️ Mark Read-Back: $readBackText');
       return;
     }
 
-    // Default: Query HRMS-AI Engine for general policy or complex intents
+    // ==========================================
+    // Multi-Turn Policy Follow-Up Queries
+    // ==========================================
+    String queryPrompt = command;
+    if (ConversationalSessionMemory.lastDomain != null && (c.contains('what about') || c.contains('how about') || c.contains('how many') || c.contains('what is the'))) {
+      queryPrompt = '${ConversationalSessionMemory.lastDomain} policy details for: $command';
+    }
+
     try {
-      final res = await _hrmsAiService.askPolicyChat(command);
+      final res = await _hrmsAiService.askPolicyChat(queryPrompt);
       if (res.answer.isNotEmpty) {
         lastResponseNotifier.value = res.answer;
+        ConversationalSessionMemory.recordTurn(command, res.answer, domain: 'policy');
         VoiceHelper.speak(res.answer, force: true);
         _showFeedbackSnackBar('🤖 Mark: ${res.answer}');
       } else {
         final resp = "I heard: $command. Action processed.";
         lastResponseNotifier.value = resp;
+        ConversationalSessionMemory.recordTurn(command, resp);
         VoiceHelper.speak(resp, force: true);
         _showFeedbackSnackBar('🤖 Mark: $resp');
       }
     } catch (_) {
       final resp = "I heard: $command. Action completed.";
       lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp);
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🤖 Mark: $resp');
     }
