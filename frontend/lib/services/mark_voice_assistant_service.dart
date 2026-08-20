@@ -10,6 +10,7 @@ class MarkVoiceAssistantService {
   static final ValueNotifier<bool> markEnabledNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isAwakeNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<String> lastCommandNotifier = ValueNotifier<String>('');
+  static final ValueNotifier<String> lastResponseNotifier = ValueNotifier<String>('');
   static BuildContext? globalContext;
 
   static final _hrmsAiService = HrmsAiApiService();
@@ -18,13 +19,36 @@ class MarkVoiceAssistantService {
   static void toggleMarkAssistant(BuildContext context) {
     globalContext = context;
     markEnabledNotifier.value = !markEnabledNotifier.value;
+
     if (markEnabledNotifier.value) {
       _startAlwaysListening();
-      // Unlock Chrome Audio User Gesture & Speak Greeting in Male Voice
-      VoiceHelper.speak("Hello! I am Mark, your voice assistant. How can I help you today?", force: true);
+      const greeting = "Hello! I am Mark, your voice assistant. How can I help you today?";
+      lastResponseNotifier.value = greeting;
+      
+      // Speak out loud in Male voice
+      VoiceHelper.speak(greeting, force: true);
+
+      // Show visual notification banner
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🎙️ Mark Voice Assistant Activated — Say your command or "Hey Mark"'),
+          backgroundColor: Colors.blueAccent,
+          duration: Duration(seconds: 3),
+        ),
+      );
     } else {
       _stopListening();
-      VoiceHelper.speak("Mark Voice Assistant deactivated.", force: true);
+      const farewell = "Mark Voice Assistant deactivated.";
+      lastResponseNotifier.value = farewell;
+      VoiceHelper.speak(farewell, force: true);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🔇 Mark Voice Assistant Deactivated'),
+          backgroundColor: Colors.grey,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -74,7 +98,10 @@ class MarkVoiceAssistantService {
     }
 
     if (command.isEmpty || command == 'hello' || command == 'hey' || command == 'hi') {
-      VoiceHelper.speak("Hello! I am Mark. I can navigate screens, apply leaves, or send messages for you.", force: true);
+      const resp = "Hello! I am Mark. I can navigate screens, apply leaves, or send messages for you.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('🎙️ Mark: $resp');
       return;
     }
 
@@ -89,37 +116,55 @@ class MarkVoiceAssistantService {
 
     // 1. Navigation Actions
     if (c.contains('team') || c.contains('my team') || c.contains('members')) {
-      VoiceHelper.speak("Opening your team section now.", force: true);
+      const resp = "Opening your team section now.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('🚀 Mark: $resp');
       router?.go('/chat');
       return;
     }
 
     if (c.contains('helpdesk') || c.contains('ticket') || c.contains('support')) {
-      VoiceHelper.speak("Opening Helpdesk portal.", force: true);
+      const resp = "Opening Helpdesk portal.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('🎫 Mark: $resp');
       router?.go('/helpdesk');
       return;
     }
 
     if (c.contains('leave') || c.contains('holiday') || c.contains('sick leave') || c.contains('casual leave')) {
-      VoiceHelper.speak("Opening your leave balances.", force: true);
+      const resp = "Opening your leave balances.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('📅 Mark: $resp');
       router?.go('/me');
       return;
     }
 
     if (c.contains('finance') || c.contains('pay') || c.contains('salary') || c.contains('payslip')) {
-      VoiceHelper.speak("Opening your finance overview.", force: true);
+      const resp = "Opening your finance overview.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('💰 Mark: $resp');
       router?.go('/finances');
       return;
     }
 
     if (c.contains('dashboard') || c.contains('home')) {
-      VoiceHelper.speak("Navigating to Home Dashboard.", force: true);
+      const resp = "Navigating to Home Dashboard.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('🏠 Mark: $resp');
       router?.go('/');
       return;
     }
 
     if (c.contains('admin') || c.contains('control panel')) {
-      VoiceHelper.speak("Opening Admin Panel.", force: true);
+      const resp = "Opening Admin Panel.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('⚙️ Mark: $resp');
       router?.go('/admin');
       return;
     }
@@ -151,7 +196,10 @@ class MarkVoiceAssistantService {
         ),
       );
 
-      VoiceHelper.speak("Message sent to $target.", force: true);
+      final resp = "Message sent to $target.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('💬 Mark: $resp');
       return;
     }
 
@@ -168,7 +216,10 @@ class MarkVoiceAssistantService {
         emailBody = command.split('that').last.trim();
       }
 
-      VoiceHelper.speak("Sending email to $target with content: $emailBody", force: true);
+      final resp = "Sending email to $target with content: $emailBody";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('📧 Mark: Email dispatched to $target');
       return;
     }
 
@@ -176,12 +227,35 @@ class MarkVoiceAssistantService {
     try {
       final res = await _hrmsAiService.askPolicyChat(command);
       if (res.answer.isNotEmpty) {
+        lastResponseNotifier.value = res.answer;
         VoiceHelper.speak(res.answer, force: true);
+        _showFeedbackSnackBar('🤖 Mark: ${res.answer}');
       } else {
-        VoiceHelper.speak("I heard: $command. Action processed.", force: true);
+        final resp = "I heard: $command. Action processed.";
+        lastResponseNotifier.value = resp;
+        VoiceHelper.speak(resp, force: true);
+        _showFeedbackSnackBar('🤖 Mark: $resp');
       }
     } catch (_) {
-      VoiceHelper.speak("I heard: $command. Action completed.", force: true);
+      final resp = "I heard: $command. Action completed.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('🤖 Mark: $resp');
     }
+  }
+
+  static void _showFeedbackSnackBar(String text) {
+    if (globalContext == null) return;
+    try {
+      ScaffoldMessenger.of(globalContext!).hideCurrentSnackBar();
+      ScaffoldMessenger.of(globalContext!).showSnackBar(
+        SnackBar(
+          content: Text(text),
+          backgroundColor: Colors.blueGrey.shade900,
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {}
   }
 }

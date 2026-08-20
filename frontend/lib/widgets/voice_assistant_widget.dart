@@ -37,7 +37,6 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> with Single
 
   void _showVoiceModal(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
-    final contextSummary = VoiceHelper.getScreenContextSummary(location);
 
     showModalBottomSheet(
       context: context,
@@ -55,195 +54,234 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> with Single
                     return ValueListenableBuilder<bool>(
                       valueListenable: VoiceHelper.isListeningNotifier,
                       builder: (context, isListening, _) {
-                        return Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(28),
-                              topRight: Radius.circular(28),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Handle pill bar
-                              Container(
-                                width: 40,
-                                height: 4,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.borderGrey,
-                                  borderRadius: BorderRadius.circular(2),
+                        return ValueListenableBuilder<String>(
+                          valueListenable: MarkVoiceAssistantService.lastResponseNotifier,
+                          builder: (context, lastResponse, _) {
+                            return Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(28),
+                                  topRight: Radius.circular(28),
                                 ),
                               ),
-                              const SizedBox(height: 20),
-
-                              // Header with Mark Toggle Switch
-                              Row(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  // Handle pill bar
                                   Container(
-                                    padding: const EdgeInsets.all(10),
+                                    width: 40,
+                                    height: 4,
                                     decoration: BoxDecoration(
-                                      gradient: markEnabled ? AppTheme.primaryGradient : null,
-                                      color: markEnabled ? null : Colors.grey.shade300,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      markEnabled ? Icons.graphic_eq_rounded : Icons.mic_off_rounded,
-                                      color: Colors.white,
-                                      size: 24,
+                                      color: AppTheme.borderGrey,
+                                      borderRadius: BorderRadius.circular(2),
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Mark — Voice Assistant',
-                                          style: TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppTheme.textDark,
-                                          ),
-                                        ),
-                                        Text(
-                                          markEnabled
-                                              ? '🎙️ Always-Listening (Say "Hey Mark")'
-                                              : 'OFF — Tap switch to activate Mark',
-                                          style: TextStyle(
-                                            fontSize: 12.5,
-                                            color: markEnabled ? AppTheme.primary : AppTheme.textMuted,
-                                            fontWeight: markEnabled ? FontWeight.bold : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Mark Assistant ON/OFF Toggle Switch
-                                  Switch.adaptive(
-                                    value: markEnabled,
-                                    activeColor: AppTheme.primary,
-                                    onChanged: (val) {
-                                      MarkVoiceAssistantService.toggleMarkAssistant(context);
-                                      setModalState(() {});
-                                    },
-                                  ),
-                                ],
-                              ),
+                                  const SizedBox(height: 20),
 
-                              const SizedBox(height: 20),
-
-                              // Screen Context Card
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.bgLight,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppTheme.borderGrey),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Row(
+                                  // Header with Mark Toggle Switch
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          gradient: markEnabled ? AppTheme.primaryGradient : null,
+                                          color: markEnabled ? null : Colors.grey.shade300,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          markEnabled ? Icons.graphic_eq_rounded : Icons.mic_off_rounded,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Icon(Icons.info_outline_rounded, size: 16, color: AppTheme.primary),
-                                            SizedBox(width: 6),
-                                            Text(
-                                              'Hands-Free Voice Commands',
+                                            const Text(
+                                              'Mark — Voice Assistant',
                                               style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 17,
                                                 fontWeight: FontWeight.bold,
-                                                color: AppTheme.primary,
+                                                color: AppTheme.textDark,
+                                              ),
+                                            ),
+                                            Text(
+                                              markEnabled
+                                                  ? (isSpeaking ? '🔊 Mark Speaking...' : '🎙️ Mark Listening (Say "Hey Mark")')
+                                                  : 'OFF — Tap switch to activate Mark',
+                                              style: TextStyle(
+                                                fontSize: 12.5,
+                                                color: markEnabled ? AppTheme.primary : AppTheme.textMuted,
+                                                fontWeight: markEnabled ? FontWeight.bold : FontWeight.normal,
                                               ),
                                             ),
                                           ],
                                         ),
-                                        InkWell(
-                                          onTap: () {
-                                            if (isSpeaking) {
-                                              VoiceHelper.stopSpeaking();
-                                            } else {
-                                              VoiceHelper.readScreenContext(location);
-                                            }
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: AppTheme.primary.withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
+                                      ),
+                                      // Mark Assistant ON/OFF Toggle Switch
+                                      Switch.adaptive(
+                                        value: markEnabled,
+                                        activeTrackColor: AppTheme.primary,
+                                        onChanged: (val) {
+                                          MarkVoiceAssistantService.toggleMarkAssistant(context);
+                                          setModalState(() {});
+                                        },
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 20),
+
+                                  // Last Response Display Box
+                                  if (lastResponse.isNotEmpty) ...[
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade50,
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(color: Colors.blue.shade200),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: const [
+                                              Icon(Icons.record_voice_over_rounded, size: 16, color: Colors.blueAccent),
+                                              SizedBox(width: 6),
+                                              Text(
+                                                'Mark Last Spoken Response',
+                                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            lastResponse,
+                                            style: const TextStyle(fontSize: 13, color: AppTheme.textDark, fontWeight: FontWeight.w500),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+
+                                  // Hands-Free Command Card
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.bgLight,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: AppTheme.borderGrey),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Row(
                                               children: [
-                                                Icon(
-                                                  isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_rounded,
-                                                  size: 14,
-                                                  color: AppTheme.primary,
-                                                ),
-                                                const SizedBox(width: 4),
+                                                Icon(Icons.info_outline_rounded, size: 16, color: AppTheme.primary),
+                                                SizedBox(width: 6),
                                                 Text(
-                                                  isSpeaking ? 'Stop Voice' : 'Read Summary (Male Voice)',
-                                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                                  'Hands-Free Voice Commands',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppTheme.primary,
+                                                  ),
                                                 ),
                                               ],
                                             ),
+                                            InkWell(
+                                              onTap: () {
+                                                if (isSpeaking) {
+                                                  VoiceHelper.stopSpeaking();
+                                                } else {
+                                                  VoiceHelper.readScreenContext(location);
+                                                }
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: AppTheme.primary.withValues(alpha: 0.1),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_rounded,
+                                                      size: 14,
+                                                      color: AppTheme.primary,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      isSpeaking ? 'Stop Voice' : 'Read Summary',
+                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        const Text(
+                                          'Example Voice Triggers:\n'
+                                          '• "Hey Mark, show me the team section"\n'
+                                          '• "Hello Mark, open helpdesk"\n'
+                                          '• "Mark, apply casual leave for tomorrow"\n'
+                                          '• "Hey Mark, send message to Vinodh that I\'m on the way"\n'
+                                          '• "Hello Mark, send a mail to Vinodh that the meeting is postponed"',
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                            color: AppTheme.textDark,
+                                            height: 1.45,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
-                                    const Text(
-                                      'Example Voice Triggers:\n'
-                                      '• "Hey Mark, show me the team section"\n'
-                                      '• "Hello Mark, open helpdesk"\n'
-                                      '• "Mark, apply casual leave for tomorrow"\n'
-                                      '• "Hey Mark, send message to Vinodh that I\'m on the way"\n'
-                                      '• "Hello Mark, send a mail to Vinodh that the meeting is postponed"',
-                                      style: TextStyle(
-                                        fontSize: 12.5,
-                                        color: AppTheme.textDark,
-                                        height: 1.45,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              const SizedBox(height: 24),
-
-                              // Quick Action Buttons
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: markEnabled ? AppTheme.primary : Colors.grey.shade700,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                        elevation: 0,
-                                      ),
-                                      icon: Icon(markEnabled ? Icons.mic_rounded : Icons.mic_off_rounded),
-                                      label: Text(
-                                        markEnabled ? 'Mark Assistant ON' : 'Turn ON Mark Assistant',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
-                                      ),
-                                      onPressed: () {
-                                        MarkVoiceAssistantService.toggleMarkAssistant(context);
-                                        setModalState(() {});
-                                      },
-                                    ),
                                   ),
+
+                                  const SizedBox(height: 24),
+
+                                  // Quick Action Buttons
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: markEnabled ? AppTheme.primary : Colors.grey.shade700,
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(vertical: 14),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                            elevation: 0,
+                                          ),
+                                          icon: Icon(markEnabled ? Icons.mic_rounded : Icons.mic_off_rounded),
+                                          label: Text(
+                                            markEnabled ? 'Mark Assistant Active (Tap to Turn OFF)' : 'Turn ON Mark Voice Assistant',
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                                          ),
+                                          onPressed: () {
+                                            MarkVoiceAssistantService.toggleMarkAssistant(context);
+                                            setModalState(() {});
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                            ],
-                          ),
+                            );
+                          },
                         );
                       },
                     );

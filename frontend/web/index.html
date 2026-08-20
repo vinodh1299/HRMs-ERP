@@ -25,9 +25,9 @@
 
     // Force voice initialization on page load
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
+      try { window.speechSynthesis.getVoices(); } catch(e){}
       window.speechSynthesis.onvoiceschanged = function() {
-        window.speechSynthesis.getVoices();
+        try { window.speechSynthesis.getVoices(); } catch(e){}
       };
     }
 
@@ -42,6 +42,7 @@
 
       if (_activeRecognition) {
         try { _activeRecognition.abort(); } catch(e){}
+        _activeRecognition = null;
       }
 
       var recognition = new SpeechRecognition();
@@ -52,9 +53,11 @@
       recognition.onresult = function(event) {
         var lastResultIndex = event.results.length - 1;
         var text = event.results[lastResultIndex][0].transcript;
+        console.log("[SpeechRecognition Result]:", text);
         if (onResult) onResult(text);
       };
       recognition.onerror = function(event) {
+        console.warn("[SpeechRecognition Error]:", event.error);
         if (onError) onError(event.error || "Speech recognition error");
       };
       recognition.onend = function() {
@@ -84,7 +87,6 @@
       var voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return null;
 
-      // Priority list for clear male voices
       var maleKeywords = ['male', 'daniel', 'alex', 'oliver', 'george', 'david', 'arthur', 'ryan', 'aaron', 'google uk english male', 'google us english male'];
       
       for (var i = 0; i < maleKeywords.length; i++) {
@@ -95,16 +97,15 @@
         if (found) return found;
       }
 
-      // Secondary fallback to English voice
       return voices.find(function(v) { return v.lang.startsWith('en'); }) || voices[0];
     }
 
     // High-Quality Male Voice Synthesis Routine
     window.speakText = function(text, onStart, onEnd) {
-      if (!('speechSynthesis' in window)) return;
-      
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
+      if (!('speechSynthesis' in window)) {
+        if (onEnd) onEnd();
+        return;
+      }
 
       var cleanText = String(text)
         .replace(/[\#\*\_\`\~]/g, '')
@@ -117,34 +118,45 @@
         return;
       }
 
-      var utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.rate = 1.0;
-      utterance.pitch = 0.9; // Clear, deep male voice tone
-      utterance.lang = 'en-US';
+      try { window.speechSynthesis.cancel(); } catch(e){}
 
-      var maleVoice = getBestMaleVoice();
-      if (maleVoice) {
-        utterance.voice = maleVoice;
-      }
+      // 50ms delay to prevent Chrome speech audio cancellation bug
+      setTimeout(function() {
+        try {
+          var utterance = new SpeechSynthesisUtterance(cleanText);
+          utterance.volume = 1.0;
+          utterance.rate = 1.0;
+          utterance.pitch = 0.85; // Natural male voice pitch
+          utterance.lang = 'en-US';
 
-      utterance.onstart = function() {
-        if (onStart) onStart();
-      };
-      utterance.onend = function() {
-        if (onEnd) onEnd();
-      };
-      utterance.onerror = function(e) {
-        if (onEnd) onEnd();
-      };
+          try {
+            var maleVoice = getBestMaleVoice();
+            if (maleVoice) utterance.voice = maleVoice;
+          } catch(ve){}
 
-      _currentSpeechEndCallback = onEnd;
+          utterance.onstart = function() {
+            console.log("[SpeechSynthesis Started]:", cleanText);
+            if (onStart) onStart();
+          };
+          utterance.onend = function() {
+            console.log("[SpeechSynthesis Ended]");
+            if (onEnd) onEnd();
+          };
+          utterance.onerror = function(e) {
+            console.warn("[SpeechSynthesis Error]:", e);
+            if (onEnd) onEnd();
+          };
 
-      // Resume speech synthesis engine in case browser paused audio queue
-      if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-      }
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
 
-      window.speechSynthesis.speak(utterance);
+          window.speechSynthesis.speak(utterance);
+        } catch(err) {
+          console.error("[SpeechSynthesis Exception]:", err);
+          if (onEnd) onEnd();
+        }
+      }, 50);
     };
 
     window.stopSpeaking = function() {
