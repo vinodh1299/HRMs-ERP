@@ -23,6 +23,29 @@
     var _currentSpeechEndCallback = null;
     var _activeRecognition = null;
     var _isContinuousListening = false;
+    var _audioCtx = null;
+
+    // Web Audio API Audio Chime Generator to guarantee audible feedback
+    function playAudioChime() {
+      try {
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!_audioCtx) _audioCtx = new AudioCtx();
+        if (_audioCtx.state === 'suspended') {
+          _audioCtx.resume();
+        }
+        var osc = _audioCtx.createOscillator();
+        var gain = _audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, _audioCtx.currentTime); // D5 note
+        gain.gain.setValueAtTime(0.15, _audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, _audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(_audioCtx.destination);
+        osc.start();
+        osc.stop(_audioCtx.currentTime + 0.3);
+      } catch(e){}
+    }
 
     // Force voice initialization on page load
     if ('speechSynthesis' in window) {
@@ -38,7 +61,6 @@
         navigator.mediaDevices.getUserMedia({ audio: true })
           .then(function(stream) {
             console.log("[Microphone Permission Granted]");
-            // Stop tracks so mic indicator doesn't stay stuck red
             stream.getTracks().forEach(function(track) { track.stop(); });
           })
           .catch(function(err) {
@@ -64,16 +86,14 @@
       }
 
       var recognition = new SpeechRecognition();
-      recognition.continuous = !!continuous;
+      recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
 
       recognition.onresult = function(event) {
         var transcript = '';
         for (var i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal || event.results[i][0].confidence > 0.3) {
-            transcript += event.results[i][0].transcript;
-          }
+          transcript += event.results[i][0].transcript;
         }
         transcript = transcript.trim();
         if (transcript) {
@@ -93,7 +113,6 @@
       recognition.onend = function() {
         console.log("[SpeechRecognition Ended]");
         if (onEnd) onEnd();
-        // Auto-restart if continuous listening is requested
         if (_isContinuousListening && _activeRecognition === recognition) {
           setTimeout(function() {
             try { recognition.start(); } catch(e){}
@@ -121,25 +140,6 @@
       }
     };
 
-    // Preferred Male Voice Selection Routine for "Mark"
-    function getBestMaleVoice() {
-      if (!('speechSynthesis' in window)) return null;
-      var voices = window.speechSynthesis.getVoices();
-      if (!voices || voices.length === 0) return null;
-
-      var maleKeywords = ['male', 'daniel', 'alex', 'oliver', 'george', 'david', 'arthur', 'ryan', 'aaron', 'google uk english male', 'google us english male'];
-      
-      for (var i = 0; i < maleKeywords.length; i++) {
-        var kw = maleKeywords[i];
-        var found = voices.find(function(v) {
-          return v.name.toLowerCase().includes(kw) && v.lang.startsWith('en');
-        });
-        if (found) return found;
-      }
-
-      return voices.find(function(v) { return v.lang.startsWith('en'); }) || voices[0];
-    }
-
     // High-Quality Male Voice Synthesis Routine
     window.speakText = function(text, onStart, onEnd) {
       if (!('speechSynthesis' in window)) {
@@ -147,9 +147,11 @@
         return;
       }
 
+      playAudioChime();
+
       var cleanText = String(text)
         .replace(/[\#\*\_\`\~]/g, '')
-        .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋|⚠️|🚫|🎙️|🔊/g, '')
+        .replace(/🚀|📅|⏰|📢|👥|💰|🎓|🍳|💻|📹|🛠️|📋|🎫|ℹ️|✅|❌|👋|⚠️|🚫|🎙️|🔊|🏠|⚙️|💬|📧|🤖/g, '')
         .replace(/\s+/g, ' ')
         .trim();
       
@@ -160,19 +162,13 @@
 
       try { window.speechSynthesis.cancel(); } catch(e){}
 
-      // 50ms delay to prevent Chrome speech audio cancellation bug
       setTimeout(function() {
         try {
           var utterance = new SpeechSynthesisUtterance(cleanText);
           utterance.volume = 1.0;
           utterance.rate = 1.0;
-          utterance.pitch = 0.85; // Natural male voice pitch
+          utterance.pitch = 0.85; // Clear deep male voice tone
           utterance.lang = 'en-US';
-
-          try {
-            var maleVoice = getBestMaleVoice();
-            if (maleVoice) utterance.voice = maleVoice;
-          } catch(ve){}
 
           utterance.onstart = function() {
             console.log("[SpeechSynthesis Started]:", cleanText);

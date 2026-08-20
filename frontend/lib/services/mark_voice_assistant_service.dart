@@ -129,8 +129,9 @@ class MarkVoiceAssistantService {
     final router = globalContext != null ? GoRouter.of(globalContext!) : null;
 
     // 1. Navigation Actions
-    if (c.contains('team') || c.contains('my team') || c.contains('members')) {
-      const resp = "Opening your team section now.";
+    // Chat / Team / Messaging Route
+    if (c.contains('chat') || c.contains('message') || c.contains('messages') || c.contains('messaging') || c.contains('team') || c.contains('my team') || c.contains('members') || c.contains('conversation')) {
+      const resp = "Opening your team chat section now.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🚀 Mark: $resp');
@@ -138,8 +139,9 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    if (c.contains('helpdesk') || c.contains('ticket') || c.contains('support')) {
-      const resp = "Opening Helpdesk portal.";
+    // Helpdesk / Support Route
+    if (c.contains('helpdesk') || c.contains('help desk') || c.contains('ticket') || c.contains('tickets') || c.contains('support') || c.contains('issue')) {
+      const resp = "Opening Helpdesk support portal.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('🎫 Mark: $resp');
@@ -147,8 +149,9 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    if (c.contains('leave') || c.contains('holiday') || c.contains('sick leave') || c.contains('casual leave')) {
-      const resp = "Opening your leave balances.";
+    // Leave / Me Profile Route
+    if (c.contains('leave') || c.contains('leaves') || c.contains('holiday') || c.contains('sick leave') || c.contains('casual leave') || c.contains('vacation') || c.contains('time off') || c.contains('me') || c.contains('profile')) {
+      const resp = "Opening your leave balances and profile overview.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('📅 Mark: $resp');
@@ -156,7 +159,8 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    if (c.contains('finance') || c.contains('pay') || c.contains('salary') || c.contains('payslip')) {
+    // Finance / Salary Route
+    if (c.contains('finance') || c.contains('finances') || c.contains('pay') || c.contains('salary') || c.contains('payslip') || c.contains('payroll') || c.contains('expense')) {
       const resp = "Opening your finance overview.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
@@ -165,7 +169,28 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    if (c.contains('dashboard') || c.contains('home')) {
+    // Mail / Inbox Route
+    if (c.contains('mail') || c.contains('email') || c.contains('inbox')) {
+      const resp = "Opening your email inbox.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('📧 Mark: $resp');
+      router?.go('/mail');
+      return;
+    }
+
+    // Org Directory Route
+    if (c.contains('org') || c.contains('organization') || c.contains('directory') || c.contains('employees') || c.contains('structure')) {
+      const resp = "Opening Organization directory.";
+      lastResponseNotifier.value = resp;
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('👥 Mark: $resp');
+      router?.go('/org');
+      return;
+    }
+
+    // Home Dashboard Route
+    if (c.contains('dashboard') || c.contains('home') || c.contains('main')) {
       const resp = "Navigating to Home Dashboard.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
@@ -174,8 +199,9 @@ class MarkVoiceAssistantService {
       return;
     }
 
-    if (c.contains('admin') || c.contains('control panel')) {
-      const resp = "Opening Admin Panel.";
+    // Admin Panel Route
+    if (c.contains('admin') || c.contains('control panel') || c.contains('settings') || c.contains('manager')) {
+      const resp = "Opening Admin Control Panel.";
       lastResponseNotifier.value = resp;
       VoiceHelper.speak(resp, force: true);
       _showFeedbackSnackBar('⚙️ Mark: $resp');
