@@ -1,6 +1,7 @@
 import express from 'express';
 import agentService from '../services/ai/agentService.js';
 import ragService from '../services/ai/ragService.js';
+import edgeTtsService from '../services/ai/edgeTtsService.js';
 
 const router = express.Router();
 
@@ -11,14 +12,15 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'HRMS-AI Engine',
-    provider: 'ElevenLabs + Self-Hosted Open Weights',
+    provider: 'Microsoft Edge Neural TTS + Self-Hosted Open Weights',
     elevenLabsEnabled: !!process.env.ELEVENLABS_API_KEY,
+    edgeTtsEnabled: true,
     timestamp: new Date().toISOString()
   });
 });
 
 /**
- * ElevenLabs Text-to-Speech Endpoint
+ * High-Clarity Text-to-Speech Endpoint (ElevenLabs + Edge TTS Neural Voices)
  */
 router.post('/tts', async (req, res) => {
   try {
@@ -28,43 +30,48 @@ router.post('/tts', async (req, res) => {
     }
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
-    // Default ElevenLabs Deep Male Voice ID ("Adam")
-    const targetVoice = voiceId || 'pNInz6obpgDQGcFmaJgB';
 
+    // 1. If ElevenLabs API Key is configured, use ElevenLabs
     if (apiKey) {
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${targetVoice}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'xi-api-key': apiKey,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_monolingual_v1',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
+      try {
+        const targetVoice = voiceId || 'pNInz6obpgDQGcFmaJgB'; // Adam male voice
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${targetVoice}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'xi-api-key': apiKey,
           },
-        }),
-      });
+          body: JSON.stringify({
+            text,
+            model_id: 'eleven_monolingual_v1',
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+            },
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error(`ElevenLabs API error: ${response.statusText}`);
+        if (response.ok) {
+          const audioBuffer = await response.arrayBuffer();
+          res.set('Content-Type', 'audio/mpeg');
+          return res.send(Buffer.from(audioBuffer));
+        }
+      } catch (e) {
+        console.warn('[ElevenLabs Fallback to EdgeTTS]:', e.message);
       }
+    }
 
-      const audioBuffer = await response.arrayBuffer();
+    // 2. Microsoft Edge Neural TTS (100% Free, Unlimited, Crisp Deep Male Voice)
+    try {
+      const audioBuffer = await edgeTtsService.generateSpeechBuffer(text, voiceId);
       res.set('Content-Type', 'audio/mpeg');
-      return res.send(Buffer.from(audioBuffer));
-    } else {
-      // Return TTS metadata fallback if key not configured
-      return res.json({
-        fallback: true,
-        message: 'ElevenLabs key not set. Using high-clarity Web Audio Speech engine.',
-        text
-      });
+      return res.send(audioBuffer);
+    } catch (edgeErr) {
+      console.error('[EdgeTTS Generation Error]:', edgeErr);
+      return res.status(500).json({ error: 'TTS Synthesis Error', details: edgeErr.message });
     }
   } catch (err) {
-    console.error('[ElevenLabs TTS Error]:', err);
+    console.error('[HRMS-AI TTS Route Error]:', err);
     res.status(500).json({ error: 'TTS Generation Error', details: err.message });
   }
 });
