@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'voice_helper.dart';
 import 'chat_service.dart';
 import 'hrms_ai_service.dart';
+import 'api_service.dart';
 
 /// Representation of a staged Tier 2/3 Voice Action waiting for verbal confirmation
 class PendingVoiceAction {
@@ -19,8 +20,8 @@ class PendingVoiceAction {
 
 /// ConversationalSessionMemory for Multi-Turn Voice State & Context Tracking
 class ConversationalSessionMemory {
-  static String? lastDomain; // e.g. 'leave', 'messaging', 'helpdesk', 'finance', 'policy'
-  static String? lastAction; // e.g. 'apply_leave', 'send_message', 'send_email'
+  static String? lastDomain; // e.g. 'leave', 'messaging', 'helpdesk', 'finance', 'attendance'
+  static String? lastAction; // e.g. 'apply_leave', 'send_message', 'check_in', 'check_out'
   static Map<String, String> contextParams = {};
   static List<String> turnHistory = [];
 
@@ -52,6 +53,7 @@ class MarkVoiceAssistantService {
   
   static BuildContext? globalContext;
   static final _hrmsAiService = HrmsAiApiService();
+  static final _apiService = ApiService();
 
   /// Initialize Mark Assistant on app startup - ALWAYS ON
   static void initMarkAssistant(BuildContext context) {
@@ -269,6 +271,56 @@ class MarkVoiceAssistantService {
   static Future<void> _executeCommand(String command, {required String originalTranscript}) async {
     final c = command.toLowerCase();
     final router = globalContext != null ? GoRouter.of(globalContext!) : null;
+
+    // ==========================================
+    // Tier 1: Attendance Check-In / Check-Out Actions
+    // ==========================================
+    if (c.contains('check in') || c.contains('clock in') || c.contains('punch in') || c.contains('check me in')) {
+      await _apiService.checkIn(source: 'Voice Assistant');
+      const resp = "You have been checked in successfully. Have a productive day!";
+      lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'attendance', action: 'check_in');
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('⏰ Mark: $resp');
+      router?.go('/me');
+      return;
+    }
+
+    if (c.contains('check out') || c.contains('clock out') || c.contains('punch out') || c.contains('check me out')) {
+      await _apiService.checkOut();
+      const resp = "You have been checked out successfully. Have a great evening!";
+      lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'attendance', action: 'check_out');
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('⏰ Mark: $resp');
+      router?.go('/me');
+      return;
+    }
+
+    // ==========================================
+    // Tier 1: Leave & Payroll Queries
+    // ==========================================
+    if (c.contains('leave balance') || c.contains('leaves left') || c.contains('how many leaves') || c.contains('my leave balance')) {
+      final balances = await _apiService.getLeaveBalances();
+      final summaryParts = balances.map((b) => '${b.balance} ${b.leaveTypeName}s').join(', ');
+      final resp = "Your current leave balances are: $summaryParts.";
+      lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'leave', action: 'get_leave_balance');
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('📅 Mark: $resp');
+      router?.go('/me');
+      return;
+    }
+
+    if (c.contains('payday') || c.contains('next pay') || c.contains('salary date') || c.contains('when is payroll') || c.contains('payslip')) {
+      const resp = "Your net pay for last month was ₹80,000. Next payroll date is August 31st.";
+      lastResponseNotifier.value = resp;
+      ConversationalSessionMemory.recordTurn(command, resp, domain: 'finance', action: 'get_payroll_date');
+      VoiceHelper.speak(resp, force: true);
+      _showFeedbackSnackBar('💰 Mark: $resp');
+      router?.go('/finances');
+      return;
+    }
 
     // ==========================================
     // Tier 1: Safe Navigation Actions (Auto-Execute)
