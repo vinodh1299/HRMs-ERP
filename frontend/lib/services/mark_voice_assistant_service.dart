@@ -7,13 +7,22 @@ import 'hrms_ai_service.dart';
 /// MarkVoiceAssistantService
 /// Always-Listening Voice Assistant ("Mark") for Asian Christian Academy HRMS Portal.
 class MarkVoiceAssistantService {
-  static final ValueNotifier<bool> markEnabledNotifier = ValueNotifier<bool>(false);
+  // Enabled ON by default when the app starts
+  static final ValueNotifier<bool> markEnabledNotifier = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> isAwakeNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<String> lastCommandNotifier = ValueNotifier<String>('');
-  static final ValueNotifier<String> lastResponseNotifier = ValueNotifier<String>('');
+  static final ValueNotifier<String> lastResponseNotifier = ValueNotifier<String>('Mark Listening... (Say "Hey Mark")');
   static BuildContext? globalContext;
 
   static final _hrmsAiService = HrmsAiApiService();
+
+  /// Initialize Mark Assistant
+  static void initMarkAssistant(BuildContext context) {
+    globalContext = context;
+    if (markEnabledNotifier.value) {
+      _startAlwaysListening();
+    }
+  }
 
   /// Initialize or Toggle Mark Assistant ON/OFF
   static void toggleMarkAssistant(BuildContext context) {

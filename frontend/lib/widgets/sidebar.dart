@@ -5,7 +5,9 @@ import '../core/responsive.dart';
 import '../core/theme.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/mark_voice_assistant_service.dart';
 import 'voice_assistant_widget.dart';
+import 'bottom_listening_popup.dart';
 
 class NavItem {
   final String title;
@@ -19,11 +21,16 @@ class NavItem {
   });
 }
 
-class NavigationShell extends ConsumerWidget {
+class NavigationShell extends ConsumerStatefulWidget {
   final Widget child;
 
   const NavigationShell({super.key, required this.child});
 
+  @override
+  ConsumerState<NavigationShell> createState() => _NavigationShellState();
+}
+
+class _NavigationShellState extends ConsumerState<NavigationShell> {
   static const List<NavItem> _stubItems = [
     NavItem(title: 'Performance', icon: Icons.speed, path: '/stubs/performance'),
     NavItem(title: 'Recruitment', icon: Icons.work_outline, path: '/stubs/recruitment'),
@@ -31,6 +38,16 @@ class NavigationShell extends ConsumerWidget {
     NavItem(title: 'Assets', icon: Icons.devices, path: '/stubs/assets'),
     NavItem(title: 'Reports', icon: Icons.bar_chart_outlined, path: '/stubs/reports'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        MarkVoiceAssistantService.initMarkAssistant(context);
+      }
+    });
+  }
 
   List<NavItem> _getNavItems(WidgetRef ref) {
     final authState = ref.watch(authProvider);
@@ -49,14 +66,12 @@ class NavigationShell extends ConsumerWidget {
   int _getSelectedIndex(BuildContext context, List<NavItem> navItems) {
     final location = GoRouterState.of(context).matchedLocation;
     
-    // Exact matching for main items
     for (int i = 0; i < navItems.length; i++) {
       if (location == navItems[i].path || location.startsWith('${navItems[i].path}/')) {
         return i;
       }
     }
     
-    // For stub items, return a negative index or map if needed
     for (int i = 0; i < _stubItems.length; i++) {
       if (location == _stubItems[i].path) {
         return navItems.length + i;
@@ -79,7 +94,7 @@ class NavigationShell extends ConsumerWidget {
     if (location.startsWith('/me')) return 1;
     if (location.startsWith('/mail')) return 2;
     if (location.startsWith('/chat')) return 3;
-    return 4; // 'More'
+    return 4;
   }
 
   void _onMobileItemTapped(BuildContext context, int index, WidgetRef ref) {
@@ -123,7 +138,6 @@ class NavigationShell extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Pull bar indicator
               Container(
                 width: 38,
                 height: 4.5,
@@ -174,15 +188,15 @@ class NavigationShell extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          Navigator.pop(context); // Close sheet
-          context.go(path); // Navigate
+          Navigator.pop(context);
+          context.go(path);
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            color: color.withOpacity(0.06),
+            color: color.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.12), width: 1),
+            border: Border.all(color: color.withValues(alpha: 0.12), width: 1),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -190,7 +204,7 @@ class NavigationShell extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -213,19 +227,18 @@ class NavigationShell extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final navItems = _getNavItems(ref);
     final selectedIndex = _getSelectedIndex(context, navItems);
     final isMobile = Responsive.isMobile(context);
     final isTablet = Responsive.isTablet(context);
 
-    // Top Header bar containing Profile Avatar & Org Info
     final AppBar appBar = AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
-      shape: Border(bottom: BorderSide(color: AppTheme.borderGrey, width: 1)),
+      shape: const Border(bottom: BorderSide(color: AppTheme.borderGrey, width: 1)),
       title: Row(
         children: [
           Container(
@@ -290,16 +303,16 @@ class NavigationShell extends ConsumerWidget {
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const CircleAvatar(
+              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.white24,
                   child: Text('V', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(width: 6),
-                const Text('My Profile', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
-                const SizedBox(width: 4),
-                const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white70, size: 16),
+                SizedBox(width: 6),
+                Text('My Profile', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+                SizedBox(width: 4),
+                Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white70, size: 16),
               ]),
             ),
             itemBuilder: (context) {
@@ -335,13 +348,15 @@ class NavigationShell extends ConsumerWidget {
       ),
     );
 
+    Widget contentBody;
+
     if (isMobile) {
       final location = GoRouterState.of(context).matchedLocation;
       final mobileSelectedIndex = _getMobileSelectedIndex(location);
 
-      return Scaffold(
+      contentBody = Scaffold(
         appBar: appBar,
-        body: child,
+        body: widget.child,
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
@@ -379,10 +394,8 @@ class NavigationShell extends ConsumerWidget {
           ],
         ),
       );
-    }
-
-    if (isTablet) {
-      return Scaffold(
+    } else if (isTablet) {
+      contentBody = Scaffold(
         appBar: appBar,
         body: Row(
           children: [
@@ -391,9 +404,9 @@ class NavigationShell extends ConsumerWidget {
               child: NavigationRail(
                 backgroundColor: Colors.transparent,
                 selectedIconTheme: const IconThemeData(color: AppTheme.sidebarSelected),
-                unselectedIconTheme: IconThemeData(color: AppTheme.sidebarText.withOpacity(0.5)),
+                unselectedIconTheme: IconThemeData(color: Colors.white54),
                 selectedLabelTextStyle: const TextStyle(color: AppTheme.sidebarSelected, fontSize: 12, fontWeight: FontWeight.bold),
-                unselectedLabelTextStyle: TextStyle(color: AppTheme.sidebarText.withOpacity(0.6), fontSize: 12),
+                unselectedLabelTextStyle: const TextStyle(color: Colors.white60, fontSize: 12),
                 labelType: NavigationRailLabelType.all,
                 destinations: [
                   ...navItems.map((item) => NavigationRailDestination(
@@ -410,82 +423,88 @@ class NavigationShell extends ConsumerWidget {
               ),
             ),
             const VerticalDivider(width: 1, thickness: 1, color: AppTheme.borderGrey),
-            Expanded(child: child),
+            Expanded(child: widget.child),
+          ],
+        ),
+      );
+    } else {
+      contentBody = Scaffold(
+        backgroundColor: AppTheme.bgLight,
+        appBar: appBar,
+        body: Row(
+          children: [
+            Container(
+              width: 235,
+              decoration: const BoxDecoration(
+                gradient: AppTheme.navGradient,
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Text(
+                            'CORE MODULES',
+                            style: TextStyle(
+                              color: AppTheme.sidebarText.withValues(alpha: 0.45),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        ...List.generate(navItems.length, (index) {
+                          final item = navItems[index];
+                          final isSelected = selectedIndex == index;
+                          return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, index, navItems));
+                        }),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          child: Divider(color: Colors.white.withValues(alpha: 0.08), height: 1),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Text(
+                            'OTHER MODULES',
+                            style: TextStyle(
+                              color: AppTheme.sidebarText.withValues(alpha: 0.45),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        ...List.generate(_stubItems.length, (index) {
+                          final item = _stubItems[index];
+                          final globalIndex = navItems.length + index;
+                          final isSelected = selectedIndex == globalIndex;
+                          return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, globalIndex, navItems));
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                color: AppTheme.bgLight,
+                child: widget.child,
+              ),
+            ),
           ],
         ),
       );
     }
 
-    // Desktop: Left Sidebar — dark navy
-    return Scaffold(
-      backgroundColor: AppTheme.bgLight,
-      appBar: appBar,
-      body: Row(
-        children: [
-          Container(
-            width: 235,
-            decoration: const BoxDecoration(
-              gradient: AppTheme.navGradient,
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        child: Text(
-                          'CORE MODULES',
-                          style: TextStyle(
-                            color: AppTheme.sidebarText.withOpacity(0.45),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ),
-                      ...List.generate(navItems.length, (index) {
-                        final item = navItems[index];
-                        final isSelected = selectedIndex == index;
-                        return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, index, navItems));
-                      }),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                        child: Divider(color: Colors.white.withOpacity(0.08), height: 1),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        child: Text(
-                          'OTHER MODULES',
-                          style: TextStyle(
-                            color: AppTheme.sidebarText.withOpacity(0.45),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ),
-                      ...List.generate(_stubItems.length, (index) {
-                        final item = _stubItems[index];
-                        final globalIndex = navItems.length + index;
-                        final isSelected = selectedIndex == globalIndex;
-                        return _buildSidebarButton(context, item, isSelected, () => _onItemTapped(context, globalIndex, navItems));
-                      }),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: AppTheme.bgLight,
-              child: child,
-            ),
-          ),
-        ],
-      ),
+    return Stack(
+      children: [
+        contentBody,
+        const BottomListeningPopUpWidget(),
+      ],
     );
   }
 
@@ -493,10 +512,10 @@ class NavigationShell extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
       decoration: BoxDecoration(
-        color: isSelected ? Colors.white.withOpacity(0.10) : Colors.transparent,
+        color: isSelected ? Colors.white.withValues(alpha: 0.10) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         border: isSelected
-            ? Border.all(color: Colors.white.withOpacity(0.10), width: 1)
+            ? Border.all(color: Colors.white.withValues(alpha: 0.10), width: 1)
             : null,
       ),
       child: Material(
@@ -504,13 +523,12 @@ class NavigationShell extends ConsumerWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(10),
-          hoverColor: Colors.white.withOpacity(0.06),
-          splashColor: Colors.white.withOpacity(0.08),
+          hoverColor: Colors.white.withValues(alpha: 0.06),
+          splashColor: Colors.white.withValues(alpha: 0.08),
           child: SizedBox(
             height: 42,
             child: Row(
               children: [
-                // Selected indicator
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 3,
@@ -522,7 +540,7 @@ class NavigationShell extends ConsumerWidget {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: AppTheme.sidebarSelected.withOpacity(0.7),
+                              color: AppTheme.sidebarSelected.withValues(alpha: 0.7),
                               blurRadius: 8,
                               spreadRadius: 1,
                             )
@@ -535,7 +553,7 @@ class NavigationShell extends ConsumerWidget {
                   item.icon,
                   color: isSelected
                       ? AppTheme.sidebarSelected
-                      : AppTheme.sidebarText.withOpacity(0.55),
+                      : AppTheme.sidebarText.withValues(alpha: 0.55),
                   size: 19,
                 ),
                 const SizedBox(width: 12),
@@ -545,7 +563,7 @@ class NavigationShell extends ConsumerWidget {
                     style: TextStyle(
                       color: isSelected
                           ? Colors.white
-                          : AppTheme.sidebarText.withOpacity(0.70),
+                          : AppTheme.sidebarText.withValues(alpha: 0.70),
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
                       fontSize: 13,
                     ),
